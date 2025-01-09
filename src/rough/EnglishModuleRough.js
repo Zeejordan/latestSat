@@ -6,16 +6,15 @@ import { ENGLISH_MODULE, ENGLISH_SUBMIT_MODULE_FIRST, ENGLISH_SECOND_MODULE, ENG
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Octicons from 'react-native-vector-icons/Octicons';
-import Entypo from 'react-native-vector-icons/Entypo';
 import { COLORS, FONTS } from '../theme';
 import { useNavigation } from '@react-navigation/native';
 // import RenderHTML from 'react-native-render-html';
 import { WebView } from 'react-native-webview';
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import Entypo from 'react-native-vector-icons/Entypo';
 
-// stop stop stop stop stop stop stop 
-// stop stop stop stop stop HORIZONTAL SCROLL BAR QUESTION FUNCTIONALITY IS HERE
 const EnglishQuizModule1 = () => {
-
+    // stop stop stop stop stop
 
     const navigation = useNavigation();
     const [data, setData] = useState([]);
@@ -32,7 +31,6 @@ const EnglishQuizModule1 = () => {
 
     const [timeLeft, setTimeLeft] = useState(32 * 60);
     const [stopTimer, setStopTimer] = useState(false);
-
     const [statusData, setStatusData] = useState([]);
     const [showStatus, setShowStatus] = useState(false);
 
@@ -257,7 +255,6 @@ const EnglishQuizModule1 = () => {
         console.log("yaha dekh answers : ", answers)
     };
 
-
     const [markedForReview, setMarkedForReview] = useState({});
 
     const handleMarkForReview = (questionId) => {
@@ -419,6 +416,7 @@ const EnglishQuizModule1 = () => {
             </View>
         );
     };
+
     return (
         <SafeAreaView style={styles.mainContainer}>
             <View style={styles.container}>
@@ -467,14 +465,14 @@ const EnglishQuizModule1 = () => {
                         <View style={styles.buttonsContainer}>
                             <TouchableOpacity
                                 style={styles.navigateButton}
-                                onPress={() => navigation.goBack()}
                             >
                                 <Text style={styles.navigateText}>Go Back</Text>
                             </TouchableOpacity>
                             <TouchableOpacity
                                 style={styles.navigateButton}
                                 onPress={() => {
-                                    submitCheck("onSubmitClick");
+                                    submitCheck("onSubmitClick"); // Call SubmitCheck function
+                                    // navigation.navigate('English-Quiz-1'); // Navigate back to EnglishQuizModule1
                                 }}
                             >
                                 <Text style={styles.navigateText}>Finish</Text>
@@ -496,6 +494,10 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         paddingHorizontal: wp('3%'),
+    },
+    markForReviewContainer: {
+        flexDirection: 'row',
+        gap: 5
     },
     topBar: {
         flexDirection: 'row',
@@ -520,9 +522,31 @@ const styles = StyleSheet.create({
         paddingHorizontal: wp('3%'),
         marginTop: hp('2%'),
     },
+    questionTextReview: {
+        flexDirection: 'row',
+        justifyContent: 'center',
+        alignItems: 'center',
+        gap: 10
+    },
     questionText: {
         fontSize: hp('2.5%'),
         fontWeight: '600'
+    },
+    questionTextMain: {
+        fontSize: hp('2.5%'),
+        fontWeight: '600',
+        color: 'white',
+        textAlign: 'center',
+        // borderWidth: 1,
+        borderColor: '#0470B8',
+    },
+    questionBox: {
+        width: 40, // Adjust the size as needed
+        height: 40,
+        borderRadius: 20, // Half of width/height for perfect circle
+        backgroundColor: '#0470B8', // Example background color
+        alignItems: 'center',
+        justifyContent: 'center',
     },
     infoIcon: {
         fontSize: hp('2.6%')
@@ -622,6 +646,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#ccc',
     },
 
+
     horizontalScrollContainer: {
         paddingVertical: hp('1%'),
         paddingHorizontal: wp('2%'),
@@ -665,32 +690,6 @@ const styles = StyleSheet.create({
         position: 'absolute',
         top: -5,
         right: -5,
-    },
-    questionTextReview: {
-        flexDirection: 'row',
-        justifyContent: 'center',
-        alignItems: 'center',
-        gap: 10
-    },
-    questionTextMain: {
-        fontSize: hp('2.5%'),
-        fontWeight: '600',
-        color: 'white',
-        textAlign: 'center',
-        // borderWidth: 1,
-        borderColor: '#0470B8',
-    },
-    markForReviewContainer: {
-        flexDirection: 'row',
-        gap: 5
-    },
-    questionBox: {
-        width: 40, // Adjust the size as needed
-        height: 40,
-        borderRadius: 20, // Half of width/height for perfect circle
-        backgroundColor: '#0470B8', // Example background color
-        alignItems: 'center',
-        justifyContent: 'center',
     },
     statusPageContainer: {
         flex: 1,
@@ -756,4 +755,6 @@ const styles = StyleSheet.create({
     },
 })
 
-// iss code mai mai chahta hoon ki jab showStatus activate ho tab statusPage poore page pe display ho jo ki abhi nahi ho raha
+
+// stop stop stop stop stop stop
+// iss code mai EnglishQuizModule or statusPage mai jo function hai use sahi se link karna hia 

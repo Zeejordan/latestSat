@@ -1,4 +1,4 @@
-export const BASE_URL = "http://192.168.1.22:8000/api/"
+export const BASE_URL = "http://192.168.1.34:8000/api/"
 // export const BASE_URL = "https://bba6-2401-4900-7cc3-4450-5534-fc0-d659-26d8.ngrok-free.app/api/"
 export const LOGIN = BASE_URL + "user/login"                            // POST
 export const VERIFY_OTP = BASE_URL + "user/verify-otp"                  // POST

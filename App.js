@@ -87,6 +87,7 @@ import ModuleGap from './src/Pages/ModuleGap';
 import MathsQuiz from './src/Pages/MathsQuiz';
 import Statistics from './src/Pages/Statistics';
 import SelectSubject from './src/Pages/SelectSubject';
+import StatusPage from './src/Components/StatusPage';
 
 const Stack = createNativeStackNavigator();
 
@@ -115,6 +116,7 @@ const App = () => {
         <Stack.Screen name="Maths-Quiz" component={MathsQuiz} />
         <Stack.Screen name="Statistics" component={Statistics} />
         <Stack.Screen name="Select-Subject" component={SelectSubject} />
+        <Stack.Screen name="StatusPage" component={StatusPage} />
 
       </Stack.Navigator>
     </NavigationContainer>
