@@ -1,27 +1,22 @@
 import { StyleSheet, Text, View, SafeAreaView, TouchableOpacity, Image } from 'react-native';
-import React, { useState, useEffect, memo } from 'react';
+import React, { useState, useEffect, memo, useRef } from 'react';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
-// import FastImage from 'react-native-fast-image';
 import { useNavigation } from '@react-navigation/native';
 
 const ModuleGap = () => {
     const navigation = useNavigation();
     const [secondsLeft, setSecondsLeft] = useState(10 * 60);
-    const [hasNavigated, setHasNavigated] = useState(false);
-    // console.log("yeh hai gap module mai session id", sessionId) // correct
+    const hasNavigated = useRef(false);
+    const timerRef = useRef(null);
 
     useEffect(() => {
-        const timer = setInterval(() => {
+        timerRef.current = setInterval(() => {
             setSecondsLeft((prev) => {
                 if (prev <= 1) {
-                    clearInterval(timer);
-                    if (!hasNavigated) {
-                        setHasNavigated((prev) => !prev);
-                        try {
-                            navigation.navigate('Maths-Quiz')
-                        } catch (error) {
-                            console.error("An Error Occured", error)
-                        }
+                    clearInterval(timerRef.current);
+                    if (!hasNavigated.current) {
+                        hasNavigated.current = true;
+                        navigation.navigate('Maths-Quiz');
                     }
                     return 0;
                 }
@@ -29,8 +24,11 @@ const ModuleGap = () => {
             });
         }, 1000);
 
-        return () => clearInterval(timer);
-    }, []);
+        return () => {
+            clearInterval(timerRef.current);
+        };
+    }, [navigation]);
+
     const formatTime = (timer) => {
         const minutes = Math.floor(timer / 60);
         const seconds = timer % 60;
@@ -41,14 +39,13 @@ const ModuleGap = () => {
     };
 
     const handleNavigateToMath = () => {
-        if (!hasNavigated) {
-            try {
-                navigation.navigate('Maths-Quiz')
-            } catch (error) {
-                console.error("An Error Occured", error)
-            }
+        if (!hasNavigated.current) {
+            hasNavigated.current = true;
+            clearInterval(timerRef.current); // Stop the timer when skipping
+            navigation.navigate('Maths-Quiz');
         }
-    }
+    };
+
     return (
         <SafeAreaView style={styles.mainContainer}>
             <View style={styles.container}>

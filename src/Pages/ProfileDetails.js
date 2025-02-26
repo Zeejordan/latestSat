@@ -11,9 +11,6 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const ProfileDetails = ({ navigation }) => {
 
-
-    // const { userId } = route.params;
-
     const [name, setName] = useState('');
     const [phone, setPhone] = useState('');
     const [username, setUsername] = useState('');
@@ -22,63 +19,60 @@ const ProfileDetails = ({ navigation }) => {
 
     const registerProfileUrl = REGISTER_PROFILE;
 
-    // stop stop stop stop stop stop 
-
     const handleRegister = async () => {
+        if (!name.trim()) {
+            Alert.alert("Invalid Name", "Please enter a valid name.");
+            return;
+        }
 
-        if (!name) {
-            Alert.alert("Please Enter Your Name!")
+        if (!username.trim()) {
+            Alert.alert("Invalid Username", "Please enter a valid username.");
             return;
         }
-        if (!username) {
-            Alert.alert("Please Enter Your User Name!")
-            return;
-        }
-        if (!phone) {
-            Alert.alert("Please Enter Your Phone Number!")
+
+        const phoneRegex = /^[0-9]{10}$/;
+        if (!phone.trim() || !phoneRegex.test(phone)) {
+            Alert.alert("Invalid Phone Number", "Please enter a valid 10-digit phone number.");
             return;
         }
 
         setLoading(true);
 
-        const userId = await AsyncStorage.getItem('userId');
-        const token = await AsyncStorage.getItem('token');
-
-        console.log("yeh hai profile details pe user id", userId)
-        console.log("yeh hai profile details pe token", token)
-
-        const payload = {
-            "user_id": userId,
-            "name": name,
-            "username": username,
-            "phone_number": phone
-        }
         try {
+            const userId = await AsyncStorage.getItem('userId');
+            const token = await AsyncStorage.getItem('token');
+
+            console.log("User ID:", userId);
+            console.log("Token:", token);
+
+            const payload = {
+                "user_id": userId,
+                "name": name.trim(),
+                "username": username.trim(),
+                "phone_number": phone.trim(),
+            };
+
             const response = await axios.post(registerProfileUrl, payload, {
                 headers: {
                     'Authorization': `Bearer ${token}`,
-                    "Content-Type": "multipart/form-data"
-                }
+                    "Content-Type": "application/json",
+                },
             });
-            // const response = await axios.post(registerProfileUrl, payload, {
-            //     headers: {
-            //         'Authorization': `Bearer ${token}`,
-            //         "Content-Type": "application/json", // Usually better as JSON unless multipart required
-            //     }
-            // });
 
             console.log(response.data.message);
             if (response.data.message === "Profile created successfully.") {
-                navigation.navigate('HomeScreen')
+                navigation.navigate('HomeScreen');
+            } else {
+                Alert.alert("Error", response.data.message || "An error occurred.");
             }
-        }
-        catch (error) {
-            console.log("An Error Occured", error)
-        }
-        finally {
+        } catch (error) {
+            console.log("An error occurred:", error);
+            Alert.alert("Error", "An unexpected error occurred. Please try again.");
+        } finally {
             setLoading(false);
         }
-    }
+    };
+
 
     const handleNavigation = () => {
         navigation.navigate("HomeScreen")

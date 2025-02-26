@@ -1,127 +1,216 @@
-import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
-import React from 'react';
-import Entypo from 'react-native-vector-icons/Entypo';
-import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
+import React, { useEffect, useState } from "react";
+import { View, Text, ScrollView, StyleSheet, ActivityIndicator, SafeAreaView } from "react-native";
+import axios from "axios";
+import { QUIZ_ANSWERS } from "../../config/api";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const StatusPage = ({ route, navigation }) => {
-    const { statusData, SubmitCheck } = route.params; // Retrieve SubmitCheck function
+const QuizAnalysisPage = ({ route }) => {
+    const { userSession } = route.params;
+    const [data, setData] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+    const [flatlistData, setFlatlistData] = useState([]);
+    const [indexArray, setIndexArray] = useState([]);
+
+
+
+    useEffect(() => {
+        const fetchQuizAnswers = async () => {
+            const token = await AsyncStorage.getItem('token');
+            const baseUrlGet = QUIZ_ANSWERS + userSession + "/";
+            try {
+                const response = await axios.get(baseUrlGet, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        "Content-Type": "application/json"
+                    }
+                });
+                if (!response?.data?.error) {
+                    const modulesData = response?.data?.meta?.modules_data;
+                    setData(modulesData);
+                    console.log("YHE HAI DATA, OF MODULES", modulesData) // correct
+
+                    if (modulesData) {
+                        Object.keys(data).map((item) => {
+                            if (item.length > 0) {
+                                setFlatlistData(item);
+                            }
+                        })
+                        console.log('YEH AHI FLATLIST DATA', flatlistData) // output : math_module_2
+
+                        if (flatlistData) {
+                            const array = []
+                            flatlistData.map((item) => {
+                                if (item.index) {
+                                    array.push(item.index)
+                                }
+                            })
+                            setIndexArray((prev) => prev = array);
+                        }
+                        console.log('yeh hai index array ', indexArray)
+                    }
+                }
+            } catch (err) {
+                console.log(err.response);
+                setError("Failed to fetch data. Please try again later.");
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchQuizAnswers();
+    }, [userSession]);
+
+    if (loading) {
+        return (
+            <View style={styles.centeredContainer}>
+                <ActivityIndicator size="large" color="#007BFF" />
+            </View>
+        );
+    }
+
+    if (error) {
+        return (
+            <View style={styles.centeredContainer}>
+                <Text style={styles.errorText}>{error}</Text>
+            </View>
+        );
+    }
+
+    // return (
+    //     <ScrollView contentContainerStyle={styles.container}>
+    //         {Object.keys(data).map((moduleKey) => (
+    //             <View key={moduleKey} style={styles.moduleContainer}>
+    //                 <Text style={styles.moduleTitle}>{moduleKey.replace(/_/g, ' ').toUpperCase()}</Text>
+    //                 {data[moduleKey].map((item, index) => (
+    //                     <View key={index} style={styles.questionContainer}>
+    //                         <Text style={styles.questionText}>Question {index + 1}:</Text>
+    //                         <Text style={styles.content}>{item.Question || "No question provided."}</Text>
+    //                         <Text style={styles.answer}>Your Answer: {item.user_answer || "Not Answered"}</Text>
+    //                         <Text style={styles.correctAnswer}>Correct Answer: {item.correct_answer || "Not Provided"}</Text>
+    //                         <Text style={item.is_correct ? styles.correct : styles.incorrect}>
+    //                             {item.is_correct ? "Correct" : "Incorrect"}
+    //                         </Text>
+    //                     </View>
+    //                 ))}
+    //             </View>
+    //         ))}
+    //     </ScrollView>
+    // );
 
     return (
-        <View style={styles.statusPageContainer}>
-            <View style={styles.questionsBox}>
-                <Text style={styles.statusPageHeader}>Summary</Text>
-
-                <View style={styles.statusSummary}>
-                    {statusData.map((question) => (
-                        <View
-                            key={question.questionNo}
-                            style={[
-                                styles.statusItem,
-                                { backgroundColor: question.isAttempted ? '#0470B8' : '#ccc' },
-                            ]}
-                        >
-                            {question.isMarked && (
-                                <Entypo
-                                    name="bookmarks"
-                                    size={14}
-                                    color="red"
-                                    style={styles.bookmarkIcon}
-                                />
-                            )}
-                            <Text style={styles.statusText}>{question.questionNo}</Text>
-                        </View>
-                    ))}
-                </View>
-            </View>
-
-            <View style={styles.buttonsContainer}>
-                <TouchableOpacity
-                    style={styles.navigateButton}
-                    onPress={() => navigation.goBack()}
-                >
-                    <Text style={styles.navigateText}>Go Back</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                    style={styles.navigateButton}
-                    onPress={() => {
-                        SubmitCheck("onSubmitClick"); // Call SubmitCheck function
-                        navigation.navigate('English-Quiz-1'); // Navigate back to EnglishQuizModule1
-                    }}
-                >
-                    <Text style={styles.navigateText}>Finish</Text>
-                </TouchableOpacity>
-            </View>
-        </View>
+        <SafeAreaView></SafeAreaView>
     );
 };
 
-export default StatusPage;
-
 const styles = StyleSheet.create({
-    statusPageContainer: {
+    container: {
+        padding: 16,
+        backgroundColor: "#F9F9F9",
+    },
+    centeredContainer: {
         flex: 1,
-        padding: 20,
-        backgroundColor: '#fff',
-        justifyContent: 'center',
+        justifyContent: "center",
+        alignItems: "center",
+        backgroundColor: "#F9F9F9",
     },
-    statusPageHeader: {
-        fontSize: 24,
-        fontWeight: 'bold',
-        marginBottom: 20,
-        textAlign: 'center',
-        textDecorationLine: 'underline',
-        color: '#0470B8',
+    moduleContainer: {
+        marginBottom: 24,
+        backgroundColor: "#FFF",
+        borderRadius: 8,
+        padding: 16,
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+        elevation: 3,
     },
-    statusSummary: {
-        flexDirection: 'row',
-        flexWrap: 'wrap',
-        justifyContent: 'center',
+    moduleTitle: {
+        fontSize: 18,
+        fontWeight: "bold",
+        color: "#333",
+        marginBottom: 12,
     },
-    statusItem: {
-        width: 50,
-        height: 50,
-        justifyContent: 'center',
-        alignItems: 'center',
-        margin: 5,
-        borderWidth: 1,
-        borderRadius: 25,
-        borderColor: '#ccc',
-        position: 'relative', // Necessary for absolute positioning of the bookmark icon
+    questionContainer: {
+        marginBottom: 16,
     },
-    bookmarkIcon: {
-        position: 'absolute',
-        top: 5,
-        right: 5,
-    },
-    statusText: {
-        fontSize: 14,
-        fontWeight: 'bold',
-        color: '#fff', // Text color set to white for better contrast
-    },
-    buttonsContainer: {
-        flexDirection: 'row',
-        justifyContent: 'space-around',
-        marginTop: 20,
-    },
-    navigateButton: {
-        padding: 15,
-        borderRadius: 5,
-        backgroundColor: '#0470B8',
-    },
-    navigateText: {
-        color: '#fff',
+    questionText: {
         fontSize: 16,
-        fontWeight: '700',
+        fontWeight: "600",
+        color: "#007BFF",
     },
-    questionsBox: {
-        borderWidth: 1,
-        paddingHorizontal: 20,
-        paddingVertical: 20,
-        borderColor: '#ccc',
-        borderRadius: 10,
+    content: {
+        fontSize: 14,
+        color: "#555",
+        marginTop: 4,
+        marginBottom: 8,
+    },
+    answer: {
+        fontSize: 14,
+        color: "#FF5722",
+        marginBottom: 4,
+    },
+    correctAnswer: {
+        fontSize: 14,
+        color: "#4CAF50",
+        marginBottom: 4,
+    },
+    correct: {
+        fontSize: 14,
+        color: "#4CAF50",
+        fontWeight: "600",
+    },
+    incorrect: {
+        fontSize: 14,
+        color: "#F44336",
+        fontWeight: "600",
+    },
+    errorText: {
+        fontSize: 16,
+        color: "#F44336",
+        textAlign: "center",
     },
 });
 
-// stop stop stop stop stop stop stop
-// finish pe submit ki functionality properly achieve karni hai
+export default QuizAnalysisPage;
 
+// useEffect(() => {
+//     const fetchQuizAnswers = async () => {
+//         const token = await AsyncStorage.getItem('token');
+//         const baseUrlGet = QUIZ_ANSWERS + userSession + "/";
+//         try {
+//             const response = await axios.get(baseUrlGet, {
+//                 headers: {
+//                     'Authorization': `Bearer ${token}`,
+//                     "Content-Type": "application/json"
+//                 }
+//             });
+
+//             if (!response?.data?.error) {
+//                 const modulesData = response?.data?.meta?.modules_data;
+//                 setData(modulesData);
+//                 console.log("YHE HAI DATA, OF MODULES", modulesData); // correct
+
+//                 if (modulesData) {
+//                     // Collect flatlistData directly
+//                     const flatData = Object.keys(modulesData);
+//                     setFlatlistData(flatData);
+//                     console.log('YEH AHI FLATLIST DATA', flatData);
+
+//                     // Set indexArray based on flatlistData
+//                     const array = flatData.map(item => modulesData[item].map(subItem => subItem.index)).flat();
+//                     setIndexArray(array);
+//                     console.log('yeh hai index array ', array);
+//                 }
+//             }
+//         } catch (err) {
+//             console.log(err.response);
+//             setError("Failed to fetch data. Please try again later.");
+//         } finally {
+//             setLoading(false);
+//         }
+//     };
+
+//     fetchQuizAnswers();
+// }, [userSession]);
+//  use if for reference

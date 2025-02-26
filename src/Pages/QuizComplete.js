@@ -1,20 +1,64 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View, SafeAreaView, Image, TouchableOpacity } from 'react-native';
 // import FastImage from 'react-native-fast-image';
 import { LinearGradient } from 'expo-linear-gradient';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import { COLORS, FONTS } from '../theme';
 import { useNavigation } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
+import { MATHS_SECOND_MODULE_SUBMIT } from '../../config/api';
 
 const QuizComplete = ({ route }) => {
-    const { totalEnglishScore, totalMathScore, totalScore } = route.params;
-    console.log("YEH AHI SAARE TOTAL SCORES ENGLISH", totalEnglishScore) // null
-    console.log("YEH AHI SAARE TOTAL SCORES MATH", totalMathScore) // null
-    console.log("YEH AHI SAARE TOTAL SCORES ", totalScore) // null
+    const { answers } = route.params;
+    console.log("YEH Ahai ANSWERS IN QUIZ COMPLETE", answers) // null
+
+    const [totalScore, setTotalScore] = useState(null)
+    const [EnglishScore, setEnglishScore] = useState(null)
+    const [MathScore, setMathScore] = useState(null)
+
     const navigation = useNavigation();
     const handleNavigation = () => {
         navigation.navigate("HomeScreen")
     }
+
+    useEffect(() => {
+        const SubmitQuestions = async () => {
+            const token = await AsyncStorage.getItem('token');
+            const baseUrlPost2 = MATHS_SECOND_MODULE_SUBMIT
+            const sessionId = await AsyncStorage.getItem("sessionId");
+            console.log('yeh hai session id in quiz complete', sessionId)
+
+            const payload = {
+                session_id: sessionId,
+                answers,
+            }
+            console.log("yeh hai submit ka payload : ", payload);
+            try {
+                const response = await axios.post(baseUrlPost2, payload, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        "Content-Type": "application/json"
+                    }
+                })
+                if (!response?.data?.error) {
+                    console.log("EVERTHING IS FINE ")
+                    const ts = response.data.meta.final_scores.Total_score;
+                    const es = response.data.meta.final_scores.Total_English_score;
+                    const ms = response.data.meta.final_scores.Total_Math_score;
+
+                    setTotalScore(ts);
+                    setEnglishScore(es);
+                    setMathScore(ms);
+                }
+
+            } catch (error) {
+                console.log("An Error Occured", error)
+            }
+        }
+
+        SubmitQuestions()
+    }, [])
     return (
         <SafeAreaView style={styles.mainContainer}>
             <LinearGradient
@@ -24,11 +68,11 @@ const QuizComplete = ({ route }) => {
                 end={{ x: 0.5, y: 1 }}>
 
                 <View style={styles.container}>
-                    <View style={styles.threeStarsContainer}>
+                    {/* <View style={styles.threeStarsContainer}>
                         <Image
                             source={require('../../assets/images/threeStars.png')}
                         />
-                    </View>
+                    </View> */}
 
                     <View style={styles.completedContainer}>
                         <Text style={styles.completedText}>Completed</Text>
@@ -36,15 +80,15 @@ const QuizComplete = ({ route }) => {
 
                     <View style={styles.girlImageContainer}>
                         <Image
-                            source={require('../../assets/images/latest_quiz_complete.gif')}
+                            source={require('../../assets/images/goldenTrophy.png')}
                             style={styles.girlImage}
                         />
                     </View>
 
                     <View style={styles.scoreContainer}>
                         <Text style={styles.scoreText}>Total Score: {totalScore}</Text>
-                        <Text style={styles.scoreText}>Total English Score: {totalEnglishScore}</Text>
-                        <Text style={styles.scoreText}>Total Maths Score: {totalMathScore}</Text>
+                        <Text style={styles.scoreText}>Total English Score: {EnglishScore}</Text>
+                        <Text style={styles.scoreText}>Total Maths Score: {MathScore}</Text>
                     </View>
 
                     <View style={styles.bottomButtonsContainer}>
@@ -82,7 +126,7 @@ const styles = StyleSheet.create({
     },
 
     completedContainer: {
-        marginTop: hp('2.5%'),
+        marginTop: hp('5%'),
         justifyContent: 'center',
         alignItems: 'center',
 
@@ -114,11 +158,12 @@ const styles = StyleSheet.create({
     girlImageContainer: {
         justifyContent: 'center',
         alignItems: 'center',
+        marginVertical: hp('3%'),
     },
     girlImage: {
         resizeMode: 'contain',
-        height: hp('30%'),
-        width: hp('30%')
+        height: hp('40%'),
+        width: hp('40%')
     },
     nextText: {
         color: '#26A5E6',
@@ -147,10 +192,28 @@ const styles = StyleSheet.create({
         paddingVertical: hp('0.2%')
     },
     scoreContainer: {
-
+        backgroundColor: 'rgba(255, 255, 255, 0.15)',
+        borderRadius: 12,
+        paddingVertical: hp('2%'),
+        paddingHorizontal: wp('8%'),
+        marginTop: hp('3%'),
+        alignSelf: 'center',
+        width: '80%',
+        alignItems: 'center',
+        borderWidth: 1,
+        borderColor: 'rgba(255, 255, 255, 0.3)',
     },
+
     scoreText: {
         color: "white",
-        textAlign: 'center'
-    }
+        fontSize: hp('2.5%'),
+        fontWeight: '600',
+        textAlign: 'center',
+        marginVertical: hp('0.5%'),
+        textShadowColor: 'rgba(0, 0, 0, 0.3)',
+        textShadowOffset: { width: 1, height: 1 },
+        textShadowRadius: 3,
+    },
+
+
 })

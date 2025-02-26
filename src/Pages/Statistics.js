@@ -4,11 +4,13 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { COLORS, FONTS } from '../theme';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
+import Feather from "react-native-vector-icons/Feather";
 import Footer from '../Components/Footer';
-import { GET_USER_DETAILS, LOGOUT } from '../../config/api';
+import { GET_USER_DETAILS, LOGOUT, BASE_URL, IMG_URL } from '../../config/api';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
+
 
 const Statistics = () => {
 
@@ -33,7 +35,8 @@ const Statistics = () => {
                     "Content-Type": "application/json",
                 }
             })
-            setUserData(response?.data);
+            setUserData(response?.data?.meta);
+            console.log("THIS IS USERDATA PROFILE IMAGE", `${BASE_URL}${userData?.avatar_image_url}`)
 
         } catch (error) {
             console.log("An Error Occured", error)
@@ -52,7 +55,6 @@ const Statistics = () => {
             })
 
             if (!response?.data?.error) {
-                // console.log("everthing is good", response.data.message)
                 await AsyncStorage.removeItem('token');
                 await AsyncStorage.clear();
                 navigation.navigate("Login");
@@ -60,6 +62,10 @@ const Statistics = () => {
         } catch (error) {
             console.log("An Error Occured", error)
         }
+    }
+
+    const handleUpdateProfile = () => {
+        navigation.navigate('Update-Profile')
     }
 
 
@@ -74,7 +80,7 @@ const Statistics = () => {
             >
                 <Text style={styles.profileText}>Profile</Text>
             </LinearGradient>
-            <Image source={require('../../assets/images/profileStatistics.png')} style={styles.profileStatisticsImage} />
+            <Image source={userData?.avatar_image_url ? { uri: `${IMG_URL}${userData?.avatar_image_url}` } : require('../../assets/images/profileStatistics.png')} style={styles.profileStatisticsImage} onError={(e) => console.log("Image Load Error:", e.nativeEvent.error)} />
             {
                 userData ? (
                     <View style={styles.container}>
@@ -83,6 +89,9 @@ const Statistics = () => {
                             contentContainerStyle={{ paddingBottom: hp('10%') }}
                             showsVerticalScrollIndicator={false}
                         >
+                            <TouchableOpacity style={styles.editIconContainer} onPress={handleUpdateProfile}>
+                                <Feather name={"edit"} size={25} style={styles.editIcon} />
+                            </TouchableOpacity>
                             <View style={styles.section}>
                                 <Text style={styles.fieldHeading}>Name</Text>
                                 <View style={styles.singleField}>
@@ -109,11 +118,11 @@ const Statistics = () => {
                                 </View>
                             </View>
 
-                            <View style={styles.statisticsContainer}>
-                                {/* <Text style={styles.statisticsText}>Statistics</Text>
+
+                            {/* <Text style={styles.statisticsText}>Statistics</Text>
                                 <Text style={styles.levelText}>Level Stats</Text> */}
 
-                                {/* <View style={styles.secondSection}>
+                            {/* <View style={styles.secondSection}>
                                     <View style={styles.levelSection}>
                                         <Text style={styles.pointsEarnedText}>⭐</Text>
                                         <Text style={styles.pointsEarnedText}>Points Earned</Text>
@@ -146,11 +155,11 @@ const Statistics = () => {
                                         <Text style={styles.Text50}>15</Text>
                                     </View>
                                 </View> */}
-                                <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
-                                    <Text style={styles.logoutText}>Log Out</Text>
-                                    <MaterialCommunityIcons name={"logout"} size={22} color={'white'} />
-                                </TouchableOpacity>
-                            </View>
+                            <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+                                <Text style={styles.logoutText}>Log Out</Text>
+                                <MaterialCommunityIcons name={"logout"} size={22} color={'white'} />
+                            </TouchableOpacity>
+
                         </ScrollView>
                         <Footer />
                     </View>
@@ -170,22 +179,25 @@ const styles = StyleSheet.create({
     },
     container: {
         flex: 1,
+        marginTop: hp("2%")
     },
     topGradient: {
-        height: hp('10%'),
+        height: hp('12%'),
         width: wp('100%')
     },
     profileText: {
         color: 'white',
-        fontSize: hp('3.1%'),
-        margin: '2.3%'
+        fontSize: hp('3.4%'),
+        marginLeft: wp('8%'),
+        marginTop: hp('1%'),
+        fontWeight: '600'
     },
     profileStatisticsImage: {
         position: 'absolute',
         top: hp('6.5%'),
         left: wp('6.6%'),
-        height: hp('8%'),
-        width: hp('8%'),
+        height: hp('10%'),
+        width: hp('10%'),
         zIndex: 10
     },
     flatListContent: {
@@ -200,21 +212,21 @@ const styles = StyleSheet.create({
         paddingHorizontal: wp('4%'),
     },
     fieldHeading: {
-        fontSize: hp('2%')
+        fontSize: hp('2.5%')
     },
     fieldText: {
         color: '#2562C1',
         fontWeight: '700',
-        fontSize: hp('1.8%')
+        fontSize: hp('2%')
     },
     subContainer: {
         marginHorizontal: wp('7%'),
         flexDirection: 'column',
         gap: hp('10%'),
-        marginTop: hp("6%")
+        marginTop: hp("3%")
     },
     section: {
-        gap: hp("0.5%"),
+        gap: hp("0.8%"),
         marginVertical: hp('1%')
     },
     statisticsText: {
@@ -267,6 +279,13 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         color: 'white',
         fontSize: hp('2.3%')
+    },
+    editIconContainer: {
+        flexDirection: 'row',
+        justifyContent: 'flex-end',
+    },
+    editIcon: {
+        marginRight: wp('0.5%'),
     },
 })
 

@@ -28,7 +28,7 @@ const Footer = () => {
                     <Ionicons
                         name="grid"
                         color={isClicked === 'home' ? '#0470B8' : 'grey'}
-                        size={25}
+                        size={23}
                     />
                     <Text
                         style={isClicked === 'home' ? styles.clickedText : styles.unClickedText}
@@ -44,7 +44,7 @@ const Footer = () => {
                     <Feather
                         name="shield"
                         color={isClicked === 'level' ? '#0470B8' : 'grey'}
-                        size={25}
+                        size={23}
                     />
                     <Text
                         style={isClicked === 'level' ? styles.clickedText : styles.unClickedText}
@@ -60,7 +60,7 @@ const Footer = () => {
                     <MaterialIcons
                         name="castle"
                         color={isClicked === 'quiz' ? '#0470B8' : 'grey'}
-                        size={25}
+                        size={23}
                     />
                     <Text
                         style={isClicked === 'quiz' ? styles.clickedText : styles.unClickedText}
@@ -76,7 +76,7 @@ const Footer = () => {
                     <MaterialCommunityIcons
                         name="account"
                         color={isClicked === 'profile' ? '#0470B8' : 'grey'}
-                        size={25}
+                        size={23}
                     />
                     <Text
                         style={isClicked === 'profile' ? styles.clickedText : styles.unClickedText}

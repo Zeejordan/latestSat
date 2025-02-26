@@ -6,15 +6,16 @@ import { ENGLISH_MODULE, ENGLISH_SUBMIT_MODULE_FIRST, ENGLISH_SECOND_MODULE, ENG
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Octicons from 'react-native-vector-icons/Octicons';
+import Entypo from 'react-native-vector-icons/Entypo';
 import { COLORS, FONTS } from '../theme';
 import { useNavigation } from '@react-navigation/native';
 // import RenderHTML from 'react-native-render-html';
 import { WebView } from 'react-native-webview';
-import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import Entypo from 'react-native-vector-icons/Entypo';
 
+// stop stop stop stop stop stop stop 
+// stop stop stop stop stop HORIZONTAL SCROLL BAR QUESTION FUNCTIONALITY IS HERE
 const EnglishQuizModule1 = () => {
-    // stop stop stop stop stop
+
 
     const navigation = useNavigation();
     const [data, setData] = useState([]);
@@ -31,6 +32,7 @@ const EnglishQuizModule1 = () => {
 
     const [timeLeft, setTimeLeft] = useState(32 * 60);
     const [stopTimer, setStopTimer] = useState(false);
+
     const [statusData, setStatusData] = useState([]);
     const [showStatus, setShowStatus] = useState(false);
 
@@ -255,6 +257,9 @@ const EnglishQuizModule1 = () => {
         console.log("yaha dekh answers : ", answers)
     };
 
+    const handleGoBack = () => {
+        setShowStatus(false);
+    }
     const [markedForReview, setMarkedForReview] = useState({});
 
     const handleMarkForReview = (questionId) => {
@@ -416,10 +421,56 @@ const EnglishQuizModule1 = () => {
             </View>
         );
     };
-
     return (
         <SafeAreaView style={styles.mainContainer}>
-            <View style={styles.container}>
+
+            {showStatus ? (
+                <View style={styles.statusPageContainer}>
+                    <View style={styles.questionsBox}>
+                        <Text style={styles.statusPageHeader}>Summary</Text>
+
+                        <View style={styles.statusSummary}>
+                            {statusData.map((question) => (
+                                <View
+                                    key={question.questionNo}
+                                    style={[
+                                        styles.statusItem,
+                                        { backgroundColor: question.isAttempted ? '#0470B8' : '#ccc' },
+                                    ]}
+                                >
+                                    {question.isMarked && (
+                                        <Entypo
+                                            name="bookmarks"
+                                            size={14}
+                                            color="red"
+                                            style={styles.bookmarkIcon}
+                                        />
+                                    )}
+                                    <Text style={styles.statusText}>{question.questionNo}</Text>
+                                </View>
+                            ))}
+                        </View>
+                    </View>
+
+                    <View style={styles.buttonsContainer}>
+                        <TouchableOpacity
+                            style={styles.navigateButton}
+                            onPress={handleGoBack}
+                        >
+                            <Text style={styles.navigateText}>Go Back</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                            style={styles.navigateButton}
+                            onPress={() => {
+                                setShowStatus(false)
+                                submitCheck("onSubmitClick");
+                            }}
+                        >
+                            <Text style={styles.navigateText}>Finish</Text>
+                        </TouchableOpacity>
+                    </View>
+                </View>
+            ) : (<View style={styles.container}>
                 <View style={styles.topBar}>
                     <Text style={styles.topText}>{moduleName}</Text>
                     <Text style={styles.topText}>Questions-{totalQuestions}</Text>
@@ -434,56 +485,13 @@ const EnglishQuizModule1 = () => {
                     showsVerticalScrollIndicator={false}
                 />
 
-                {showStatus && (
-                    <View style={styles.statusPageContainer}>
-                        <View style={styles.questionsBox}>
-                            <Text style={styles.statusPageHeader}>Summary</Text>
+            </View>)}
 
-                            <View style={styles.statusSummary}>
-                                {statusData.map((question) => (
-                                    <View
-                                        key={question.questionNo}
-                                        style={[
-                                            styles.statusItem,
-                                            { backgroundColor: question.isAttempted ? '#0470B8' : '#ccc' },
-                                        ]}
-                                    >
-                                        {question.isMarked && (
-                                            <Entypo
-                                                name="bookmarks"
-                                                size={14}
-                                                color="red"
-                                                style={styles.bookmarkIcon}
-                                            />
-                                        )}
-                                        <Text style={styles.statusText}>{question.questionNo}</Text>
-                                    </View>
-                                ))}
-                            </View>
-                        </View>
 
-                        <View style={styles.buttonsContainer}>
-                            <TouchableOpacity
-                                style={styles.navigateButton}
-                            >
-                                <Text style={styles.navigateText}>Go Back</Text>
-                            </TouchableOpacity>
-                            <TouchableOpacity
-                                style={styles.navigateButton}
-                                onPress={() => {
-                                    submitCheck("onSubmitClick"); // Call SubmitCheck function
-                                    // navigation.navigate('English-Quiz-1'); // Navigate back to EnglishQuizModule1
-                                }}
-                            >
-                                <Text style={styles.navigateText}>Finish</Text>
-                            </TouchableOpacity>
-                        </View>
-                    </View>
-                )}
-            </View>
         </SafeAreaView>
     )
 }
+
 
 export default EnglishQuizModule1
 
@@ -494,10 +502,6 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         paddingHorizontal: wp('3%'),
-    },
-    markForReviewContainer: {
-        flexDirection: 'row',
-        gap: 5
     },
     topBar: {
         flexDirection: 'row',
@@ -522,31 +526,9 @@ const styles = StyleSheet.create({
         paddingHorizontal: wp('3%'),
         marginTop: hp('2%'),
     },
-    questionTextReview: {
-        flexDirection: 'row',
-        justifyContent: 'center',
-        alignItems: 'center',
-        gap: 10
-    },
     questionText: {
         fontSize: hp('2.5%'),
         fontWeight: '600'
-    },
-    questionTextMain: {
-        fontSize: hp('2.5%'),
-        fontWeight: '600',
-        color: 'white',
-        textAlign: 'center',
-        // borderWidth: 1,
-        borderColor: '#0470B8',
-    },
-    questionBox: {
-        width: 40, // Adjust the size as needed
-        height: 40,
-        borderRadius: 20, // Half of width/height for perfect circle
-        backgroundColor: '#0470B8', // Example background color
-        alignItems: 'center',
-        justifyContent: 'center',
     },
     infoIcon: {
         fontSize: hp('2.6%')
@@ -646,7 +628,6 @@ const styles = StyleSheet.create({
         backgroundColor: '#ccc',
     },
 
-
     horizontalScrollContainer: {
         paddingVertical: hp('1%'),
         paddingHorizontal: wp('2%'),
@@ -690,6 +671,32 @@ const styles = StyleSheet.create({
         position: 'absolute',
         top: -5,
         right: -5,
+    },
+    questionTextReview: {
+        flexDirection: 'row',
+        justifyContent: 'center',
+        alignItems: 'center',
+        gap: 10
+    },
+    questionTextMain: {
+        fontSize: hp('2.5%'),
+        fontWeight: '600',
+        color: 'white',
+        textAlign: 'center',
+        // borderWidth: 1,
+        borderColor: '#0470B8',
+    },
+    markForReviewContainer: {
+        flexDirection: 'row',
+        gap: 5
+    },
+    questionBox: {
+        width: 40, // Adjust the size as needed
+        height: 40,
+        borderRadius: 20, // Half of width/height for perfect circle
+        backgroundColor: '#0470B8', // Example background color
+        alignItems: 'center',
+        justifyContent: 'center',
     },
     statusPageContainer: {
         flex: 1,
@@ -755,6 +762,68 @@ const styles = StyleSheet.create({
     },
 })
 
+// iss code mai mai chahta hoon ki jab showStatus activate ho tab statusPage poore page pe display ho jo ki abhi nahi ho raha
 
-// stop stop stop stop stop stop
-// iss code mai EnglishQuizModule or statusPage mai jo function hai use sahi se link karna hia 
+// {
+//     "message": "Request was successful",
+//         "error": false,
+//             "meta": {
+//         "session_id": "810a6667-1242-48c2-b41d-a7cfa80e134b",
+//             "created_at": "2025-01-05T06:19:56.616520Z",
+//                 "modules_data": [
+//                     {
+//                         "module_name": "english_module_1",
+//                         "answers": [
+//                             {
+//                                 "question_id": "e624b368-77c8-4783-bce9-f63ed6fcc104",
+//                                 "Question": "<p>Which choice completes the text with the most logical transition?</p>",
+//                                 "Stem": "<p>When one looks at the dark craggy vistas in Hitoshi Fugo&rsquo;s evocative photo series, one&rsquo;s mind might wander off to the cratered surfaces of faraway planets. <span aria-hidden=\"true\">______</span><span class=\"sr-only\">blank</span> it&rsquo;s the series&rsquo; title, <em>Flying Frying Pan</em>, that brings one back to Earth, reminding the viewer that each photo is actually a close-up view of a familiar household object: a frying pan.</p>",
+//                                 "user_answer": "C",
+//                                 "correct_answer": "C",
+//                                 "is_correct": true,
+//                                 "marks_awarded": 20.0,
+//                                 "rationale": "<p>Choice C is the best answer. The first sentence describes an experience that the viewer has when they&rsquo;re looking at the photos: they imagine other planets. This sentence describes an experience that the viewer has afterward: the title reminds them that the photos are of frying pans, bringing them back to reality. &ldquo;Ultimately&rdquo; is a transition that means &ldquo;eventually&rdquo; or &ldquo;in the end,&rdquo; so it fits the context perfectly. </p><p>Choice A is incorrect. This choice uses a cause-and-effect transition, which doesn&rsquo;t make sense here. The viewer imagining other planets when they&rsquo;re looking at the photos doesn&rsquo;t cause the title to bring them back to reality. Choice B is incorrect. This choice uses a transition that indicates another option or possibility, which doesn&rsquo;t make sense here. Rather, the viewer has both experiences: first the viewer imagines that they&rsquo;re looking at another planet, and then the title reminds them that it&rsquo;s just a frying pan. Choice D is incorrect. This choice uses a transition that indicates the addition of an agreeing idea. But the viewer&rsquo;s experience in the second sentence is actually the opposite of the viewer&rsquo;s experience in the first sentence. In the first sentence, the viewer is imagining that they&rsquo;re seeing a landscape from another planet. In the second sentence, the viewer is reminded that they&rsquo;re looking at a frying pan. </p>",
+//                                 "created_at": "2025-01-18T16:11:54.423063Z",
+//                                 "module_name": "English Module 1",
+//                                 "index": 2,
+//                                 "type": null,
+//                                 "OptionA": "<p>A. Consequently,</p>",
+//                                 "OptionB": "<p>B. Alternatively,</p>",
+//                                 "OptionC": "<p>C. Ultimately,</p>",
+//                                 "OptionD": "<p>D. Additionally,</p>"
+//                             },
+//                             {
+//                                 "question_id": "d3598b8b-ed73-426d-b855-2edd94b08abb",
+//                                 "Question": "<p>Which choice completes the text so that it conforms to the conventions of Standard English?</p>",
+//                                 "Stem": "<p>In 2000, Nora de Hoyos Comstock, herself an owner of a successful consulting firm, sought to increase Latina representation in corporate <span aria-hidden=\"true\">______</span><span class=\"sr-only\">blank</span> founded<em> </em>Las Comadres para las Americas, an international community that for over two decades has served as a resource and information network for Latina business professionals.</p>",
+//                                 "user_answer": "B",
+//                                 "correct_answer": "D",
+//                                 "is_correct": false,
+//                                 "marks_awarded": 0.0,
+//                                 "rationale": "<p>Choice D is the best answer. It appropriately uses a period to mark the end of one independent clause (\"In 2000&hellip;settings\") and the start of another (\"She founded&hellip;professionals\").</p><p>Choice A is incorrect. This choice results in a run-on sentence error. Both the clause before the blank (\"In 2000&hellip;settings\") and the clause after the blank (\"she&hellip;professionals\") are independent clauses, so they need to be separated by punctuation. Choice B is incorrect. This choice results in a comma splice error. It incorrectly joins two independent clauses with just a comma. Linking two independent clauses with a comma also requires the use of a coordinating conjunction (like<em> for</em>, <em>and</em>, <em>nor</em>, <em>but</em>, <em>or</em>, <em>yet</em>, or <em>so</em>). Choice C is incorrect. This choice results in a run-on sentence, an error caused when two independent clauses are joined without punctuation or appropriate conjunctions. Since both the clause before the blank (\"In 2000&hellip;settings\") and the clause after the blank (\"she&hellip;professionals\") are independent, a comma would be required in addition to the coordinating conjunction \"and.\"</p>",
+//                                 "created_at": "2025-01-18T16:11:54.408312Z",
+//                                 "module_name": "English Module 1",
+//                                 "index": 3,
+//                                 "type": null,
+//                                 "OptionA": "<p>A. settings she</p>",
+//                                 "OptionB": "<p>B. settings, she</p>",
+//                                 "OptionC": "<p>C. settings and she</p>",
+//                                 "OptionD": "<p>D. settings. She</p>"
+//                             },
+//                         ]
+//                     },
+//                     {
+//                         "module_name": "english_module_2",
+//                         "answers": []
+//                     },
+//                     {
+//                         "module_name": "math_module_1",
+//                         "answers": []
+//                     },
+//                     {
+//                         "module_name": "math_module_2",
+//                         "answers": []
+//                     }
+//                 ]
+//     }
+// }

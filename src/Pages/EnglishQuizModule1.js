@@ -11,9 +11,8 @@ import { COLORS, FONTS } from '../theme';
 import { useNavigation } from '@react-navigation/native';
 // import RenderHTML from 'react-native-render-html';
 import { WebView } from 'react-native-webview';
+import Tooltip from 'react-native-walkthrough-tooltip';
 
-// stop stop stop stop stop stop stop 
-// stop stop stop stop stop HORIZONTAL SCROLL BAR QUESTION FUNCTIONALITY IS HERE
 const EnglishQuizModule1 = () => {
 
 
@@ -35,6 +34,7 @@ const EnglishQuizModule1 = () => {
 
     const [statusData, setStatusData] = useState([]);
     const [showStatus, setShowStatus] = useState(false);
+    const [tooltipVisible, setTooltipVisible] = useState(true);
 
     useEffect(() => {
         getData();
@@ -68,6 +68,7 @@ const EnglishQuizModule1 = () => {
 
         return () => clearInterval(timerInterval);
     }, [timeLeft, stopTimer]);
+
 
     const formatTime = (seconds) => {
         const minutes = Math.floor(seconds / 60);
@@ -228,21 +229,25 @@ const EnglishQuizModule1 = () => {
     };
 
     const handleOptionSelection = (option, questionId) => {
+        const question = data.find((item) => item.id === questionId);
+        const questionNo = question?.Question_No;
+
         if (selectedOption === option) {
             setSelectedOption(null);
             if (questionsAttempted > 0) {
                 const newStatus = questionsAttempted - 1;
                 setQuestionsAttempted(newStatus);
+
                 if (answers[questionId]) {
                     setAnswers((prev) => {
-                        const updated = { ...prev }
-                        delete updated[questionId]
+                        const updated = { ...prev };
+                        delete updated[questionId];
                         return updated;
-                    })
+                    });
                 }
             }
-        }
-        else {
+        } else {
+
             setSelectedOption(option);
             if (!answers[questionId]) {
                 const newStatus = questionsAttempted + 1;
@@ -250,14 +255,20 @@ const EnglishQuizModule1 = () => {
             }
 
             setAnswers((prev) => ({
-                ...prev, [questionId]: option
-            }))
+                ...prev,
+                [questionId]: {
+                    answer: option,
+                    index: questionNo,
+                },
+            }));
         }
 
-        console.log("yaha dekh answers : ", answers)
+        console.log("Updated answers: ", answers);
     };
 
-
+    const handleGoBack = () => {
+        setShowStatus(false);
+    }
     const [markedForReview, setMarkedForReview] = useState({});
 
     const handleMarkForReview = (questionId) => {
@@ -266,6 +277,10 @@ const EnglishQuizModule1 = () => {
             [questionId]: !prev[questionId],
         }));
     };
+
+    const toggleTooltip = () => {
+        setTooltipVisible((prev) => !prev)
+    }
 
     const renderHorizontalScroll = () => {
         return (
@@ -285,7 +300,7 @@ const EnglishQuizModule1 = () => {
                                 style={[
                                     styles.questionCircle,
                                     currentQuestion === questionNo && styles.currentQuestionCircle,
-                                    isAttempted && styles.attemptedQuestionCircle, // Light-blue for attempted
+                                    isAttempted && styles.attemptedQuestionCircle,
                                 ]}
                                 onPress={() => {
                                     const selectedQuestion = data.filter(
@@ -323,7 +338,16 @@ const EnglishQuizModule1 = () => {
         );
     };
 
+    const [optionHeights, setOptionHeights] = useState({});
 
+    const handleContentSizeChange = (contentWidth, contentHeight, option) => {
+        setOptionHeights((prevHeights) => ({
+            ...prevHeights,
+            [option]: contentHeight,
+        }));
+    };
+
+    const dynamicFontSize = hp("6%");
     const renderItem = ({ item }) => {
         const handleStatusPageDisplay = () => {
             const statusDataTemp = Array.from({ length: totalQuestions }, (_, index) => {
@@ -363,23 +387,43 @@ const EnglishQuizModule1 = () => {
                             </Text>
                         </TouchableOpacity>
                     </View>
-                    <TouchableOpacity>
-                        <Octicons name="info" color="black" style={styles.infoIcon} />
-                    </TouchableOpacity>
+
+
+                    <Tooltip
+                        isVisible={tooltipVisible}
+                        content={
+                            <Text style={styles.tooltipText}>
+                                This section focuses on key reading and writing skills. Each question is based on one or more passages, which may include tables or graphs. Read the passages and questions thoroughly, then choose the best answer based on the information provided.
+
+                                All questions are multiple-choice with four options, and each has only one correct answer.
+
+                            </Text>
+                        }
+                        placement="bottom"
+                        onClose={() => setTooltipVisible(false)}
+                        showChildInTooltip={false}
+                        backgroundStyle={styles.tooltipBackground}
+                    >
+                        <TouchableOpacity onPress={toggleTooltip}>
+                            <Octicons name="info" color="black" style={styles.infoIcon} />
+                        </TouchableOpacity>
+                    </Tooltip>
                 </View>
 
                 <View style={styles.questionDescription}>
                     <WebView
                         originWhitelist={['*']}
-                        source={{ html: `<html><body style='font-size: 14px; color: black;'>${item.Stem}</body></html>` }}
-                        style={{ width: '90%', height: 100 }}
-                        scrollEnabled={false}
+                        source={{ html: `<style>body { font-size: ${dynamicFontSize}; padding:40px;}</style>${item.Stem}` }}
+                        style={[styles.webView, { flex: 1 }]}
+                        scalesPageToFit={true}
+                        javaScriptEnabled={true}
                     />
                     <WebView
                         originWhitelist={['*']}
-                        source={{ html: `<html><body style='font-size: 14px; color: black;'>${item.Question}</body></html>` }}
-                        style={{ width: '90%', height: 100 }}
-                        scrollEnabled={false}
+                        source={{ html: `<style>body { font-size: ${dynamicFontSize}; padding:40px; }</style>${item.Question}` }}
+                        style={[styles.webView, { flex: 1 }]}
+                        scalesPageToFit={true}
+                        javaScriptEnabled={true}
                     />
                 </View>
 
@@ -396,14 +440,23 @@ const EnglishQuizModule1 = () => {
                     {['A', 'B', 'C', 'D'].map((option) => (
                         <TouchableOpacity
                             key={option}
-                            style={selectedOption === option ? styles.selectedOptionBox : styles.optionBox}
+                            style={[
+                                selectedOption === option ? styles.selectedOptionBox : styles.optionBox,
+                                { height: optionHeights[option] || 'auto' }, // Make sure you handle undefined state correctly
+                            ]}
                             onPress={() => handleOptionSelection(option, item.id)}
                         >
                             <WebView
+                                source={{
+                                    html: `<style>body { font-size: ${dynamicFontSize};background-color: ${selectedOption === option ? '#C5E6FD' : 'transparent'}; }</style>${item[`Option${option}`]}`,
+                                }}
+                                style={styles.webViewOptions}
                                 originWhitelist={['*']}
-                                source={{ html: `<html><body style='font-size: 14px; color: black;'>${item[`Option${option}`]}</body></html>` }}
-                                style={{ width: '80%', height: 50 }}
-                                scrollEnabled={false}
+                                scalesPageToFit={true}
+                                javaScriptEnabled={true}
+                                onContentSizeChange={(contentWidth, contentHeight) =>
+                                    handleContentSizeChange(contentWidth, contentHeight, option)
+                                }
                             />
                         </TouchableOpacity>
                     ))}
@@ -421,7 +474,54 @@ const EnglishQuizModule1 = () => {
     };
     return (
         <SafeAreaView style={styles.mainContainer}>
-            <View style={styles.container}>
+
+            {showStatus ? (
+                <View style={styles.statusPageContainer}>
+                    <View style={styles.questionsBox}>
+                        <Text style={styles.statusPageHeader}>Summary</Text>
+
+                        <View style={styles.statusSummary}>
+                            {statusData.map((question) => (
+                                <View
+                                    key={question.questionNo}
+                                    style={[
+                                        styles.statusItem,
+                                        { backgroundColor: question.isAttempted ? '#0470B8' : '#ccc' },
+                                    ]}
+                                >
+                                    {question.isMarked && (
+                                        <Entypo
+                                            name="bookmarks"
+                                            size={14}
+                                            color="red"
+                                            style={styles.bookmarkIcon}
+                                        />
+                                    )}
+                                    <Text style={styles.statusText}>{question.questionNo}</Text>
+                                </View>
+                            ))}
+                        </View>
+                    </View>
+
+                    <View style={styles.buttonsContainer}>
+                        <TouchableOpacity
+                            style={styles.navigateButton}
+                            onPress={handleGoBack}
+                        >
+                            <Text style={styles.navigateText}>Go Back</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                            style={styles.navigateButton}
+                            onPress={() => {
+                                setShowStatus(false)
+                                submitCheck("onSubmitClick");
+                            }}
+                        >
+                            <Text style={styles.navigateText}>Finish</Text>
+                        </TouchableOpacity>
+                    </View>
+                </View>
+            ) : (<View style={styles.container}>
                 <View style={styles.topBar}>
                     <Text style={styles.topText}>{moduleName}</Text>
                     <Text style={styles.topText}>Questions-{totalQuestions}</Text>
@@ -436,56 +536,13 @@ const EnglishQuizModule1 = () => {
                     showsVerticalScrollIndicator={false}
                 />
 
-                {showStatus && (
-                    <View style={styles.statusPageContainer}>
-                        <View style={styles.questionsBox}>
-                            <Text style={styles.statusPageHeader}>Summary</Text>
+            </View>)}
 
-                            <View style={styles.statusSummary}>
-                                {statusData.map((question) => (
-                                    <View
-                                        key={question.questionNo}
-                                        style={[
-                                            styles.statusItem,
-                                            { backgroundColor: question.isAttempted ? '#0470B8' : '#ccc' },
-                                        ]}
-                                    >
-                                        {question.isMarked && (
-                                            <Entypo
-                                                name="bookmarks"
-                                                size={14}
-                                                color="red"
-                                                style={styles.bookmarkIcon}
-                                            />
-                                        )}
-                                        <Text style={styles.statusText}>{question.questionNo}</Text>
-                                    </View>
-                                ))}
-                            </View>
-                        </View>
 
-                        <View style={styles.buttonsContainer}>
-                            <TouchableOpacity
-                                style={styles.navigateButton}
-                                onPress={() => navigation.goBack()}
-                            >
-                                <Text style={styles.navigateText}>Go Back</Text>
-                            </TouchableOpacity>
-                            <TouchableOpacity
-                                style={styles.navigateButton}
-                                onPress={() => {
-                                    submitCheck("onSubmitClick");
-                                }}
-                            >
-                                <Text style={styles.navigateText}>Finish</Text>
-                            </TouchableOpacity>
-                        </View>
-                    </View>
-                )}
-            </View>
         </SafeAreaView>
     )
 }
+
 
 export default EnglishQuizModule1
 
@@ -530,9 +587,23 @@ const styles = StyleSheet.create({
     questionDescription: {
         borderWidth: 1,
         borderColor: '#888888',
-        paddingVertical: hp('2%'),
-        paddingHorizontal: wp('6%'),
+        // paddingVertical: hp('2%'),
+        // paddingHorizontal: wp('6%'),
         marginTop: hp('2%'),
+    },
+    webView: {
+        height: hp('20%'),
+        width: wp('90%'),
+        marginVertical: 0,
+        borderRadius: 8,
+        backgroundColor: "#FFF",
+    },
+    webViewOptions: {
+        height: hp('5%'),
+        width: wp('90%'),
+        marginVertical: 10,
+        borderRadius: 8,
+        backgroundColor: "#FFF",
     },
     questionDescriptionText: {
         marginTop: hp('1%'),
@@ -542,12 +613,6 @@ const styles = StyleSheet.create({
     questionParagraphText: {
         fontWeight: '500',
         fontSize: hp('1.8%')
-    },
-    buttonsContainer: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        borderWidth: 1,
-        borderColor: 'transparent'
     },
     navigateButton: {
         backgroundColor: "#0470B8",
@@ -734,25 +799,34 @@ const styles = StyleSheet.create({
     },
     buttonsContainer: {
         flexDirection: 'row',
-        justifyContent: 'space-around',
-        marginTop: 20,
+        justifyContent: 'space-between',
+        borderWidth: 1,
+        borderColor: 'transparent'
     },
-    navigateButton: {
-        padding: 15,
-        borderRadius: 5,
-        backgroundColor: '#0470B8',
-    },
-    navigateText: {
-        color: '#fff',
-        fontSize: 16,
-        fontWeight: '700',
-    },
+    // navigateButton: {
+    //     padding: 15,
+    //     borderRadius: 5,
+    //     backgroundColor: '#0470B8',
+    // },
+    // navigateText: {
+    //     color: '#fff',
+    //     fontSize: 16,
+    //     fontWeight: '700',
+    // },
     questionsBox: {
         borderWidth: 1,
         paddingHorizontal: 20,
         paddingVertical: 20,
         borderColor: '#ccc',
         borderRadius: 10,
+    },
+    tooltipText: {
+        fontSize: 16,
+        color: 'black',
+        padding: 10,
+    },
+    tooltipBackground: {
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
     },
 })
 

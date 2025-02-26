@@ -3,7 +3,11 @@ import { StyleSheet, Text, View, SafeAreaView, Image, TouchableOpacity } from 'r
 // import FastImage from 'react-native-fast-image';
 import { LinearGradient } from 'expo-linear-gradient';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
+import Zocial from "react-native-vector-icons/Zocial";
+import { useNavigation } from '@react-navigation/native';
+
 const GoogleSplashScreen = () => {
+    const navigation = useNavigation();
     return (
         <SafeAreaView style={styles.mainContainer}>
             <LinearGradient
@@ -38,6 +42,16 @@ const GoogleSplashScreen = () => {
                             style={styles.googleIcon}
                         />
                         <Text style={styles.getText}>LOGIN WITH GOOGLE </Text>
+                        <View>
+                            <Text></Text>
+                        </View>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.buttonContainer} onPress={() => navigation.navigate('Login')}>
+                        <Zocial name="email" size={20} color={"#0651C6"} />
+                        <Text style={styles.getText}>LOGIN WITH EMAIL</Text>
+                        <View>
+                            <Text></Text>
+                        </View>
                     </TouchableOpacity>
                 </View>
             </LinearGradient>
@@ -87,16 +101,17 @@ const styles = StyleSheet.create({
     },
     textContainer: {
         marginTop: hp('7%'),
-        // backgroundColor:'red',
         gap: hp('2%')
     },
     welcomeText: {
         color: 'white',
-        fontSize: hp('2%')
+        fontSize: hp('2%'),
+        textAlign: 'center'
     },
     playText: {
         color: 'white',
-        fontSize: hp('1.9%')
+        fontSize: hp('1.9%'),
+        textAlign: 'center'
     },
     satText: {
         fontWeight: 600,
@@ -105,11 +120,12 @@ const styles = StyleSheet.create({
     buttonContainer: {
         flexDirection: 'row',
         backgroundColor: 'white',
-        justifyContent: "center",
+        justifyContent: "space-between",
         alignItems: 'center',
         marginHorizontal: wp('3%'),
         paddingVertical: hp('2%'),
-        marginTop: hp('7%'),
+        paddingHorizontal: hp('2.5%'),
+        marginVertical: hp('2%'),
         borderWidth: 1,
         borderColor: 'white',
         borderRadius: 30,

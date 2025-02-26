@@ -13,96 +13,57 @@ import {
 import Icon from "react-native-vector-icons/MaterialIcons";
 import Footer from "../Components/Footer";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { GET_UNFINISHED_DETAILS, GET_UPPER_DETAILS } from "../../config/api";
+import { GET_UNFINISHED_DETAILS, GET_UPPER_DETAILS, IMG_URL, LEVELS_STARTING, GET_USER_DETAILS } from "../../config/api";
 import axios from "axios";
 import { useState, useEffect } from "react";
 import CircularProgress from 'react-native-circular-progress-indicator';
-// stop stop stop stop stop
+import { useNavigation } from '@react-navigation/native';
+
 const HomeScreen = () => {
+
+  const navigation = useNavigation();
 
   const [mathUnfinished, setMathUnfinished] = useState([])
   const [englishUnfinished, setEnglishUnfinished] = useState([])
   const [quizStatus, setQuizStatus] = useState([])
+  const [subject, setSubject] = useState('');
+  const [category, setCategory] = useState('');
+  const [levels, setLevels] = useState([]);
+  const [totalLevels, setTotalLevels] = useState('');
+  const [username, setUsername] = useState('');
 
-
-  const quizData = [
-    {
-      id: "1",
-      title: "SAT Quiz 1",
-      description: "20 Questions",
-      image: require("../../assets/images/maths.jpeg"),
-      progress: "70%",
-    },
-    {
-      id: "2",
-      title: "SAT Quiz 2",
-      description: "20 Questions",
-      image: require("../../assets/images/writing.jpeg"),
-      progress: "50%",
-    },
-    {
-      id: "3",
-      title: "SAT Quiz 3",
-      description: "20 Questions",
-      image: require("../../assets/images/sports.png"),
-      progress: "80%",
-    },
-  ];
-
-  const additionalData = [
-    {
-      id: "1",
-      title: "Math Quiz 1",
-      description: "10 Questions",
-      image: require("../../assets/images/cube.png"),
-      progress: "40%",
-    },
-    {
-      id: "2",
-      title: "Science Quiz 1",
-      description: "15 Questions",
-      image: require("../../assets/images/chemistry.png"),
-      progress: "60%",
-    },
-    {
-      id: "3",
-      title: "History Quiz 1",
-      description: "12 Questions",
-      image: require("../../assets/images/fox.png"),
-      progress: "80%",
-    },
-    {
-      id: "5",
-      title: "History Quiz 1",
-      description: "12 Questions",
-      image: require("../../assets/images/game.png"),
-      progress: "80%",
-    },
-    {
-      id: "6",
-      title: "History Quiz 1",
-      description: "12 Questions",
-      image: require("../../assets/images/sports.png"),
-      progress: "80%",
-    },
-    {
-      id: "7",
-      title: "History Quiz 1",
-      description: "12 Questions",
-      image: require("../../assets/images/sports.png"),
-      progress: "80%",
-    },
-    {
-      id: "8",
-      title: "History Quiz 1",
-      description: "12 Questions",
-      image: require("../../assets/images/sports.png"),
-      progress: "80%",
-    },
-  ];
 
   useEffect(() => {
     getUserStatus()
+  }, [])
+
+  useEffect(() => {
+    if (levels.length > 0) {
+      navigation.navigate('Levels', { levels, totalLevels });
+    }
+  }, [levels]);
+
+  useEffect(() => {
+    const fetUserDetails = async () => {
+      const token = await AsyncStorage.getItem('token');
+      const baseUrlGet = GET_USER_DETAILS;
+
+      try {
+        const response = await axios.get(baseUrlGet, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          }
+        })
+        if (!response?.data?.error) {
+          const tempUsername = response?.data?.meta?.username;
+          setUsername(tempUsername);
+        }
+      } catch (error) {
+        console.log("An Error Occured", error)
+      }
+    }
+    fetUserDetails();
   }, [])
 
   const getUserStatus = async () => {
@@ -128,7 +89,7 @@ const HomeScreen = () => {
       if (!response_02?.data?.error) {
         // console.log("yeh hai unfinished ka response:", response_02)
         setMathUnfinished(response_02?.data?.meta?.data?.Math);
-        // console.log("yeh hai all data of mathUnfinished", mathUnfinished)
+        console.log("yeh hai all data of mathUnfinished", mathUnfinished)
 
         setEnglishUnfinished(response_02?.data?.meta?.data?.Reading_and_Writing);
         console.log("yeh hai all data of english unfinished", englishUnfinished)
@@ -144,59 +105,63 @@ const HomeScreen = () => {
     }
   }
 
-  const renderCard = ({ item }) => (
-    <TouchableOpacity style={styles.card}>
-      <Image source={item.image} style={styles.cardImage} />
-      <View style={styles.cardContent}>
-        <View style={styles.textContainer}>
-          <Text style={styles.cardTitle}>SAT {item.Test_Name}</Text>
-          <Text style={styles.cardDescription}>{item.Total_Score}</Text>
-        </View>
-        <View style={styles.progressBarContainer}>
-          <View style={[styles.progressBarFill, { width: item.progress }]} />
-        </View>
-      </View>
-    </TouchableOpacity>
-  );
+  const handleLevelNavigation = async (subject, category) => {
 
-  const renderAdditionalCard = ({ item }) => (
-    <TouchableOpacity style={styles.additionalCard}>
-      <View style={styles.imageContainer}>
-        <Image source={item.image} style={styles.cardImage2} />
-      </View>
-      <View style={styles.additionalCardContent}>
-        <Text style={styles.cardTitle2}>{item.title}</Text>
-        <Text style={styles.cardDescription2}>{item.description}</Text>
-      </View>
-      <Text style={styles.cardProgress}>{item.progress}</Text>
-    </TouchableOpacity>
-  );
+    setSubject(() => subject);
+    setCategory(() => category);
+    console.log("YEH HAI SUBJECT ", subject)
+    console.log("YEH HAI CATEGORY ", category)
 
+    if (!subject || !category) return;
+
+    console.log("YEH HAI check1");
+
+    try {
+      const token = await AsyncStorage.getItem('token');
+      const response = await axios.post(
+        LEVELS_STARTING,
+        { subject, section: category },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+      console.log("THIS IS API RESPONSE IN HOMESCREEN")
+      if (response?.data?.meta) {
+        setLevels(response.data.meta.levels);
+        setTotalLevels(response.data.meta.total_levels);
+      }
+    } catch (error) {
+      if (error.response) {
+        console.error('API Error Response:', error.response.data);
+      } else {
+        console.error('Error:', error.message);
+      }
+    }
+  }
+
+  const handleQuizNavigation = () => {
+    navigation.navigate('Quiz')
+  }
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.textIconContainer}>
-        <Text style={styles.text}>Hello, Moss</Text>
-        <Icon name="account-circle" size={25} color="#0651C6" />
+        {username ? (<Text style={styles.text}>Hello, {username}</Text>) : (<Text style={styles.text}>Hello, User</Text>)}
+        {/* <Text style={styles.text}>Hello, User</Text> */}
+        {/* <Icon name="account-circle" size={25} color="#0651C6" /> */}
+        <TouchableOpacity onPress={() => navigation.navigate("Statistics")}>
+          <Icon name="account-circle" size={25} color="#0651C6" />
+        </TouchableOpacity>
       </View>
       <Text style={styles.bigheading}>What would you like to play today?</Text>
 
-      {/* <FlatList
-        data={quizData}
-        renderItem={renderCard}
-        keyExtractor={(item) => item.id}
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        contentContainerStyle={styles.scrollContainer}
-      /> */}
-
-      <ScrollView
-        horizontal={true}
-        showsHorizontalScrollIndicator={false}
-      >
+      <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
         {quizStatus ?
-          quizStatus.map((item) => (
-            <TouchableOpacity style={styles.card}>
-              <Image source={require('../../assets/images/maths.jpeg')} style={styles.cardImage} />
+          quizStatus.map((item, index) => (
+            <TouchableOpacity key={item.id || index} style={styles.card} onPress={handleQuizNavigation}>
+              <Image source={item?.Image_URL ? { uri: `${IMG_URL}${item?.Image_URL}` } : require("../../assets/images/maths.jpeg")} style={styles.cardImage} />
               <View style={styles.cardContent}>
                 <View style={styles.textContainer}>
                   <Text style={styles.cardTitle}>SAT {item.Test_Name}</Text>
@@ -208,25 +173,19 @@ const HomeScreen = () => {
               </View>
             </TouchableOpacity>
           ))
-          : (<ActivityIndicator size={'large'} color={"white"} />)}
+          : (<ActivityIndicator size={'large'} color={"white"} />)
+        }
       </ScrollView>
+
 
       <Text style={styles.unfinishheading}>Unfinished Test</Text>
 
-      {/* <FlatList
-        data={additionalData}
-        renderItem={renderAdditionalCard}
-        keyExtractor={(item) => item.id}
-        showsVerticalScrollIndicator={true}
-        contentContainerStyle={styles.secondscrollContainer}
-      /> */}
-
       <ScrollView>
         {mathUnfinished ?
-          mathUnfinished.map((item) => (
-            <TouchableOpacity style={styles.additionalCard}>
+          mathUnfinished.map((item, index) => (
+            <TouchableOpacity key={item.id || index} style={styles.additionalCard} onPress={() => handleLevelNavigation(item.subject, item.section)}>
               <View style={styles.imageContainer}>
-                <Image source={require('../../assets/images/maths.jpeg')} style={styles.cardImage2} />
+                <Image source={item?.image ? { uri: `${IMG_URL}${item?.image}` } : require("../../assets/images/maths.jpeg")} style={styles.cardImage2} />
               </View>
               <View style={styles.additionalCardContent}>
                 <Text style={styles.cardTitle2}>{item.section}</Text>
@@ -243,16 +202,16 @@ const HomeScreen = () => {
                   inActiveStrokeColor={'black'}
                 />
               </View>
-
             </TouchableOpacity>
           ))
-          : (<ActivityIndicator size={'large'} color={"white"} />)}
+          : (<ActivityIndicator size={'large'} color={"white"} />)
+        }
 
         {englishUnfinished ?
-          englishUnfinished.map((item) => (
-            <TouchableOpacity style={styles.additionalCard}>
+          englishUnfinished.map((item, index) => (
+            <TouchableOpacity key={item.id || index} style={styles.additionalCard} onPress={() => handleLevelNavigation(item.subject, item.section)}>
               <View style={styles.imageContainer}>
-                <Image source={require('../../assets/images/writing.jpeg')} style={styles.cardImage2} />
+                <Image source={item?.image ? { uri: `${IMG_URL}${item?.image}` } : require("../../assets/images/writing.jpeg")} style={styles.cardImage2} />
               </View>
               <View style={styles.additionalCardContent}>
                 <Text style={styles.cardTitle2}>{item.section}</Text>
@@ -271,8 +230,10 @@ const HomeScreen = () => {
               </View>
             </TouchableOpacity>
           ))
-          : (<ActivityIndicator size={'large'} color={"white"} />)}
+          : (<ActivityIndicator size={'large'} color={"white"} />)
+        }
       </ScrollView>
+
       <Footer />
     </SafeAreaView>
   );

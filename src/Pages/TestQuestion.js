@@ -8,21 +8,7 @@ import { WebView } from 'react-native-webview';
 import { LEVELS_PAGINATION_API } from '../../config/api';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-// stop stop stop stop stop stop 
-const sanitizeHtml = (html) => {
-    if (!html) return '';
-    return html
-        .replace(/&rsquo;/g, '’')
-        .replace(/&ldquo;/g, '“')
-        .replace(/&rdquo;/g, '”')
-        .replace(/&amp;/g, '&')
-        .replace(/&lt;/g, '<')
-        .replace(/&gt;/g, '>')
-        .replace(/<em>/g, '<i>')
-        .replace(/<\/em>/g, '</i>')
-        .replace(/<p>/g, '')
-        .replace(/<\/p>/g, '');
-};
+
 const TestQuestion = ({ route }) => {
     const { questions } = route.params;
     const navigation = useNavigation();
@@ -59,11 +45,6 @@ const TestQuestion = ({ route }) => {
 
 
     const handleNextQuestion = async (index, type) => {
-
-        // if ((type === "MCQ" && !optionSelected) || (type === "SPR" && !sprValue)) {
-        //     console.log("Incomplete data. Skipping API call.");
-        //     return; // Do not proceed if the data is incomplete
-        // }
 
         const optionMapping = {
             'optiona': "A",
@@ -104,7 +85,7 @@ const TestQuestion = ({ route }) => {
         if (currentQuestionIndex === questions.length - 1) {
             // navigation.navigate('LevelComplete', { percentage });
             if (percentage && message) {
-                navigation.navigate('LevelComplete', { percentage, message });
+                navigation.navigate('LevelComplete', { percentage, message, questions });
             }
         } else {
             setCurrentQuestionIndex((prevIndex) => prevIndex + 1);
@@ -120,11 +101,12 @@ const TestQuestion = ({ route }) => {
         setFlatlistData(temp);
     }, [question]);
 
+    const dynamicFontSize = hp("5%");
 
     const renderItem = ({ item }) => (
         <View style={styles.container}>
             {/* Top Bar */}
-            <View style={styles.topBar}>
+            {/* <View style={styles.topBar}>
                 <View style={styles.progressBarBackground}>
                     <View style={[styles.progressBarFill, { width: `${progress * 100}%` }]} />
                 </View>
@@ -136,25 +118,41 @@ const TestQuestion = ({ route }) => {
                     />
                     <Text style={styles.score}>10</Text>
                 </View>
-            </View>
+            </View> */}
 
             <View style={styles.questionContainer}>
-                <WebView
+                {/* <WebView
                     originWhitelist={['*']}
                     source={{ html: `<p style="font-size: 22px; color: black;">${item.data.stem}</p>` }}
                     style={styles.webView}
                     scrollEnabled={false}
+                /> */}
+                <WebView
+                    source={{ html: `<style>body { font-size: ${dynamicFontSize}; color:white; font-weight: bold; }</style>${item.data.stem}` }}
+                    style={styles.webView}
+                    originWhitelist={['*']}
+                    scalesPageToFit={true}
+                    javaScriptEnabled={true}
                 />
+
             </View>
 
             {item?.data?.question && (
                 <View style={styles.questionContainer}>
-                    <WebView
+                    {/* <WebView
                         originWhitelist={['*']}
                         source={{ html: `<p style="font-size: 22px; color: black;">${item.data.question}</p>` }}
                         style={styles.webView}
                         scrollEnabled={false}
+                    /> */}
+                    <WebView
+                        source={{ html: `<style>body { font-size: ${dynamicFontSize};  color:white; font-weight: bold;}</style>${item.data.question}` }}
+                        style={styles.webView}
+                        originWhitelist={['*']}
+                        scalesPageToFit={true}
+                        javaScriptEnabled={true}
                     />
+
                 </View>
             )}
 
@@ -169,21 +167,32 @@ const TestQuestion = ({ route }) => {
                 </View>
             ) : (
                 <View style={styles.optionsContainer}>
-                    {['optiona', 'optionb', 'optionc', 'optiond'].map((option, index) => (
-                        <TouchableOpacity
-                            key={`${option}-${index}`}
-                            style={optionChoosen === option ? styles.optionTicked : styles.singleOption}
-                            onPress={() => {
-                                console.log("yeh dek option", option)
-                                handleOption(option);
-                                setCurrentOption((prev) => prev = option)
-                            }}
-                        >
-                            <Text>{sanitizeHtml(item.data[option])}</Text>
-
-                        </TouchableOpacity>
-                    ))}
+                    {['optiona', 'optionb', 'optionc', 'optiond'].map((option, index) => {
+                        const isSelected = optionChoosen === option;
+                        return (
+                            <TouchableOpacity
+                                key={`${option}-${index}`}
+                                style={[styles.singleOption, isSelected && styles.optionTicked]}
+                                onPress={() => {
+                                    handleOption(option);
+                                    setCurrentOption(option);
+                                }}
+                            >
+                                <View style={styles.webViewWrapper}>
+                                    <WebView
+                                        source={{ html: `<style>body { font-size: 16px; color: black; text-align: center;  }</style>${item.data[option] || ''}` }}
+                                        style={styles.webViewOptions}
+                                        originWhitelist={['*']}
+                                        scalesPageToFit={false}
+                                        javaScriptEnabled={true}
+                                    />
+                                </View>
+                            </TouchableOpacity>
+                        );
+                    })}
                 </View>
+
+
             )}
 
             <TouchableOpacity
@@ -216,7 +225,7 @@ const TestQuestion = ({ route }) => {
 
                 <FlatList
                     renderItem={renderItem}
-                    keyExtractor={(item) => item?.data?.id}
+                    keyExtractor={(item, index) => item?.data?.id ? item.data.id.toString() : `index-${index}`}
                     data={flatlistData}
                     showsVerticalScrollIndicator={false}
                 />
@@ -289,6 +298,24 @@ const styles = StyleSheet.create({
         gap: hp('2.8%'),
         marginTop: hp('3.5%')
     },
+    webView: {
+        height: hp('20%'),
+        width: wp('90%'),
+        marginVertical: 10,
+        borderRadius: 8,
+        backgroundColor: "#FFF",
+    },
+    webViewWrapper: {
+        width: '100%',
+        height: hp('7%'),  // Prevents overflow
+        overflow: 'hidden',
+        justifyContent: 'center',
+    },
+    webViewOptions: {
+        flex: 1,
+        backgroundColor: 'transparent',
+        maxHeight: hp('10%'),
+    },
     singleOption: {
         backgroundColor: 'white',
         paddingVertical: hp('1%'),
@@ -297,18 +324,13 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderColor: 'white',
         borderRadius: 7,
-        marginHorizontal: wp('3.5%')
+        marginHorizontal: wp('3.5%'),
+        minHeight: hp('8%'),
+        overflow: 'hidden',
     },
     optionTicked: {
         backgroundColor: '#26A5E6',
-        paddingVertical: hp('1%'),
-        justifyContent: 'center',
-        alignItems: 'center',
-        borderWidth: 1,
         borderColor: '#0470B8',
-        borderRadius: 7,
-        marginHorizontal: wp('3.5%'),
-
     },
     optionText: {
         fontSize: hp('3%'),

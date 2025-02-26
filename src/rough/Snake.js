@@ -17,7 +17,6 @@ import { useNavigation } from '@react-navigation/native';
 import { LEVELS_PROGRESSION } from '../../config/api';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
-import AntDesign from 'react-native-vector-icons/AntDesign'
 
 const { width } = Dimensions.get('window');
 
@@ -33,12 +32,10 @@ const Levels = ({ route }) => {
             return true;
         };
 
-        const backHandler = () => BackHandler.addEventListener('hardwareBackPress', backAction);
+        const backHandler = BackHandler.addEventListener('hardwareBackPress', backAction);
 
-        backHandler();
-        return () => BackHandler.removeEventListener('hardwareBackPress', backAction);
+        return () => backHandler.remove();
     }, [navigation]);
-
 
     useEffect(() => {
         if (questions.length > 0) {
@@ -66,10 +63,6 @@ const Levels = ({ route }) => {
         }
     };
 
-    const handleGoBack = () => {
-        navigation.goBack()
-    }
-
     const renderItem = ({ item, index }) => {
         const groupIndex = Math.floor(index / 3);
         const isEvenGroup = groupIndex % 2 === 0;
@@ -91,7 +84,7 @@ const Levels = ({ route }) => {
                     }
                     style={styles.coinImage}
                 />
-                <Text style={styles.coinText}>{item.level_number}</Text>
+                <Text style={styles.coinText}>1</Text>
             </TouchableOpacity>
         );
     };
@@ -104,27 +97,12 @@ const Levels = ({ route }) => {
                 start={{ x: 0.5, y: 0 }}
                 end={{ x: 0.5, y: 1 }}
             >
-
-                <View style={styles.topHeader}>
-                    <TouchableOpacity style={styles.backArrow} onPress={handleGoBack}>
-                        <AntDesign name={'left'} size={25} color={'white'} />
-                    </TouchableOpacity>
-
-                    <View style={styles.levelsContainer}>
-                        <Text style={styles.levelsText}>Levels</Text>
-                    </View>
-
-                    <View>
-                        <Text>          </Text>
-                    </View>
-                </View>
                 <View style={styles.container}>
                     <FlatList
                         data={levels}
                         keyExtractor={(item) => item.id.toString()}
                         renderItem={renderItem}
                         contentContainerStyle={styles.flatListContent}
-                        showsVerticalScrollIndicator={false}
                     />
                 </View>
             </LinearGradient>
@@ -140,17 +118,6 @@ const styles = StyleSheet.create({
     },
     gradientContainer: {
         flex: 1,
-    },
-    topHeader: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        marginLeft: wp("5%"),
-        marginTop: hp('2%')
-    },
-    backArrow: {
-        // marginTop: hp('2%'),
-        // marginLeft: wp('4%')
     },
     container: {
         flex: 1,
@@ -174,21 +141,12 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         marginVertical: 20,
         alignSelf: 'flex-start',
-        position: 'relative',
+        position: 'relative', // Ensures proper stacking of children
     },
     coinText: {
         position: 'absolute',
-        top: 14,
         fontSize: 18,
         fontWeight: 'bold',
         color: 'black',
     },
-    levelsContainer: {
-        // marginTop: hp("0.5%"),
-        // alignSelf: 'center'
-    },
-    levelsText: {
-        fontSize: hp('4%'),
-        color: 'white'
-    }
 });

@@ -7,34 +7,48 @@ import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
 import Footer from '../Components/Footer';
-import { COLORS, FONTS } from '../theme';
+import { COLORS } from '../theme';
 import { LEVELS_STARTING } from '../../config/api';
+import AntDesign from "react-native-vector-icons/AntDesign";
 
 const SelectSubject = () => {
     const navigation = useNavigation();
-    const [mathsDropdownStatus, setMathsDropdownStatus] = useState(false);
-    const [englishDropdownStatus, setEnglishDropdownStatus] = useState(false);
+    const [subjectDropdownStatus, setSubjectDropdownStatus] = useState(false);
+    const [categoryDropdownStatus, setCategoryDropdownStatus] = useState(false);
     const [subject, setSubject] = useState('');
     const [category, setCategory] = useState('');
     const [levels, setLevels] = useState([]);
     const [totalLevels, setTotalLevels] = useState('');
     const [loading, setLoading] = useState(false);
 
-    const toggleDropdown = (type) => {
-        if (type === 'maths') {
-            setMathsDropdownStatus(!mathsDropdownStatus);
-            setEnglishDropdownStatus(false);
-        } else {
-            setEnglishDropdownStatus(!englishDropdownStatus);
-            setMathsDropdownStatus(false);
-        }
+    const subjects = ['Math', 'Reading and Writing'];
+
+    const categories = {
+        Math: ['Advancement Math', 'Problem-Solving', 'Algebra', 'Geometry'],
+        'Reading and Writing': ['Expression of Ideas', 'Craft and Structure', 'Information and Ideas', 'Standard English Conventions'],
     };
 
-    const selectCategory = (subjectType, categoryType) => {
-        setSubject(subjectType);
-        setCategory(categoryType);
-        setMathsDropdownStatus(false);
-        setEnglishDropdownStatus(false);
+
+    const toggleSubjectDropdown = () => {
+        setSubjectDropdownStatus(!subjectDropdownStatus);
+        setCategoryDropdownStatus(false);
+    };
+
+    const toggleCategoryDropdown = () => {
+        setCategoryDropdownStatus(!categoryDropdownStatus);
+    };
+
+
+    const selectSubject = (selectedSubject) => {
+        setSubject(selectedSubject);
+        setCategory('');
+        setSubjectDropdownStatus(false);
+        setCategoryDropdownStatus(false);
+    };
+
+    const selectCategory = (selectedCategory) => {
+        setCategory(selectedCategory);
+        setCategoryDropdownStatus(false);
     };
 
     useEffect(() => {
@@ -46,6 +60,8 @@ const SelectSubject = () => {
     const startQuiz = async () => {
         if (!subject || !category) return;
         setLoading(true);
+        console.log('YEH HAI LEVLES STARTING', LEVELS_STARTING);
+        console.log('YEH HAI SUBJECT AND CATEGORY', { subject, section: category });
 
         try {
             const token = await AsyncStorage.getItem('token');
@@ -59,7 +75,7 @@ const SelectSubject = () => {
                     },
                 }
             );
-            if (response?.data?.meta) {
+            if (!response?.data?.error) {
                 setLevels(response.data.meta.levels);
                 setTotalLevels(response.data.meta.total_levels);
             }
@@ -69,65 +85,57 @@ const SelectSubject = () => {
             setLoading(false);
         }
     };
-
     return (
         <SafeAreaView style={styles.mainContainer}>
-            <LinearGradient
-                colors={[COLORS.linearGradientColor1, COLORS.linearGradientColor2]}
-                style={styles.gradientContainer}
-            >
+            <LinearGradient colors={[COLORS.linearGradientColor1, COLORS.linearGradientColor2]} style={styles.gradientContainer}>
                 <Text style={styles.headingText}>Select a Subject to Begin</Text>
 
                 <View style={styles.dropdownContainer}>
                     <TouchableOpacity
-                        style={[styles.dropdown, mathsDropdownStatus && styles.dropdownActive]}
-                        onPress={() => toggleDropdown('maths')}
+                        style={[styles.dropdown, subjectDropdownStatus && styles.dropdownActive]}
+                        onPress={toggleSubjectDropdown}
                     >
-                        <Text style={styles.dropdownText}>{subject === 'Math' ? category : 'Math'}</Text>
-                        <Feather name={mathsDropdownStatus ? 'chevron-up' : 'chevron-down'} size={24} color="#26A5E6" />
+                        <Text style={styles.dropdownText}>{subject || 'Select Subject'}</Text>
+                        <Feather name={subjectDropdownStatus ? 'chevron-up' : 'chevron-down'} size={24} color={COLORS.primary} />
                     </TouchableOpacity>
-
-                    {mathsDropdownStatus && (
+                    {subjectDropdownStatus && (
                         <View style={styles.dropdownOptions}>
-                            {['Advancement Math', 'Problem-Solving and Data Analysis', 'Algebra', 'Geometry and Trigonometry'].map(
-                                (item) => (
-                                    <TouchableOpacity key={item} onPress={() => selectCategory('Math', item)}>
-                                        <Text style={styles.optionText}>{item}</Text>
-                                    </TouchableOpacity>
-                                )
-                            )}
+                            {subjects.map((item) => (
+                                <TouchableOpacity key={item} onPress={() => selectSubject(item)}>
+                                    <Text style={styles.optionText}>{item}</Text>
+                                </TouchableOpacity>
+                            ))}
                         </View>
                     )}
                 </View>
 
-                <View style={styles.dropdownContainer}>
-                    <TouchableOpacity
-                        style={[styles.dropdown, englishDropdownStatus && styles.dropdownActive]}
-                        onPress={() => toggleDropdown('english')}
-                    >
-                        <Text style={styles.dropdownText}>{subject === 'Reading and Writing' ? category : 'Reading and Writing'}</Text>
-                        <Feather name={englishDropdownStatus ? 'chevron-up' : 'chevron-down'} size={24} color="#26A5E6" />
-                    </TouchableOpacity>
-
-                    {englishDropdownStatus && (
-                        <View style={styles.dropdownOptions}>
-                            {['Expression of Ideas', 'Craft and Structure', 'Information and Ideas', 'Standard English Conventions'].map(
-                                (item) => (
-                                    <TouchableOpacity key={item} onPress={() => selectCategory('Reading and Writing', item)}>
+                {subject && (
+                    <View style={styles.dropdownContainer}>
+                        <TouchableOpacity
+                            style={[styles.dropdown, categoryDropdownStatus && styles.dropdownActive]}
+                            onPress={toggleCategoryDropdown}
+                        >
+                            <Text style={styles.dropdownText}>{category || 'Select Category'}</Text>
+                            <Feather name={categoryDropdownStatus ? 'chevron-up' : 'chevron-down'} size={24} color={COLORS.primary} />
+                        </TouchableOpacity>
+                        {categoryDropdownStatus && (
+                            <View style={styles.dropdownOptions}>
+                                {categories[subject].map((item) => (
+                                    <TouchableOpacity key={item} onPress={() => selectCategory(item)}>
                                         <Text style={styles.optionText}>{item}</Text>
                                     </TouchableOpacity>
-                                )
-                            )}
-                        </View>
-                    )}
-                </View>
+                                ))}
+                            </View>
+                        )}
+                    </View>
+                )}
 
                 <TouchableOpacity
                     style={[styles.startButton, (!subject || !category) && styles.startButtonDisabled]}
                     onPress={startQuiz}
                     disabled={!subject || !category || loading}
                 >
-                    {loading ? <ActivityIndicator color="#26A5E6" /> : <Text style={styles.startButtonText}>Start Quiz</Text>}
+                    {loading ? <ActivityIndicator color="#FFF" /> : <Text style={styles.startButtonText}>Start Quiz</Text>}
                 </TouchableOpacity>
             </LinearGradient>
             <Footer />
@@ -140,66 +148,73 @@ export default SelectSubject;
 const styles = StyleSheet.create({
     mainContainer: {
         flex: 1,
-        backgroundColor: '#f9f9f9',
     },
     gradientContainer: {
         flex: 1,
         padding: wp('5%'),
+        justifyContent: 'center',
     },
     headingText: {
-        color: 'white',
-        fontSize: hp('3%'),
-        fontWeight: '700',
+        color: '#fff',
+        fontSize: hp('3.5%'),
+        fontWeight: 'bold',
         textAlign: 'center',
         marginBottom: hp('4%'),
+        textDecorationLine: 'underline'
     },
     dropdownContainer: {
         marginBottom: hp('2%'),
     },
     dropdown: {
-        backgroundColor: 'white',
-        borderRadius: 10,
+        backgroundColor: '#fff',
+        borderRadius: 16,
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
         padding: wp('4%'),
-        borderColor: '#26A5E6',
-        borderWidth: 1,
+        borderWidth: 1.5,
+        borderBottomWidth: 5,
+        borderColor: 'black',
+        shadowColor: '#000',
+        shadowOpacity: 0.2,
+        shadowRadius: 5,
+        shadowOffset: { width: 0, height: 2 },
+        elevation: 5
     },
     dropdownActive: {
-        borderColor: '#1E90FF',
+        borderColor: COLORS.secondary,
     },
     dropdownText: {
         fontSize: hp('2.2%'),
         color: '#333',
     },
     dropdownOptions: {
-        backgroundColor: 'white',
-        borderRadius: 10,
-        marginTop: hp('1%'),
+        backgroundColor: '#fff',
+        borderRadius: 12,
         padding: wp('2%'),
-        borderColor: '#26A5E6',
+        borderColor: COLORS.primary,
         borderWidth: 1,
+        marginTop: hp('1%'),
     },
     optionText: {
         fontSize: hp('2%'),
-        color: '#26A5E6',
-        paddingVertical: hp('1%'),
+        color: COLORS.primary,
+        paddingVertical: hp('1.2%'),
         textAlign: 'center',
     },
     startButton: {
-        backgroundColor: '#26A5E6',
+        backgroundColor: 'white',
         padding: wp('4%'),
-        borderRadius: 10,
+        borderRadius: 12,
         alignItems: 'center',
         marginTop: hp('5%'),
     },
     startButtonDisabled: {
-        backgroundColor: '#B0E0E6',
+        backgroundColor: '#ccc',
     },
     startButtonText: {
-        color: 'white',
+        color: COLORS.blueColor,
         fontSize: hp('2.5%'),
-        fontWeight: '700',
+        fontWeight: 'bold',
     },
 });

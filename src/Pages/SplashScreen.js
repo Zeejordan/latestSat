@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, Text, View, SafeAreaView, Image, TouchableOpacity } from 'react-native';
+import { StyleSheet, Text, View, SafeAreaView, Image, TouchableOpacity, StatusBar } from 'react-native';
 // import FastImage from 'react-native-fast-image';
 import { LinearGradient } from 'expo-linear-gradient';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
@@ -10,7 +10,7 @@ const SplashScreen = () => {
     const navigation = useNavigation();
 
     const handleEntry = () => {
-        navigation.navigate('Login')
+        navigation.navigate('GoogleLogin')
     }
     return (
         <SafeAreaView style={styles.mainContainer}>
@@ -94,16 +94,19 @@ const styles = StyleSheet.create({
     welcomeText: {
         color: 'white',
         fontSize: hp('2%'),
-        textAlign: 'center'
+        textAlign: 'center',
+        fontFamily: 'Jaldi'
     },
     playText: {
         color: 'white',
         fontSize: hp('1.9%'),
-        textAlign: 'center'
+        textAlign: 'center',
+        fontFamily: 'Jaldi'
     },
     satText: {
-        fontWeight: 600,
-        fontSize: hp('2.5%')
+        fontWeight: 700,
+        fontSize: hp('2.5%'),
+        fontFamily: 'Jaldi'
     },
     buttonContainer: {
         backgroundColor: 'white',
