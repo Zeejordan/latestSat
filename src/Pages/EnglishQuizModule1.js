@@ -1,6 +1,6 @@
 import { StyleSheet, Text, View, SafeAreaView, TouchableOpacity, FlatList, Alert, ActivityIndicator, ScrollView } from 'react-native'
 import React, { useState } from 'react'
-import { useEffect } from 'react';
+import { useEffect, useContext } from 'react';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import { ENGLISH_MODULE, ENGLISH_SUBMIT_MODULE_FIRST, ENGLISH_SECOND_MODULE, ENGLISH_SUBMIT_MODULE_SECOND } from '../../config/api';
 import axios from 'axios';
@@ -12,8 +12,11 @@ import { useNavigation } from '@react-navigation/native';
 // import RenderHTML from 'react-native-render-html';
 import { WebView } from 'react-native-webview';
 import Tooltip from 'react-native-walkthrough-tooltip';
+import { GlobalContext } from '../context/GlobalContext';
 
 const EnglishQuizModule1 = () => {
+
+    const { mode, setMode } = useContext(GlobalContext);
 
 
     const navigation = useNavigation();
@@ -35,9 +38,12 @@ const EnglishQuizModule1 = () => {
     const [statusData, setStatusData] = useState([]);
     const [showStatus, setShowStatus] = useState(false);
     const [tooltipVisible, setTooltipVisible] = useState(true);
+    const [showAnswer, setShowAnswer] = useState(false)
 
     useEffect(() => {
-        getData();
+        if (mode) {
+            getData();
+        }
     }, []);
 
     useEffect(() => {
@@ -78,7 +84,7 @@ const EnglishQuizModule1 = () => {
 
     const getData = async () => {
         const token = await AsyncStorage.getItem('token');
-        const baseUrlGet = ENGLISH_MODULE;
+        const baseUrlGet = `${ENGLISH_MODULE}?mode=${mode}`;
         try {
             const response = await axios.get(baseUrlGet, {
                 headers: {
@@ -110,7 +116,7 @@ const EnglishQuizModule1 = () => {
     const getNextData = async () => {
         console.log("ab tum getNext function k andar ho")
         const token = await AsyncStorage.getItem('token');
-        const baseUrlPost = ENGLISH_SECOND_MODULE;
+        const baseUrlPost = `${ENGLISH_SECOND_MODULE}?mode=${mode}`;
 
         const payload = {
             "session_id": sessionId
@@ -347,6 +353,9 @@ const EnglishQuizModule1 = () => {
         }));
     };
 
+    const handleShowAnswer = () => {
+        setShowAnswer(!showAnswer);
+    }
     const dynamicFontSize = hp("6%");
     const renderItem = ({ item }) => {
         const handleStatusPageDisplay = () => {
@@ -468,6 +477,25 @@ const EnglishQuizModule1 = () => {
                     <TouchableOpacity style={styles.submitButton} onPress={handleStatusPageDisplay}>
                         <Text style={styles.submitText}>Submit</Text>
                     </TouchableOpacity>
+                )}
+
+                {mode === "practice_mode" && (
+                    <TouchableOpacity style={styles.viewAnswer} onPress={handleShowAnswer}>
+                        <Text style={styles.viewAnswerText}>{showAnswer ? "Hide Answer" : "View Answer"}</Text>
+                    </TouchableOpacity>
+                )}
+
+                {showAnswer && (
+                    <View style={styles.answerBox}>
+                        <WebView
+                            originWhitelist={['*']}
+                            source={{ html: `<style>body { font-size: ${dynamicFontSize}; padding:40px; }</style>${item.Rational}` }}
+                            style={[styles.webView, { flex: 1 }]}
+                            scalesPageToFit={true}
+                            javaScriptEnabled={true}
+                            showsVerticalScrollIndicator={false}
+                        />
+                    </View>
                 )}
             </View>
         );
@@ -668,6 +696,23 @@ const styles = StyleSheet.create({
         fontSize: hp('2.5%'),
         color: "#0470B8",
         fontWeight: '600'
+    },
+    viewAnswer: {
+        alignSelf: 'center',
+        backgroundColor: 'green',
+        paddingVertical: hp("1%"),
+        paddingHorizontal: wp('3%'),
+        borderRadius: 5,
+        marginBottom: hp('2%')
+    },
+    viewAnswerText: {
+        color: 'white'
+    },
+    answerBox: {
+        borderWidth: 1,
+        borderColor: "#D9D9D9",
+        borderRadius: 5,
+        marginBottom: hp('2%'),
     },
     submitButton: {
         backgroundColor: "#C5E6FD",

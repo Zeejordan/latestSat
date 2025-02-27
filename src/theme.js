@@ -10,6 +10,8 @@ export const COLORS = {
     profileGradientColor3: '#C5E6FD',
     profileGradientColor2: '#4FAFD7',
     profileGradientColor1: '#0470B8',
+    blackColor: 'black',
+    whiteColor: 'white'
 }
 
 export const FONTS = {

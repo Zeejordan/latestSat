@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useContext } from "react";
 import {
     StyleSheet,
     Text,
@@ -8,6 +8,7 @@ import {
     TouchableOpacity,
     ScrollView,
     StatusBar,
+    Modal
 } from "react-native";
 import RBSheet from "react-native-raw-bottom-sheet"; // Importing Bottom Sheet
 import AntDesign from "react-native-vector-icons/AntDesign";
@@ -21,6 +22,7 @@ import {
     widthPercentageToDP as wp,
     heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
+import { GlobalContext } from '../context/GlobalContext';
 
 const Quiz = ({ navigation }) => {
     const [quizData, setQuizData] = useState([]);
@@ -33,7 +35,10 @@ const Quiz = ({ navigation }) => {
     const [englishScore, setEnglishScore] = useState('');
     const [mathScore, setMathScore] = useState('');
     const [userSession, setUserSession] = useState('');
+    const [modal, setModal] = useState(false);
     const bottomSheetRef = useRef(); // Ref to manage Bottom Sheet visibility
+
+    const { mode, setMode } = useContext(GlobalContext);
 
     useEffect(() => {
         quizList();
@@ -95,15 +100,21 @@ const Quiz = ({ navigation }) => {
     };
 
     const handleNavigation = () => {
-        navigation.navigate("English-Quiz-1");
+        setModal(true)
     };
+
+    const handleNextNavigation = (mode) => {
+        setMode(mode)
+        setModal(false);
+        navigation.navigate("English-Quiz-1");
+    }
 
     const handleQuizClose = () => {
         setInstructions(false)
     };
 
     const handleAnalysisNavigation = () => {
-        bottomSheetRef.current.close(); // Close the bottom sheet
+        bottomSheetRef.current.close();
         if (userSession) {
             console.log('THIS IS USERSESSUIB', userSession)
             navigation.navigate('Quiz-Analysis', { userSession })
@@ -162,6 +173,10 @@ const Quiz = ({ navigation }) => {
 
         return quizData;
     };
+
+    const handleBack = () => {
+        navigation.navigate('HomeScreen')
+    }
 
     const handleFilterSelection = (filter) => {
         setFilterOption(filter);
@@ -272,7 +287,12 @@ const Quiz = ({ navigation }) => {
             ) : (
                 <View style={styles.container}>
                     <View style={styles.topBar}>
-                        <Text style={styles.quizText}>Quiz</Text>
+                        <View style={styles.miniContainer}>
+                            <TouchableOpacity onPress={handleBack}>
+                                <AntDesign name={"arrowleft"} size={25} color={'#46557B'} />
+                            </TouchableOpacity>
+                            <Text style={styles.quizText}>Quiz</Text>
+                        </View>
                         <View style={styles.leftSubBar}>
                             <TouchableOpacity onPress={() => setInstructions((prev) => !prev)}>
                                 <Octicons name="info" color="black" style={styles.infoIcon} />
@@ -293,6 +313,37 @@ const Quiz = ({ navigation }) => {
                         showsVerticalScrollIndicator={false}
                     />
                 </View>
+            )}
+
+            {modal && (
+                <Modal
+                    transparent={true}
+                    animationType="slide"
+                    visible={modal}
+                    onRequestClose={() => setModal(false)}
+                >
+                    <View style={styles.newModal}>
+                        <View style={styles.newModalContainer}>
+                            <Text style={styles.newModalText}>Select Mode</Text>
+
+                            <View style={styles.modeContainer}>
+                                <TouchableOpacity
+                                    style={styles.newModalButton}
+                                    onPress={() => handleNextNavigation('practice_mode')}
+                                >
+                                    <Text style={styles.newModalButtonText}>Practise Mode</Text>
+                                </TouchableOpacity>
+
+                                <TouchableOpacity
+                                    style={styles.newModalButton}
+                                    onPress={() => handleNextNavigation('exam_mode')}
+                                >
+                                    <Text style={styles.newModalButtonText}>Exam Mode</Text>
+                                </TouchableOpacity>
+                            </View>
+                        </View>
+                    </View>
+                </Modal>
             )}
 
             <Footer />
@@ -345,6 +396,12 @@ const styles = StyleSheet.create({
     topBar: {
         flexDirection: "row",
         justifyContent: "space-between",
+    },
+    miniContainer: {
+        flexDirection: 'row',
+        justifyContent: 'center',
+        alignItems: 'center',
+        gap: wp("4%")
     },
     leftSubBar: {
         flexDirection: "row",
@@ -572,6 +629,50 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     buttonText: {
+        color: '#FFFFFF',
+        fontSize: hp('2%'),
+        fontWeight: '600',
+    },
+    newModal: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    },
+    newModalContainer: {
+        width: '80%',
+        height: '28%',
+        paddingTop: hp("3%"),
+        paddingHorizontal: wp("5%"),
+        backgroundColor: '#FFFFFF',
+        borderRadius: 15,
+        alignItems: 'center',
+        elevation: 10,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.3,
+        shadowRadius: 6,
+    },
+    newModalText: {
+        fontSize: 18,
+        marginBottom: 20,
+        textAlign: 'center',
+    },
+    modeContainer: {
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'center',
+        gap: hp('2%')
+    },
+    newModalButton: {
+        backgroundColor: '#0470B8',
+        paddingVertical: hp('1.5%'),
+        paddingHorizontal: wp('7%'),
+        borderRadius: 8,
+        alignItems: 'center',
+        width: wp('60%')
+    },
+    newModalButtonText: {
         color: '#FFFFFF',
         fontSize: hp('2%'),
         fontWeight: '600',

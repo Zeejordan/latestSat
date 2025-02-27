@@ -9,7 +9,7 @@ import { useNavigation } from '@react-navigation/native';
 import Footer from '../Components/Footer';
 import { COLORS } from '../theme';
 import { LEVELS_STARTING } from '../../config/api';
-import AntDesign from "react-native-vector-icons/AntDesign";
+import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 
 const SelectSubject = () => {
     const navigation = useNavigation();
@@ -57,6 +57,10 @@ const SelectSubject = () => {
         }
     }, [levels]);
 
+    const handleBack = () => {
+        navigation.navigate('HomeScreen')
+    }
+
     const startQuiz = async () => {
         if (!subject || !category) return;
         setLoading(true);
@@ -88,55 +92,62 @@ const SelectSubject = () => {
     return (
         <SafeAreaView style={styles.mainContainer}>
             <LinearGradient colors={[COLORS.linearGradientColor1, COLORS.linearGradientColor2]} style={styles.gradientContainer}>
-                <Text style={styles.headingText}>Select a Subject to Begin</Text>
 
-                <View style={styles.dropdownContainer}>
-                    <TouchableOpacity
-                        style={[styles.dropdown, subjectDropdownStatus && styles.dropdownActive]}
-                        onPress={toggleSubjectDropdown}
-                    >
-                        <Text style={styles.dropdownText}>{subject || 'Select Subject'}</Text>
-                        <Feather name={subjectDropdownStatus ? 'chevron-up' : 'chevron-down'} size={24} color={COLORS.primary} />
-                    </TouchableOpacity>
-                    {subjectDropdownStatus && (
-                        <View style={styles.dropdownOptions}>
-                            {subjects.map((item) => (
-                                <TouchableOpacity key={item} onPress={() => selectSubject(item)}>
-                                    <Text style={styles.optionText}>{item}</Text>
-                                </TouchableOpacity>
-                            ))}
-                        </View>
-                    )}
-                </View>
+                <TouchableOpacity onPress={handleBack} style={styles.backButton}>
+                    <FontAwesome5 name={"arrow-left"} size={30} color={'white'} />
+                </TouchableOpacity>
 
-                {subject && (
+                <View style={styles.semiContainer}>
+                    <Text style={styles.headingText}>Select a Subject to Begin</Text>
+
                     <View style={styles.dropdownContainer}>
                         <TouchableOpacity
-                            style={[styles.dropdown, categoryDropdownStatus && styles.dropdownActive]}
-                            onPress={toggleCategoryDropdown}
+                            style={[styles.dropdown, subjectDropdownStatus && styles.dropdownActive]}
+                            onPress={toggleSubjectDropdown}
                         >
-                            <Text style={styles.dropdownText}>{category || 'Select Category'}</Text>
-                            <Feather name={categoryDropdownStatus ? 'chevron-up' : 'chevron-down'} size={24} color={COLORS.primary} />
+                            <Text style={styles.dropdownText}>{subject || 'Select Subject'}</Text>
+                            <Feather name={subjectDropdownStatus ? 'chevron-up' : 'chevron-down'} size={24} color={COLORS.primary} />
                         </TouchableOpacity>
-                        {categoryDropdownStatus && (
+                        {subjectDropdownStatus && (
                             <View style={styles.dropdownOptions}>
-                                {categories[subject].map((item) => (
-                                    <TouchableOpacity key={item} onPress={() => selectCategory(item)}>
+                                {subjects.map((item) => (
+                                    <TouchableOpacity key={item} onPress={() => selectSubject(item)}>
                                         <Text style={styles.optionText}>{item}</Text>
                                     </TouchableOpacity>
                                 ))}
                             </View>
                         )}
                     </View>
-                )}
 
-                <TouchableOpacity
-                    style={[styles.startButton, (!subject || !category) && styles.startButtonDisabled]}
-                    onPress={startQuiz}
-                    disabled={!subject || !category || loading}
-                >
-                    {loading ? <ActivityIndicator color="#FFF" /> : <Text style={styles.startButtonText}>Start Quiz</Text>}
-                </TouchableOpacity>
+                    {subject && (
+                        <View style={styles.dropdownContainer}>
+                            <TouchableOpacity
+                                style={[styles.dropdown, categoryDropdownStatus && styles.dropdownActive]}
+                                onPress={toggleCategoryDropdown}
+                            >
+                                <Text style={styles.dropdownText}>{category || 'Select Category'}</Text>
+                                <Feather name={categoryDropdownStatus ? 'chevron-up' : 'chevron-down'} size={24} color={COLORS.primary} />
+                            </TouchableOpacity>
+                            {categoryDropdownStatus && (
+                                <View style={styles.dropdownOptions}>
+                                    {categories[subject].map((item) => (
+                                        <TouchableOpacity key={item} onPress={() => selectCategory(item)}>
+                                            <Text style={styles.optionText}>{item}</Text>
+                                        </TouchableOpacity>
+                                    ))}
+                                </View>
+                            )}
+                        </View>
+                    )}
+
+                    <TouchableOpacity
+                        style={[styles.startButton, (!subject || !category) && styles.startButtonDisabled]}
+                        onPress={startQuiz}
+                        disabled={!subject || !category || loading}
+                    >
+                        {loading ? <ActivityIndicator color="#FFF" /> : <Text style={styles.startButtonText}>Start Quiz</Text>}
+                    </TouchableOpacity>
+                </View>
             </LinearGradient>
             <Footer />
         </SafeAreaView>
@@ -152,7 +163,11 @@ const styles = StyleSheet.create({
     gradientContainer: {
         flex: 1,
         padding: wp('5%'),
-        justifyContent: 'center',
+        // justifyContent: 'center',
+
+    },
+    semiContainer: {
+        marginTop: hp("22%")
     },
     headingText: {
         color: '#fff',
@@ -217,4 +232,7 @@ const styles = StyleSheet.create({
         fontSize: hp('2.5%'),
         fontWeight: 'bold',
     },
+    backButton: {
+        width: wp('8%')
+    }
 });

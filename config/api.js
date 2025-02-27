@@ -11,7 +11,7 @@ export const QUIZ_LIST = BASE_URL + "test-list/"                // GET
 export const QUIZ_LIST_COMPLETE = BASE_URL + "get-test-details/"                // GET(fir progress id k baad ek slash hai)
 export const QUIZ_ANSWERS = BASE_URL + "session/"
 
-export const ENGLISH_MODULE = BASE_URL + "first-module-eng/"          // GET
+export const ENGLISH_MODULE = BASE_URL + "first-module-eng"          // GET
 export const ENGLISH_SUBMIT_MODULE_FIRST = BASE_URL + "submit-first-module/"     // POST
 export const ENGLISH_SECOND_MODULE = BASE_URL + "second-module/"                     // POST
 export const ENGLISH_SUBMIT_MODULE_SECOND = BASE_URL + "submit-second-modules/"  // POST

@@ -1,5 +1,5 @@
 import { StyleSheet, Text, View, SafeAreaView, TouchableOpacity, FlatList, Alert, ActivityIndicator, TextInput, ScrollView, Modal, TouchableWithoutFeedback } from 'react-native'
-import React, { memo, useState } from 'react'
+import React, { memo, useState, useContext } from 'react'
 import { useEffect } from 'react';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import { MATHS_FIRST_MODULE, MATHS_FIRST_MODULE_SUBMIT, MATHS_SECOND_MODULE, MATHS_SECOND_MODULE_SUBMIT } from '../../config/api';
@@ -12,8 +12,11 @@ import { useNavigation } from '@react-navigation/native';
 import { WebView } from 'react-native-webview';
 import CalculatorModal from '../Components/CalculatorModal';
 import Tooltip from 'react-native-walkthrough-tooltip';
+import { GlobalContext } from '../context/GlobalContext';
 
 const MathsQuiz = () => {
+
+     const { mode, setMode } = useContext(GlobalContext);
 
     const navigation = useNavigation();
     const [data, setData] = useState([]);
@@ -106,7 +109,7 @@ const MathsQuiz = () => {
     const getData = async () => {
         console.log("abhi hum getData function k andar hai")
         const token = await AsyncStorage.getItem('token');
-        const baseUrlGet = MATHS_FIRST_MODULE;
+        const baseUrlGet = `${MATHS_FIRST_MODULE}?mode=${mode}`;
 
         console.log("yeh hai token: ", token, "yeh hai sessionId", sessionId)
 
@@ -150,7 +153,7 @@ const MathsQuiz = () => {
     const getNextData = async () => {
         console.log("ab tum getNext function k andar ho")
         const token = await AsyncStorage.getItem('token');
-        const baseUrlPost = MATHS_SECOND_MODULE;
+        const baseUrlPost = `${MATHS_SECOND_MODULE}?mode=${mode}`;
 
         const payload = {
             "session_id": sessionId

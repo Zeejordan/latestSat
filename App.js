@@ -22,6 +22,7 @@ import SelectSubject from './src/Pages/SelectSubject';
 import StatusPage from './src/Components/StatusPage';
 import UpdateProfile from './src/Pages/UpdateProfile';
 import QuizAnalysisPage from './src/Pages/QuizAnalysisPage';
+import { GlobalProvider } from './src/context/GlobalContext';
 
 const Stack = createNativeStackNavigator();
 
@@ -35,33 +36,35 @@ const App = () => {
         backgroundColor="#0470B8"
       />
 
-      <NavigationContainer>
-        <Stack.Navigator
-          initialRouteName={initialRoute}
-          screenOptions={{
-            headerShown: false,
-          }}>
-          <Stack.Screen name="SplashScreen" component={SplashScreen} />
-          <Stack.Screen name="GoogleLogin" component={GoogleSplashScreen} />
-          <Stack.Screen name="TestQuestion" component={TestQuestion} />
-          <Stack.Screen name="LevelComplete" component={LevelComplete} />
-          <Stack.Screen name="QuizComplete" component={QuizComplete} />
-          <Stack.Screen name="Login" component={LoginPage} />
-          <Stack.Screen name="OtpVerification" component={OtpVerification} />
-          <Stack.Screen name="HomeScreen" component={HomeScreen} />
-          <Stack.Screen name="ProfileDetails" component={ProfileDetails} />
-          <Stack.Screen name="Levels" component={Levels} />
-          <Stack.Screen name="Quiz" component={Quiz} />
-          <Stack.Screen name="English-Quiz-1" component={EnglishQuizModule1} />
-          <Stack.Screen name="Module-Gap" component={ModuleGap} />
-          <Stack.Screen name="Maths-Quiz" component={MathsQuiz} />
-          <Stack.Screen name="Statistics" component={Statistics} />
-          <Stack.Screen name="Select-Subject" component={SelectSubject} />
-          <Stack.Screen name="StatusPage" component={StatusPage} />
-          <Stack.Screen name="Update-Profile" component={UpdateProfile} />
-          <Stack.Screen name="Quiz-Analysis" component={QuizAnalysisPage} />
-        </Stack.Navigator>
-      </NavigationContainer>
+      <GlobalProvider>
+        <NavigationContainer>
+          <Stack.Navigator
+            initialRouteName={initialRoute}
+            screenOptions={{
+              headerShown: false,
+            }}>
+            <Stack.Screen name="SplashScreen" component={SplashScreen} />
+            <Stack.Screen name="GoogleLogin" component={GoogleSplashScreen} />
+            <Stack.Screen name="TestQuestion" component={TestQuestion} />
+            <Stack.Screen name="LevelComplete" component={LevelComplete} />
+            <Stack.Screen name="QuizComplete" component={QuizComplete} />
+            <Stack.Screen name="Login" component={LoginPage} />
+            <Stack.Screen name="OtpVerification" component={OtpVerification} />
+            <Stack.Screen name="HomeScreen" component={HomeScreen} />
+            <Stack.Screen name="ProfileDetails" component={ProfileDetails} />
+            <Stack.Screen name="Levels" component={Levels} />
+            <Stack.Screen name="Quiz" component={Quiz} />
+            <Stack.Screen name="English-Quiz-1" component={EnglishQuizModule1} />
+            <Stack.Screen name="Module-Gap" component={ModuleGap} />
+            <Stack.Screen name="Maths-Quiz" component={MathsQuiz} />
+            <Stack.Screen name="Statistics" component={Statistics} />
+            <Stack.Screen name="Select-Subject" component={SelectSubject} />
+            <Stack.Screen name="StatusPage" component={StatusPage} />
+            <Stack.Screen name="Update-Profile" component={UpdateProfile} />
+            <Stack.Screen name="Quiz-Analysis" component={QuizAnalysisPage} />
+          </Stack.Navigator>
+        </NavigationContainer>
+      </GlobalProvider>
     </>
   )
 }
