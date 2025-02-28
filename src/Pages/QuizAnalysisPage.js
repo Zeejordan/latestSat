@@ -16,7 +16,7 @@ import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-nat
 import { WebView } from 'react-native-webview';
 import { useNavigation } from '@react-navigation/native';
 
-// stop stop stop stop stop stpo 
+// stop stop stop stop sto stop sto stop stop stop
 
 const QuizAnalysisPage = ({ route }) => {
 
@@ -77,6 +77,7 @@ const QuizAnalysisPage = ({ route }) => {
     const handleQuestionSelect = (index) => {
         setCurrentQuestionIndex(index);
     };
+
 
     const handleNextModule = () => {
         // if (currentModuleIndex < modules.length - 1) {
@@ -189,7 +190,7 @@ const QuizAnalysisPage = ({ route }) => {
             <ScrollView contentContainerStyle={styles.scrollContainer}>
                 <View style={styles.moduleContainer}>
                     <Text style={styles.moduleText}>
-                        Question No.{currentQuestion.index}
+                        Question No.{currentQuestionIndex + 1}  {/* Display the updated question number */}
                     </Text>
                     <Text style={styles.moduleText}>
                         SAT {currentQuestion.module_name}
@@ -208,7 +209,6 @@ const QuizAnalysisPage = ({ route }) => {
                                     currentQuestionIndex === index && styles.selectedQuestionCircle,
                                 ]}
                                 onPress={() => {
-
                                     if (isClickable) {
                                         handleQuestionSelect(index);
                                     }
@@ -229,6 +229,7 @@ const QuizAnalysisPage = ({ route }) => {
                         );
                     })}
                 </ScrollView>
+
 
                 <View style={styles.questionContainer}>
 
@@ -332,15 +333,15 @@ const QuizAnalysisPage = ({ route }) => {
             <View style={styles.navigationContainer}>
                 <TouchableOpacity
                     onPress={handlePreviousModule}
-                    style={[styles.navButton, currentModuleIndex === 0 && styles.disabledButton]}
-                    disabled={currentModuleIndex === 0}
+                    style={styles.navButton}
+                // disabled={currentModuleIndex === 0}
                 >
                     <Text style={styles.navButtonText}>Previous Module</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
                     onPress={handleNextModule}
-                    style={[styles.navButton, currentModuleIndex === modules.length - 1 && styles.disabledButton]}
-                    disabled={currentModuleIndex === modules.length - 1}
+                    style={styles.navButton}
+                // disabled={currentModuleIndex === modules.length - 1}
                 >
                     <Text style={styles.navButtonText}>Next Module</Text>
                 </TouchableOpacity>

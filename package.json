@@ -43,6 +43,7 @@
     "react-native-screens": "^4.4.0",
     "react-native-simple-toast": "^3.3.2",
     "react-native-toast-message": "^2.2.1",
+    "react-native-tooltips": "^1.0.3",
     "react-native-url-polyfill": "^2.0.0",
     "react-native-vector-icons": "^10.2.0",
     "react-native-walkthrough-tooltip": "^1.6.0",

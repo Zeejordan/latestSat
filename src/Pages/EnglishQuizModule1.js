@@ -14,6 +14,8 @@ import { WebView } from 'react-native-webview';
 import Tooltip from 'react-native-walkthrough-tooltip';
 import { GlobalContext } from '../context/GlobalContext';
 
+// stop stop stop stop stop stop stop stop stop 
+
 const EnglishQuizModule1 = () => {
 
     const { mode, setMode } = useContext(GlobalContext);
@@ -451,7 +453,7 @@ const EnglishQuizModule1 = () => {
                             key={option}
                             style={[
                                 selectedOption === option ? styles.selectedOptionBox : styles.optionBox,
-                                { height: optionHeights[option] || 'auto' }, // Make sure you handle undefined state correctly
+                                { height: optionHeights[option] || 'auto' },
                             ]}
                             onPress={() => handleOptionSelection(option, item.id)}
                         >

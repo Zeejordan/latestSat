@@ -125,6 +125,7 @@ const Levels = ({ route }) => {
                         renderItem={renderItem}
                         contentContainerStyle={styles.flatListContent}
                         showsVerticalScrollIndicator={false}
+                        inverted
                     />
                 </View>
             </LinearGradient>

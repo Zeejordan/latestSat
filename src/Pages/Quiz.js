@@ -8,7 +8,8 @@ import {
     TouchableOpacity,
     ScrollView,
     StatusBar,
-    Modal
+    Modal,
+    TouchableWithoutFeedback, Keyboard
 } from "react-native";
 import RBSheet from "react-native-raw-bottom-sheet"; // Importing Bottom Sheet
 import AntDesign from "react-native-vector-icons/AntDesign";
@@ -259,14 +260,14 @@ const Quiz = ({ navigation }) => {
                             - If your answer is a decimal that does not fit in the space provided, truncate or round it to the third digit. {"\n"}
                             - If your answer is a mixed number (eg. 5 1/2), enter it as an improper fraction (eg. 11/2) or its decimal equivalent (eg. 5.5).{"\n\n"}
 
-                            Here’s the example presented as a table for clarity: {"\n\n"}
+                            {/* Here’s the example presented as a table for clarity: {"\n\n"}
 
                             Acceptable Ways to Enter Answer       {"\n"}
                             --------------------------------------------------------------------------{"\n"}
                             3.5     =        3.5, 7/2                                  {"\n"}
                             19/9    =      19/9, 2.111, 2.112                        {"\n"}
                             -37/4    =     -37/4, -9.25                              {"\n"}
-                            10√(3)   =     10root(3), 17.320, 17.321                 {"\n"}
+                            10√(3)   =     10root(3), 17.320, 17.321                 {"\n"} */}
                         </Text>
 
                         <View style={styles.buttonsContainer}>
@@ -322,27 +323,29 @@ const Quiz = ({ navigation }) => {
                     visible={modal}
                     onRequestClose={() => setModal(false)}
                 >
-                    <View style={styles.newModal}>
-                        <View style={styles.newModalContainer}>
-                            <Text style={styles.newModalText}>Select Mode</Text>
+                    <TouchableWithoutFeedback onPress={() => setModal(false)}>
+                        <View style={styles.newModal}>
+                            <View style={styles.newModalContainer}>
+                                <Text style={styles.newModalText}>Select Mode</Text>
 
-                            <View style={styles.modeContainer}>
-                                <TouchableOpacity
-                                    style={styles.newModalButton}
-                                    onPress={() => handleNextNavigation('practice_mode')}
-                                >
-                                    <Text style={styles.newModalButtonText}>Practise Mode</Text>
-                                </TouchableOpacity>
+                                <View style={styles.modeContainer}>
+                                    <TouchableOpacity
+                                        style={styles.newModalButton}
+                                        onPress={() => handleNextNavigation('practice_mode')}
+                                    >
+                                        <Text style={styles.newModalButtonText}>Practise Mode</Text>
+                                    </TouchableOpacity>
 
-                                <TouchableOpacity
-                                    style={styles.newModalButton}
-                                    onPress={() => handleNextNavigation('exam_mode')}
-                                >
-                                    <Text style={styles.newModalButtonText}>Exam Mode</Text>
-                                </TouchableOpacity>
+                                    <TouchableOpacity
+                                        style={styles.newModalButton}
+                                        onPress={() => handleNextNavigation('exam_mode')}
+                                    >
+                                        <Text style={styles.newModalButtonText}>Exam Mode</Text>
+                                    </TouchableOpacity>
+                                </View>
                             </View>
                         </View>
-                    </View>
+                    </TouchableWithoutFeedback>
                 </Modal>
             )}
 
@@ -657,6 +660,9 @@ const styles = StyleSheet.create({
         fontSize: 18,
         marginBottom: 20,
         textAlign: 'center',
+        textDecorationLine: 'underline',
+        fontWeight: '700',
+        color: 'black'
     },
     modeContainer: {
         flexDirection: 'column',
