@@ -1,5 +1,5 @@
 import { StyleSheet, Text, View, SafeAreaView, TouchableOpacity, FlatList, Alert, ActivityIndicator, ScrollView } from 'react-native'
-import React, { useState } from 'react'
+import React, { useState, useRef } from 'react'
 import { useEffect, useContext } from 'react';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import { ENGLISH_MODULE, ENGLISH_SUBMIT_MODULE_FIRST, ENGLISH_SECOND_MODULE, ENGLISH_SUBMIT_MODULE_SECOND } from '../../config/api';
@@ -13,6 +13,8 @@ import { useNavigation } from '@react-navigation/native';
 import { WebView } from 'react-native-webview';
 import Tooltip from 'react-native-walkthrough-tooltip';
 import { GlobalContext } from '../context/GlobalContext';
+import RBSheet from "react-native-raw-bottom-sheet"; // Importing Bottom Sheet
+
 
 // stop stop stop stop stop stop stop stop stop 
 
@@ -41,6 +43,7 @@ const EnglishQuizModule1 = () => {
     const [showStatus, setShowStatus] = useState(false);
     const [tooltipVisible, setTooltipVisible] = useState(true);
     const [showAnswer, setShowAnswer] = useState(false)
+    const bottomSheetRef = useRef();
 
     useEffect(() => {
         if (mode) {
@@ -399,26 +402,65 @@ const EnglishQuizModule1 = () => {
                         </TouchableOpacity>
                     </View>
 
-
-                    <Tooltip
-                        isVisible={tooltipVisible}
-                        content={
-                            <Text style={styles.tooltipText}>
-                                This section focuses on key reading and writing skills. Each question is based on one or more passages, which may include tables or graphs. Read the passages and questions thoroughly, then choose the best answer based on the information provided.
-
-                                All questions are multiple-choice with four options, and each has only one correct answer.
-
-                            </Text>
-                        }
-                        placement="bottom"
-                        onClose={() => setTooltipVisible(false)}
-                        showChildInTooltip={false}
-                        backgroundStyle={styles.tooltipBackground}
+                    <RBSheet
+                        ref={bottomSheetRef}
+                        height={350}
+                        closeOnDragDown={true}
+                        customStyles={{
+                            container: {
+                                padding: 20,
+                                backgroundColor: '#fff',
+                                borderTopLeftRadius: 15,
+                                borderTopRightRadius: 15,
+                            },
+                        }}
                     >
-                        <TouchableOpacity onPress={toggleTooltip}>
-                            <Octicons name="info" color="black" style={styles.infoIcon} />
-                        </TouchableOpacity>
-                    </Tooltip>
+                        <View style={styles.answerBoxNew}>
+                            <View style={styles.answerExplanationContainer}>
+                                <Text style={styles.answerExplanationText}>Answer Explanation: </Text>
+                            </View>
+                            <WebView
+                                originWhitelist={['*']}
+                                source={{ html: `<style>body { font-size: ${dynamicFontSize}; padding:40px; }</style>${item.Rational}` }}
+                                style={[styles.webView, { flex: 1 }]}
+                                scalesPageToFit={true}
+                                javaScriptEnabled={true}
+                                showsVerticalScrollIndicator={false}
+                            />
+                        </View>
+                    </RBSheet>
+
+                    <View style={styles.semiContainer}>
+                        {mode === "practice_mode" && (
+                            <TouchableOpacity onPress={() => bottomSheetRef.current.open()}>
+                                <Entypo name={showAnswer ? "eye-with-line" : "eye"} color={"black"} size={20} />
+                            </TouchableOpacity>
+                        )}
+
+                        <Tooltip
+                            isVisible={tooltipVisible}
+                            content={
+                                <Text style={styles.tooltipText}>
+                                    This section focuses on key reading and writing skills. Each question is based on one or more passages, which may include tables or graphs. Read the passages and questions thoroughly, then choose the best answer based on the information provided.
+
+                                    All questions are multiple-choice with four options, and each has only one correct answer.
+
+                                </Text>
+                            }
+                            placement="bottom"
+                            onClose={() => setTooltipVisible(false)}
+                            showChildInTooltip={false}
+                            backgroundStyle={styles.tooltipBackground}
+                        >
+
+                            <TouchableOpacity onPress={toggleTooltip}>
+                                <Octicons name="info" color="black" style={styles.infoIcon} />
+                            </TouchableOpacity>
+
+
+                        </Tooltip>
+                    </View>
+
                 </View>
 
                 <View style={styles.questionDescription}>
@@ -481,13 +523,13 @@ const EnglishQuizModule1 = () => {
                     </TouchableOpacity>
                 )}
 
-                {mode === "practice_mode" && (
+                {/* {mode === "practice_mode" && (
                     <TouchableOpacity style={styles.viewAnswer} onPress={handleShowAnswer}>
                         <Text style={styles.viewAnswerText}>{showAnswer ? "Hide Answer" : "View Answer"}</Text>
                     </TouchableOpacity>
-                )}
+                )} */}
 
-                {showAnswer && (
+                {/* {showAnswer && (
                     <View style={styles.answerBox}>
                         <WebView
                             originWhitelist={['*']}
@@ -498,7 +540,7 @@ const EnglishQuizModule1 = () => {
                             showsVerticalScrollIndicator={false}
                         />
                     </View>
-                )}
+                )} */}
             </View>
         );
     };
@@ -567,6 +609,8 @@ const EnglishQuizModule1 = () => {
                 />
 
             </View>)}
+
+
 
 
         </SafeAreaView>
@@ -716,6 +760,20 @@ const styles = StyleSheet.create({
         borderRadius: 5,
         marginBottom: hp('2%'),
     },
+    answerBoxNew: {
+        flex: 1,
+        // height: 300,
+    },
+    answerExplanationContainer: {
+        marginLeft: wp('5%')
+    },
+    answerExplanationText: {
+        color: '#0470B8',
+        fontSize: hp('3%'),
+        fontWeight: '700',
+        textDecorationLine: 'underline',
+        marginBottom: 5
+    },
     submitButton: {
         backgroundColor: "#C5E6FD",
         marginVertical: hp('4%'),
@@ -849,6 +907,12 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         borderWidth: 1,
         borderColor: 'transparent'
+    },
+    semiContainer: {
+        flexDirection: 'row',
+        justifyContent: 'center',
+        alignItems: 'center',
+        gap: wp('2%')
     },
     // navigateButton: {
     //     padding: 15,

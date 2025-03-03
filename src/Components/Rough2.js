@@ -1,49 +1,75 @@
-import { StyleSheet, Text, View, SafeAreaView, TouchableOpacity, FlatList, Alert, ActivityIndicator } from 'react-native'
-import React, { useState } from 'react'
-import { useEffect } from 'react';
+import { StyleSheet, Text, View, SafeAreaView, TouchableOpacity, FlatList, Alert, ActivityIndicator, ScrollView } from 'react-native'
+import React, { useState, useRef } from 'react'
+import { useEffect, useContext } from 'react';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
-import { ENGLISH_MODULE, ENGLISH_SUBMIT_MODULE } from '../../config/api';
+import { ENGLISH_MODULE, ENGLISH_SUBMIT_MODULE_FIRST, ENGLISH_SECOND_MODULE, ENGLISH_SUBMIT_MODULE_SECOND } from '../../config/api';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Octicons from 'react-native-vector-icons/Octicons';
+import Entypo from 'react-native-vector-icons/Entypo';
 import { COLORS, FONTS } from '../theme';
 import { useNavigation } from '@react-navigation/native';
+// import RenderHTML from 'react-native-render-html';
+import { WebView } from 'react-native-webview';
+import Tooltip from 'react-native-walkthrough-tooltip';
+import { GlobalContext } from '../context/GlobalContext';
+import RBSheet from "react-native-raw-bottom-sheet"; // Importing Bottom Sheet
 
+
+// stop stop stop stop stop stop stop stop stop 
 
 const EnglishQuizModule1 = () => {
+
+    const { mode, setMode } = useContext(GlobalContext);
+
 
     const navigation = useNavigation();
     const [data, setData] = useState([]);
     const [flatlistData, setFlatlistData] = useState([]);
-
     const [currentQuestion, setCurrentQuestion] = useState(1);
-
     const [selectedOption, setSelectedOption] = useState(null);
     const [questionsAttempted, setQuestionsAttempted] = useState(0);
     const [totalQuestions, setTotalQuestions] = useState(0);
     const [sessionId, setSessionId] = useState(null);
-    const [currentQuestionId, setCurrentQuestionId] = useState(null);
-
     const [answers, setAnswers] = useState({});
-
     const [submitLoading, setSubmitLoading] = useState(false);
+    const [moduleName, setModuleName] = useState("");
+    const [submitCount, setSubmitCount] = useState(1);
 
-    const [timeLeft, setTimeLeft] = useState(20);
+    const [timeLeft, setTimeLeft] = useState(32 * 60);
+    const [stopTimer, setStopTimer] = useState(false);
+
+    const [statusData, setStatusData] = useState([]);
+    const [showStatus, setShowStatus] = useState(false);
+    const [tooltipVisible, setTooltipVisible] = useState(true);
+    const [showAnswer, setShowAnswer] = useState(false)
+    const bottomSheetRef = useRef();
+
+    useEffect(() => {
+        if (mode) {
+            getData();
+        }
+    }, []);
 
     useEffect(() => {
         setCurrentQuestion(1);
         setSelectedOption(null);
         setQuestionsAttempted(0);
-        setSessionId(null);
         setAnswers({});
         setTotalQuestions(0);
-        getData();
-    }, [])
+        setTimeLeft(32 * 60);
+        if (submitCount < 3) {
+            setStopTimer(false);
+
+        }
+    }, [submitCount])
 
     useEffect(() => {
+        if (stopTimer) {
+            return;
+        }
         if (timeLeft <= 0) {
             submitCheck("onTimeUp");
-            // navigation.navigate("Quiz");
             return;
         }
 
@@ -52,7 +78,8 @@ const EnglishQuizModule1 = () => {
         }, 1000);
 
         return () => clearInterval(timerInterval);
-    }, [timeLeft]);
+    }, [timeLeft, stopTimer]);
+
 
     const formatTime = (seconds) => {
         const minutes = Math.floor(seconds / 60);
@@ -62,7 +89,7 @@ const EnglishQuizModule1 = () => {
 
     const getData = async () => {
         const token = await AsyncStorage.getItem('token');
-        const baseUrlGet = ENGLISH_MODULE;
+        const baseUrlGet = `${ENGLISH_MODULE}?mode=${mode}`;
         try {
             const response = await axios.get(baseUrlGet, {
                 headers: {
@@ -72,17 +99,55 @@ const EnglishQuizModule1 = () => {
             })
 
             if (!response?.data?.error) {
-                console.log("yaha pe dekh questions ko", response.data.meta.questions);
                 setData(response?.data?.meta?.questions);
 
                 const singleQuestion = response.data.meta.questions.filter((item) => item.Question_No === 1);
-                console.log("yeh hai single question yaha pe dekh", singleQuestion)
                 setFlatlistData(singleQuestion);
-                console.log("yeh hai flatlist ka data yaha dekh", flatlistData);
 
-                const newSessionId = response.data.meta.session_id;
-                setSessionId(newSessionId);
-                setTotalQuestions(response?.data.meta.Total_Questions);
+                // const newSessionId = response.data.meta.session_id;
+                setSessionId(response?.data?.meta?.session_id);
+
+                console.log("Storing Session ID abhi kaam chal raha hai:", response?.data?.meta?.session_id);
+                await AsyncStorage.setItem("sessionId", response?.data?.meta?.session_id);
+
+                setTotalQuestions(response?.data?.meta?.Total_Questions);
+                setModuleName(response?.data?.meta?.module_name)
+            }
+        } catch (error) {
+            console.log("An Error Occured", error)
+        }
+    }
+
+    const getNextData = async () => {
+        console.log("ab tum getNext function k andar ho")
+        const token = await AsyncStorage.getItem('token');
+        const baseUrlPost = `${ENGLISH_SECOND_MODULE}?mode=${mode}`;
+
+        const payload = {
+            "session_id": sessionId
+        };
+
+        try {
+            const response = await axios.post(baseUrlPost, payload, {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    "Content-Type": "multipart/form-data"
+                }
+            })
+
+            if (!response?.data?.error) {
+                console.log("yaha pe dekh questions ko second module k", response?.data?.meta?.questions);
+                setData(response?.data?.meta?.questions);
+
+                const singleQuestion = response?.data?.meta?.questions.filter((item) => item.Question_No === 1);
+                console.log("yeh hai single question yaha pe dekh second module", singleQuestion)
+                setFlatlistData(singleQuestion);
+                console.log("yeh hai flatlist ka data yaha dekh second module", flatlistData);
+
+                setTotalQuestions(response?.data?.meta?.Total_Questions);
+
+                setModuleName(response?.data?.meta?.module_name);
+                console.log('yeh hai module ka naam second module', response?.data?.meta?.module_name);
             }
         } catch (error) {
             console.log("An Error Occured", error)
@@ -105,10 +170,12 @@ const EnglishQuizModule1 = () => {
         }
     };
     const SubmitQuestions = async () => {
+        setStopTimer(true)
         console.log("yeh hai answers submit function k andar:", answers)
         setSubmitLoading(true);
         const token = await AsyncStorage.getItem('token');
-        const baseUrlPost = ENGLISH_SUBMIT_MODULE;
+        const baseUrlPost1 = ENGLISH_SUBMIT_MODULE_FIRST;
+        const baseUrlPost2 = ENGLISH_SUBMIT_MODULE_SECOND;
 
         const payload = {
             session_id: sessionId,
@@ -116,7 +183,7 @@ const EnglishQuizModule1 = () => {
         }
         console.log("yeh hai submit ka payload : ", payload);
         try {
-            const response = await axios.post(baseUrlPost, payload, {
+            const response = await axios.post(submitCount === 2 ? baseUrlPost2 : baseUrlPost1, payload, {
                 headers: {
                     'Authorization': `Bearer ${token}`,
                     "Content-Type": "application/json"
@@ -131,7 +198,14 @@ const EnglishQuizModule1 = () => {
         }
         finally {
             setSubmitLoading(false);
-            navigation.navigate("English-Quiz-2")
+            if (submitCount === 1) {
+                getNextData();
+            }
+            setSubmitCount((prev) => prev + 1)
+            submitCount === 2 ? (console.log("yeh hai second module ka submit check")) : (console.log("yeh hai first module ka submit check"))
+            if (submitCount === 2) {
+                navigation.navigate('Module-Gap')
+            }
         }
     }
 
@@ -166,21 +240,25 @@ const EnglishQuizModule1 = () => {
     };
 
     const handleOptionSelection = (option, questionId) => {
+        const question = data.find((item) => item.id === questionId);
+        const questionNo = question?.Question_No;
+
         if (selectedOption === option) {
             setSelectedOption(null);
             if (questionsAttempted > 0) {
                 const newStatus = questionsAttempted - 1;
                 setQuestionsAttempted(newStatus);
+
                 if (answers[questionId]) {
                     setAnswers((prev) => {
-                        const updated = { ...prev }
-                        delete updated[questionId]
+                        const updated = { ...prev };
+                        delete updated[questionId];
                         return updated;
-                    })
+                    });
                 }
             }
-        }
-        else {
+        } else {
+
             setSelectedOption(option);
             if (!answers[questionId]) {
                 const newStatus = questionsAttempted + 1;
@@ -188,27 +266,215 @@ const EnglishQuizModule1 = () => {
             }
 
             setAnswers((prev) => ({
-                ...prev, [questionId]: option
-            }))
+                ...prev,
+                [questionId]: {
+                    answer: option,
+                    index: questionNo,
+                },
+            }));
         }
 
-        console.log("yaha dekh answers : ", answers)
+        console.log("Updated answers: ", answers);
     };
 
-    const renderItem = ({ item }) => {
+    const handleGoBack = () => {
+        setShowStatus(false);
+    }
+    const [markedForReview, setMarkedForReview] = useState({});
 
+    const handleMarkForReview = (questionId) => {
+        setMarkedForReview((prev) => ({
+            ...prev,
+            [questionId]: !prev[questionId],
+        }));
+    };
+
+    const toggleTooltip = () => {
+        setTooltipVisible((prev) => !prev)
+    }
+
+    const renderHorizontalScroll = () => {
+        return (
+            <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={styles.horizontalScrollContainer}
+            >
+                {Array.from({ length: totalQuestions }, (_, index) => index + 1).map((questionNo) => {
+                    const questionId = data.find((item) => item.Question_No === questionNo)?.id;
+                    const isAttempted = Object.keys(answers).includes(questionId?.toString() || "");
+                    const isMarked = markedForReview[questionId];
+
+                    return (
+                        <View key={questionNo} style={{ alignItems: 'center' }}>
+                            <TouchableOpacity
+                                style={[
+                                    styles.questionCircle,
+                                    currentQuestion === questionNo && styles.currentQuestionCircle,
+                                    isAttempted && styles.attemptedQuestionCircle,
+                                ]}
+                                onPress={() => {
+                                    const selectedQuestion = data.filter(
+                                        (item) => item.Question_No === questionNo
+                                    );
+                                    setFlatlistData(selectedQuestion);
+                                    setCurrentQuestion(questionNo);
+                                    const selectedQuestionId = selectedQuestion[0]?.id;
+                                    setSelectedOption(answers[selectedQuestionId] || null);
+                                }}
+                            >
+
+                                {isMarked && (
+                                    <View style={styles.bookmarkIconContainer}>
+                                        <Entypo name="bookmarks" size={14} color="red" />
+                                    </View>
+                                )}
+                                <Text
+                                    style={
+                                        currentQuestion === questionNo
+                                            ? [styles.questionText, styles.currentQuestionText]
+                                            : styles.questionText
+                                    }
+                                >
+                                    {questionNo}
+                                </Text>
+                            </TouchableOpacity>
+                            {currentQuestion === questionNo && (
+                                <View style={styles.pin} />
+                            )}
+                        </View>
+                    );
+                })}
+            </ScrollView>
+        );
+    };
+
+    const [optionHeights, setOptionHeights] = useState({});
+
+    const handleContentSizeChange = (contentWidth, contentHeight, option) => {
+        setOptionHeights((prevHeights) => ({
+            ...prevHeights,
+            [option]: contentHeight,
+        }));
+    };
+
+    const handleShowAnswer = () => {
+        setShowAnswer(!showAnswer);
+    }
+    const dynamicFontSize = hp("6%");
+    const renderItem = ({ item }) => {
+        const handleStatusPageDisplay = () => {
+            const statusDataTemp = Array.from({ length: totalQuestions }, (_, index) => {
+                const questionNo = index + 1;
+                const questionId = data.find((item) => item.Question_No === questionNo)?.id;
+
+                return {
+                    questionNo,
+                    isAttempted: Object.keys(answers).includes(questionId?.toString() || ""),
+                    isMarked: markedForReview[questionId] || false,
+                };
+            });
+
+            setStatusData(statusDataTemp);
+            setShowStatus(true);
+        };
         return (
             <View>
+                {renderHorizontalScroll()}
                 <View style={styles.questionHeading}>
-                    <Text style={styles.questionText}>Question No - {item.Question_No}</Text>
-                    <TouchableOpacity>
-                        <Octicons name='info' color="black" style={styles.infoIcon} />
-                    </TouchableOpacity>
+                    <View style={styles.questionTextReview}>
+                        <View style={styles.questionBox}>
+                            <Text style={styles.questionTextMain}>{item.Question_No}</Text>
+                        </View>
+
+                        <TouchableOpacity
+                            style={styles.markForReviewContainer}
+                            onPress={() => handleMarkForReview(item.id)}
+                        >
+                            <Entypo
+                                name={markedForReview[item.id] ? "bookmarks" : "bookmark"}
+                                size={20}
+                                color={markedForReview[item.id] ? "red" : "#ccc"}
+                            />
+                            <Text style={styles.markText}>
+                                {markedForReview[item.id] ? "Unmark Review" : "Mark For Review"}
+                            </Text>
+                        </TouchableOpacity>
+                    </View>
+
+                    <RBSheet
+                        ref={bottomSheetRef}
+                        height={350}
+                        closeOnDragDown={true}
+                        customStyles={{
+                            container: {
+                                padding: 20,
+                                backgroundColor: '#fff',
+                                borderTopLeftRadius: 15,
+                                borderTopRightRadius: 15,
+                            },
+                        }}
+                    >
+                        <View style={styles.answerBoxNew}>
+                            <View style={styles.answerExplanationContainer}>
+                                <Text style={styles.answerExplanationText}>Answer Explanation: </Text>
+                            </View>
+                            <WebView
+                                originWhitelist={['*']}
+                                source={{ html: `<style>body { font-size: ${dynamicFontSize}; padding:40px; }</style>${item.Rational}` }}
+                                style={[styles.webView, { flex: 1 }]}
+                                scalesPageToFit={true}
+                                javaScriptEnabled={true}
+                                showsVerticalScrollIndicator={false}
+                            />
+                        </View>
+                    </RBSheet>
+
+                    <View style={styles.semiContainer}>
+                        <TouchableOpacity onPress={() => bottomSheetRef.current.open()}>
+                            <Entypo name={showAnswer ? "eye-with-line" : "eye"} color={"black"} size={20} />
+                        </TouchableOpacity>
+                        <Tooltip
+                            isVisible={tooltipVisible}
+                            content={
+                                <Text style={styles.tooltipText}>
+                                    This section focuses on key reading and writing skills. Each question is based on one or more passages, which may include tables or graphs. Read the passages and questions thoroughly, then choose the best answer based on the information provided.
+
+                                    All questions are multiple-choice with four options, and each has only one correct answer.
+
+                                </Text>
+                            }
+                            placement="bottom"
+                            onClose={() => setTooltipVisible(false)}
+                            showChildInTooltip={false}
+                            backgroundStyle={styles.tooltipBackground}
+                        >
+                            {mode === "practice_mode" && (
+                                <TouchableOpacity onPress={toggleTooltip}>
+                                    <Octicons name="info" color="black" style={styles.infoIcon} />
+                                </TouchableOpacity>
+                            )}
+
+                        </Tooltip>
+                    </View>
+
                 </View>
 
                 <View style={styles.questionDescription}>
-                    <Text style={styles.questionParagraphText}>{item.Stem.replace(/<[^>]+>/g, '')}</Text>
-                    <Text style={styles.questionDescriptionText}>{item.Question.replace(/<[^>]+>/g, '')}</Text>
+                    <WebView
+                        originWhitelist={['*']}
+                        source={{ html: `<style>body { font-size: ${dynamicFontSize}; padding:40px;}</style>${item.Stem}` }}
+                        style={[styles.webView, { flex: 1 }]}
+                        scalesPageToFit={true}
+                        javaScriptEnabled={true}
+                    />
+                    <WebView
+                        originWhitelist={['*']}
+                        source={{ html: `<style>body { font-size: ${dynamicFontSize}; padding:40px; }</style>${item.Question}` }}
+                        style={[styles.webView, { flex: 1 }]}
+                        scalesPageToFit={true}
+                        javaScriptEnabled={true}
+                    />
                 </View>
 
                 <View style={styles.buttonsContainer}>
@@ -221,57 +487,113 @@ const EnglishQuizModule1 = () => {
                 </View>
 
                 <View style={styles.optionContainer}>
-                    <TouchableOpacity
-                        style={selectedOption === 'A' ? styles.selectedOptionBox : styles.optionBox}
-                        onPress={() => handleOptionSelection("A", item.id)}
-                    >
-                        <Text style={selectedOption === 'A' ? styles.selectedOptionText : styles.optionText}>
-                            {item.OptionA.replace(/<[^>]+>/g, '')}
-                        </Text>
-                    </TouchableOpacity>
-
-                    <TouchableOpacity
-                        style={selectedOption === 'B' ? styles.selectedOptionBox : styles.optionBox}
-                        onPress={() => handleOptionSelection("B", item.id)}
-                    >
-                        <Text style={selectedOption === 'B' ? styles.selectedOptionText : styles.optionText}>
-                            {item.OptionB.replace(/<[^>]+>/g, '')}
-                        </Text>
-                    </TouchableOpacity>
-
-                    <TouchableOpacity
-                        style={selectedOption === 'C' ? styles.selectedOptionBox : styles.optionBox}
-                        onPress={() => handleOptionSelection("C", item.id)}
-                    >
-                        <Text style={selectedOption === 'C' ? styles.selectedOptionText : styles.optionText}>
-                            {item.OptionC.replace(/<[^>]+>/g, '')}
-                        </Text>
-                    </TouchableOpacity>
-
-                    <TouchableOpacity
-                        style={selectedOption === 'D' ? styles.selectedOptionBox : styles.optionBox}
-                        onPress={() => handleOptionSelection("D", item.id)}
-                    >
-                        <Text style={selectedOption === 'D' ? styles.selectedOptionText : styles.optionText}>
-                            {item.OptionD.replace(/<[^>]+>/g, '')}
-                        </Text>
-                    </TouchableOpacity>
+                    {['A', 'B', 'C', 'D'].map((option) => (
+                        <TouchableOpacity
+                            key={option}
+                            style={[
+                                selectedOption === option ? styles.selectedOptionBox : styles.optionBox,
+                                { height: optionHeights[option] || 'auto' },
+                            ]}
+                            onPress={() => handleOptionSelection(option, item.id)}
+                        >
+                            <WebView
+                                source={{
+                                    html: `<style>body { font-size: ${dynamicFontSize};background-color: ${selectedOption === option ? '#C5E6FD' : 'transparent'}; }</style>${item[`Option${option}`]}`,
+                                }}
+                                style={styles.webViewOptions}
+                                originWhitelist={['*']}
+                                scalesPageToFit={true}
+                                javaScriptEnabled={true}
+                                onContentSizeChange={(contentWidth, contentHeight) =>
+                                    handleContentSizeChange(contentWidth, contentHeight, option)
+                                }
+                            />
+                        </TouchableOpacity>
+                    ))}
                 </View>
 
-                {submitLoading ? (<ActivityIndicator color={COLORS.blueColor} size={"large"} style={styles.submitButtonLoader} />) : (<TouchableOpacity style={styles.submitButton} onPress={() => submitCheck("onSubmitClick")}>
-                    <Text style={styles.submitText}>Submit</Text>
-                </TouchableOpacity>)}
+                {submitLoading ? (
+                    <ActivityIndicator color={COLORS.blueColor} size={"large"} style={styles.submitButtonLoader} />
+                ) : (
+                    <TouchableOpacity style={styles.submitButton} onPress={handleStatusPageDisplay}>
+                        <Text style={styles.submitText}>Submit</Text>
+                    </TouchableOpacity>
+                )}
 
+                {/* {mode === "practice_mode" && (
+                    <TouchableOpacity style={styles.viewAnswer} onPress={handleShowAnswer}>
+                        <Text style={styles.viewAnswerText}>{showAnswer ? "Hide Answer" : "View Answer"}</Text>
+                    </TouchableOpacity>
+                )} */}
+
+                {/* {showAnswer && (
+                    <View style={styles.answerBox}>
+                        <WebView
+                            originWhitelist={['*']}
+                            source={{ html: `<style>body { font-size: ${dynamicFontSize}; padding:40px; }</style>${item.Rational}` }}
+                            style={[styles.webView, { flex: 1 }]}
+                            scalesPageToFit={true}
+                            javaScriptEnabled={true}
+                            showsVerticalScrollIndicator={false}
+                        />
+                    </View>
+                )} */}
             </View>
-        )
-    }
-
+        );
+    };
     return (
         <SafeAreaView style={styles.mainContainer}>
-            <View style={styles.container}>
+
+            {showStatus ? (
+                <View style={styles.statusPageContainer}>
+                    <View style={styles.questionsBox}>
+                        <Text style={styles.statusPageHeader}>Summary</Text>
+
+                        <View style={styles.statusSummary}>
+                            {statusData.map((question) => (
+                                <View
+                                    key={question.questionNo}
+                                    style={[
+                                        styles.statusItem,
+                                        { backgroundColor: question.isAttempted ? '#0470B8' : '#ccc' },
+                                    ]}
+                                >
+                                    {question.isMarked && (
+                                        <Entypo
+                                            name="bookmarks"
+                                            size={14}
+                                            color="red"
+                                            style={styles.bookmarkIcon}
+                                        />
+                                    )}
+                                    <Text style={styles.statusText}>{question.questionNo}</Text>
+                                </View>
+                            ))}
+                        </View>
+                    </View>
+
+                    <View style={styles.buttonsContainer}>
+                        <TouchableOpacity
+                            style={styles.navigateButton}
+                            onPress={handleGoBack}
+                        >
+                            <Text style={styles.navigateText}>Go Back</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                            style={styles.navigateButton}
+                            onPress={() => {
+                                setShowStatus(false)
+                                submitCheck("onSubmitClick");
+                            }}
+                        >
+                            <Text style={styles.navigateText}>Finish</Text>
+                        </TouchableOpacity>
+                    </View>
+                </View>
+            ) : (<View style={styles.container}>
                 <View style={styles.topBar}>
-                    <Text style={styles.topText}>Unit-1 Test-1</Text>
-                    <Text style={styles.topText}>Questions-20</Text>
+                    <Text style={styles.topText}>{moduleName}</Text>
+                    <Text style={styles.topText}>Questions-{totalQuestions}</Text>
                     <Text style={styles.topText}>Time-{formatTime(timeLeft)}</Text>
                 </View>
 
@@ -282,10 +604,16 @@ const EnglishQuizModule1 = () => {
                     contentContainerStyle={styles.flatListContent}
                     showsVerticalScrollIndicator={false}
                 />
-            </View>
+
+            </View>)}
+
+
+
+
         </SafeAreaView>
     )
 }
+
 
 export default EnglishQuizModule1
 
@@ -330,9 +658,23 @@ const styles = StyleSheet.create({
     questionDescription: {
         borderWidth: 1,
         borderColor: '#888888',
-        paddingVertical: hp('2%'),
-        paddingHorizontal: wp('6%'),
+        // paddingVertical: hp('2%'),
+        // paddingHorizontal: wp('6%'),
         marginTop: hp('2%'),
+    },
+    webView: {
+        height: hp('20%'),
+        width: wp('90%'),
+        marginVertical: 0,
+        borderRadius: 8,
+        backgroundColor: "#FFF",
+    },
+    webViewOptions: {
+        height: hp('5%'),
+        width: wp('90%'),
+        marginVertical: 10,
+        borderRadius: 8,
+        backgroundColor: "#FFF",
     },
     questionDescriptionText: {
         marginTop: hp('1%'),
@@ -342,12 +684,6 @@ const styles = StyleSheet.create({
     questionParagraphText: {
         fontWeight: '500',
         fontSize: hp('1.8%')
-    },
-    buttonsContainer: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        borderWidth: 1,
-        borderColor: 'transparent'
     },
     navigateButton: {
         backgroundColor: "#0470B8",
@@ -404,6 +740,37 @@ const styles = StyleSheet.create({
         color: "#0470B8",
         fontWeight: '600'
     },
+    viewAnswer: {
+        alignSelf: 'center',
+        backgroundColor: 'green',
+        paddingVertical: hp("1%"),
+        paddingHorizontal: wp('3%'),
+        borderRadius: 5,
+        marginBottom: hp('2%')
+    },
+    viewAnswerText: {
+        color: 'white'
+    },
+    answerBox: {
+        borderWidth: 1,
+        borderColor: "#D9D9D9",
+        borderRadius: 5,
+        marginBottom: hp('2%'),
+    },
+    answerBoxNew: {
+        flex: 1,
+        // height: 300,
+    },
+    answerExplanationContainer: {
+        marginLeft: wp('5%')
+    },
+    answerExplanationText: {
+        color: '#0470B8',
+        fontSize: hp('3%'),
+        fontWeight: '700',
+        textDecorationLine: 'underline',
+        marginBottom: 5
+    },
     submitButton: {
         backgroundColor: "#C5E6FD",
         marginVertical: hp('4%'),
@@ -421,5 +788,154 @@ const styles = StyleSheet.create({
     disabledSubmitButton: {
         backgroundColor: '#ccc',
     },
+
+    horizontalScrollContainer: {
+        paddingVertical: hp('1%'),
+        paddingHorizontal: wp('2%'),
+        backgroundColor: 'white',
+        marginTop: hp('2%'),
+        flexDirection: 'row',
+        gap: 10
+    },
+
+    questionCircle: {
+        width: 40,
+        height: 40,
+        borderRadius: 20,
+        borderWidth: 2,
+        borderColor: '#ccc',
+        justifyContent: 'center',
+        alignItems: 'center',
+        position: 'relative',
+    },
+    currentQuestionCircle: {
+        borderColor: '#3498db',
+        borderWidth: 2,
+    },
+    pin: {
+        width: 0,
+        height: 0,
+        borderLeftWidth: wp('2%'),
+        borderRightWidth: wp('2%'),
+        borderBottomWidth: wp('3%'),
+        borderLeftColor: 'transparent',
+        borderRightColor: 'transparent',
+        borderBottomColor: '#3498db',
+        alignSelf: 'center',
+        marginTop: wp('1%'),
+    },
+    attemptedQuestionCircle: {
+        backgroundColor: 'lightblue',
+        borderColor: 'lightblue',
+    },
+    bookmarkIconContainer: {
+        position: 'absolute',
+        top: -5,
+        right: -5,
+    },
+    questionTextReview: {
+        flexDirection: 'row',
+        justifyContent: 'center',
+        alignItems: 'center',
+        gap: 10
+    },
+    questionTextMain: {
+        fontSize: hp('2.5%'),
+        fontWeight: '600',
+        color: 'white',
+        textAlign: 'center',
+        // borderWidth: 1,
+        borderColor: '#0470B8',
+    },
+    markForReviewContainer: {
+        flexDirection: 'row',
+        gap: 5
+    },
+    questionBox: {
+        width: 40, // Adjust the size as needed
+        height: 40,
+        borderRadius: 20, // Half of width/height for perfect circle
+        backgroundColor: '#0470B8', // Example background color
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    statusPageContainer: {
+        flex: 1,
+        padding: 20,
+        backgroundColor: '#fff',
+        justifyContent: 'center',
+    },
+    statusPageHeader: {
+        fontSize: 24,
+        fontWeight: 'bold',
+        marginBottom: 20,
+        textAlign: 'center',
+        textDecorationLine: 'underline',
+        color: '#0470B8',
+    },
+    statusSummary: {
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        justifyContent: 'center',
+    },
+    statusItem: {
+        width: 50,
+        height: 50,
+        justifyContent: 'center',
+        alignItems: 'center',
+        margin: 5,
+        borderWidth: 1,
+        borderRadius: 25,
+        borderColor: '#ccc',
+        position: 'relative', // Necessary for absolute positioning of the bookmark icon
+    },
+    bookmarkIcon: {
+        position: 'absolute',
+        top: 5,
+        right: 5,
+    },
+    statusText: {
+        fontSize: 14,
+        fontWeight: 'bold',
+        color: '#fff', // Text color set to white for better contrast
+    },
+    buttonsContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        borderWidth: 1,
+        borderColor: 'transparent'
+    },
+    semiContainer: {
+        flexDirection: 'row',
+        justifyContent: 'center',
+        alignItems: 'center',
+        gap: wp('2%')
+    },
+    // navigateButton: {
+    //     padding: 15,
+    //     borderRadius: 5,
+    //     backgroundColor: '#0470B8',
+    // },
+    // navigateText: {
+    //     color: '#fff',
+    //     fontSize: 16,
+    //     fontWeight: '700',
+    // },
+    questionsBox: {
+        borderWidth: 1,
+        paddingHorizontal: 20,
+        paddingVertical: 20,
+        borderColor: '#ccc',
+        borderRadius: 10,
+    },
+    tooltipText: {
+        fontSize: 16,
+        color: 'black',
+        padding: 10,
+    },
+    tooltipBackground: {
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    },
 })
 
+// iss code mai mai chahta hoon ki jab showStatus activate ho tab statusPage poore page pe display ho jo ki abhi nahi ho raha

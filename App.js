@@ -23,11 +23,16 @@ import StatusPage from './src/Components/StatusPage';
 import UpdateProfile from './src/Pages/UpdateProfile';
 import QuizAnalysisPage from './src/Pages/QuizAnalysisPage';
 import { GlobalProvider } from './src/context/GlobalContext';
+import WelcomeScreen1 from './src/welcomeScreens/WelcomeScreen1';
+import WelcomeScreen2 from './src/welcomeScreens/WelcomeScreen2';
+import WelcomeScreen3 from './src/welcomeScreens/WelcomeScreen3';
+import WelcomeScreen4 from './src/welcomeScreens/WelcomeScreen4';
+
 
 const Stack = createNativeStackNavigator();
 
 const App = () => {
-  const initialRoute = 'SplashScreen';
+  const initialRoute = 'Welcome-Screen-1';
 
   return (
     <>
@@ -43,7 +48,11 @@ const App = () => {
             screenOptions={{
               headerShown: false,
             }}>
-            <Stack.Screen name="SplashScreen" component={SplashScreen} />
+            {/* <Stack.Screen name="SplashScreen" component={SplashScreen} /> */}
+            <Stack.Screen name="Welcome-Screen-1" component={WelcomeScreen1} />
+            <Stack.Screen name="Welcome-Screen-2" component={WelcomeScreen2} />
+            <Stack.Screen name="Welcome-Screen-3" component={WelcomeScreen3} />
+            <Stack.Screen name="Welcome-Screen-4" component={WelcomeScreen4} />
             <Stack.Screen name="GoogleLogin" component={GoogleSplashScreen} />
             <Stack.Screen name="TestQuestion" component={TestQuestion} />
             <Stack.Screen name="LevelComplete" component={LevelComplete} />
