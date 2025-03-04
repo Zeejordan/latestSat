@@ -46,8 +46,12 @@ const QuizAnalysisPage = ({ route }) => {
     }, [userSession]);
 
     const fetchQuizAnswers = async () => {
+        setLoading(true);
+        setError(null);
+
         const token = await AsyncStorage.getItem("token");
         const url = `${QUIZ_ANSWERS}${userSession}?module_name=${moduleName}`;
+
         try {
             const response = await axios.get(url, {
                 headers: {
@@ -57,18 +61,21 @@ const QuizAnalysisPage = ({ route }) => {
             });
 
             if (!response?.data?.error) {
-                const modulesData = response?.data?.meta?.modules_data;
-                if (modulesData && modulesData.length > 0) {
+                const modulesData = response?.data?.meta?.modules_data || [];
+                if (modulesData.length > 0) {
                     setModules(modulesData);
+                } else {
+                    setError("No modules available.");
                 }
             }
         } catch (err) {
             setError("Failed to fetch data. Please try again later.");
-            console.log("An Error Occured in get all answers", err)
+            console.log("An Error Occured in get all answers", err);
         } finally {
             setLoading(false);
         }
     };
+
 
     useEffect(() => {
         fetchQuizAnswers();
@@ -79,44 +86,51 @@ const QuizAnalysisPage = ({ route }) => {
     };
 
 
-    const handleNextModule = () => {
-        // if (currentModuleIndex < modules.length - 1) {
-        //     setCurrentModuleIndex(currentModuleIndex + 1);
-        //     setCurrentQuestionIndex(0);
-        // }
+    const handleNextModule = async () => {
+        let nextModuleName = "";
 
         if (moduleName === "english_module_1") {
-            setModuleName("english_module_2")
+            nextModuleName = "english_module_2";
+        } else if (moduleName === "english_module_2") {
+            nextModuleName = "math_module_1";
+        } else if (moduleName === "math_module_1") {
+            nextModuleName = "math_module_2";
+        } else {
+            return; // Prevent updating if there's no further module
         }
-        else if (moduleName === "english_module_2") {
-            setModuleName("math_module_1")
-        }
-        else if (moduleName === "Math_Module_1") {
-            setModuleName("math_module_2")
-        }
-        else {
-            setModuleName("math_module_2")
+
+        setModuleName(nextModuleName);
+
+        // Fetch new module data and check if it exists
+        await fetchQuizAnswers();
+        if (modules.length === 0) {
+            setError("No modules available.");
         }
     };
 
-    const handlePreviousModule = () => {
-        // if (currentModuleIndex > 0) {
-        //     setCurrentModuleIndex(currentModuleIndex - 1);
-        //     setCurrentQuestionIndex(0);
-        // }
+
+    const handlePreviousModule = async () => {
+        let prevModuleName = "";
+
         if (moduleName === "math_module_2") {
-            setModuleName("math_module_1")
+            prevModuleName = "math_module_1";
+        } else if (moduleName === "math_module_1") {
+            prevModuleName = "english_module_2";
+        } else if (moduleName === "english_module_2") {
+            prevModuleName = "english_module_1";
+        } else {
+            return; // Prevent updating if there's no previous module
         }
-        else if (moduleName === "math_module_1") {
-            setModuleName("english_Module_2")
-        }
-        else if (moduleName === "english_module_2") {
-            setModuleName("english_module_1")
-        }
-        else {
-            setModuleName("english_module_1")
+
+        setModuleName(prevModuleName);
+
+        // Fetch previous module data and check if it exists
+        await fetchQuizAnswers();
+        if (modules.length === 0) {
+            setError("No modules available.");
         }
     };
+
 
     if (loading) {
         return (
