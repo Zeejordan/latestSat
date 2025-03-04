@@ -15,12 +15,13 @@ import { COLORS, FONTS } from '../theme';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
-
+import { useTranslation } from 'react-i18next';
 
 const OtpVerification = ({ route, navigation }) => {
 
     const { email } = route.params;
     console.log("this is email", email)
+    const { t } = useTranslation();
 
     const [otp, setOtp] = useState(new Array(6).fill(""));
     const [isVerified, setIsVerified] = useState(false);
@@ -110,12 +111,12 @@ const OtpVerification = ({ route, navigation }) => {
             <View style={styles.subContainer}>
                 <View style={styles.firstBox}>
                     <TouchableOpacity onPress={() => navigation.goBack()}><AntDesign name='left' color={"black"} style={styles.backIcon} /></TouchableOpacity>
-                    <TouchableOpacity onPress={() => navigation.goBack()}><Text style={styles.changeEmailText}>Change Email</Text></TouchableOpacity>
+                    <TouchableOpacity onPress={() => navigation.goBack()}><Text style={styles.changeEmailText}>{t('changeEmail')}</Text></TouchableOpacity>
                 </View>
 
                 <View style={styles.enterOtpContainer}>
-                    <Text style={styles.enterAuthText}>Enter Authentication Code</Text>
-                    <Text style={styles.enterCodeText}>{`Enter the 6-digit OTP that we have sent via the email ${email}`}</Text>
+                    <Text style={styles.enterAuthText}>{t('enterAuthenticationCode')}</Text>
+                    <Text style={styles.enterCodeText}>{t('enter_otp', { email })}</Text>
                 </View>
 
                 <View style={styles.otpContainer}>
@@ -142,12 +143,12 @@ const OtpVerification = ({ route, navigation }) => {
                             disabled={otp.join("").length < 6}
                         >
                             <Text style={styles.continueText}>
-                                {isVerified ? "Verified" : "Verify"}
+                                {t(isVerified ? 'verified' : 'verify')}
                             </Text>
                         </TouchableOpacity>)
                     }
                     {loadingResend ? (<ActivityIndicator color={COLORS.blueColor} size={"large"} style={styles.resendLoader} />) : (<TouchableOpacity style={styles.resendContainer} onPress={handleResendOtp}>
-                        <Text style={styles.resendText}>resend code</Text>
+                        <Text style={styles.resendText}>{t("resendCode")}</Text>
                     </TouchableOpacity>)}
 
                 </View>
@@ -168,7 +169,7 @@ const styles = StyleSheet.create({
         backgroundColor: 'white'
     },
     backIcon: {
-        fontSize: hp('1.6%'),
+        fontSize: hp('3%'),
     },
     enterOtpContainer: {
         gap: hp('2%'),
@@ -228,7 +229,7 @@ const styles = StyleSheet.create({
     },
     changeEmailText: {
         color: 'black',
-        fontSize: hp('1.8%'),
+        fontSize: hp('1.95%'),
         color: '#1389BE',
         fontWeight: '500'
     },

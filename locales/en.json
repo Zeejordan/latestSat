@@ -1,4 +1,10 @@
 {
     "welcome": "Login",
-    "SendOtp": "Send OTP"
+    "SendOtp": "Send OTP",
+    "changeEmail": "Change Email",
+    "enterAuthenticationCode": "Enter Authentication Code",
+    "enter_otp": "Enter the 6-digit OTP that we have sent via the email {{email}}",
+    "verify": "Verify",
+    "verified": "Verified",
+    "resendCode": "resend code"
 }
