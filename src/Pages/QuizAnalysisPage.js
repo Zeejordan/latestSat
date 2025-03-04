@@ -16,7 +16,7 @@ import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-nat
 import { WebView } from 'react-native-webview';
 import { useNavigation } from '@react-navigation/native';
 
-// stop stop stop stop sto stop sto stop stop stop
+// stop stop stop stop stop stop stop stop stop stop stop stop stop 
 
 const QuizAnalysisPage = ({ route }) => {
 
@@ -28,7 +28,7 @@ const QuizAnalysisPage = ({ route }) => {
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [moduleName, setModuleName] = useState("English_Module_1")
+    const [moduleName, setModuleName] = useState("english_module_1")
 
     useEffect(() => {
         const backAction = () => {
@@ -85,17 +85,17 @@ const QuizAnalysisPage = ({ route }) => {
         //     setCurrentQuestionIndex(0);
         // }
 
-        if (moduleName === "English_Module_1") {
-            setModuleName("English_Module_2")
+        if (moduleName === "english_module_1") {
+            setModuleName("english_module_2")
         }
-        else if (moduleName === "English_Module_2") {
-            setModuleName("Math_Module_1")
+        else if (moduleName === "english_module_2") {
+            setModuleName("math_module_1")
         }
         else if (moduleName === "Math_Module_1") {
-            setModuleName("Math_Module_2")
+            setModuleName("math_module_2")
         }
         else {
-            setModuleName("Math_Module_2")
+            setModuleName("math_module_2")
         }
     };
 
@@ -104,17 +104,17 @@ const QuizAnalysisPage = ({ route }) => {
         //     setCurrentModuleIndex(currentModuleIndex - 1);
         //     setCurrentQuestionIndex(0);
         // }
-        if (moduleName === "Math_Module_2") {
-            setModuleName("Math_Module_1")
+        if (moduleName === "math_module_2") {
+            setModuleName("math_module_1")
         }
-        else if (moduleName === "Math_Module_1") {
-            setModuleName("English_Module_2")
+        else if (moduleName === "math_module_1") {
+            setModuleName("english_Module_2")
         }
-        else if (moduleName === "English_Module_2") {
-            setModuleName("English_Module_1")
+        else if (moduleName === "english_module_2") {
+            setModuleName("english_module_1")
         }
         else {
-            setModuleName("English_Module_1")
+            setModuleName("english_module_1")
         }
     };
 
@@ -142,19 +142,38 @@ const QuizAnalysisPage = ({ route }) => {
         );
     }
 
-    const currentModule = modules[currentModuleIndex];
-    const currentQuestion = currentModule.answers[currentQuestionIndex];
+    const currentModule = modules[currentModuleIndex] || null;
+    const currentQuestion = currentModule ? currentModule.answers[currentQuestionIndex] : null;
+
+    const handleNext = () => {
+        let newIndex = currentQuestionIndex + 1;
+
+        while (
+            newIndex < currentModule.answers.length &&
+            currentModule.answers[newIndex]?.not_attempted
+        ) {
+            newIndex++;
+        }
+
+        if (newIndex < currentModule.answers.length) {
+            setCurrentQuestionIndex(newIndex);
+        }
+    };
 
     const handlePrevious = () => {
-        if (currentQuestionIndex > 0) {
-            setCurrentQuestionIndex(currentQuestionIndex - 1)
+        let newIndex = currentQuestionIndex - 1;
+
+        while (
+            newIndex >= 0 &&
+            currentModule.answers[newIndex]?.not_attempted
+        ) {
+            newIndex--;
         }
-    }
-    const handleNext = () => {
-        if (currentQuestionIndex < currentModule.answers.length - 1) {
-            setCurrentQuestionIndex(currentQuestionIndex + 1)
+
+        if (newIndex >= 0) {
+            setCurrentQuestionIndex(newIndex);
         }
-    }
+    };
 
     const getOptionStyle = (optionKey) => {
         const correctAnswer = currentQuestion.correct_answer;
@@ -182,7 +201,7 @@ const QuizAnalysisPage = ({ route }) => {
         return "#FFF";
     };
 
-    // stop sotp sot stop sto p
+
 
     const dynamicFontSize = hp("5%");
     return (
@@ -190,7 +209,7 @@ const QuizAnalysisPage = ({ route }) => {
             <ScrollView contentContainerStyle={styles.scrollContainer}>
                 <View style={styles.moduleContainer}>
                     <Text style={styles.moduleText}>
-                        Question No.{currentQuestionIndex + 1}  {/* Display the updated question number */}
+                        Question No.{currentQuestionIndex + 1}
                     </Text>
                     <Text style={styles.moduleText}>
                         SAT {currentQuestion.module_name}
@@ -198,37 +217,43 @@ const QuizAnalysisPage = ({ route }) => {
                 </View>
                 <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.horizontalScroll}>
                     {Array.from({ length: currentModule.module_name.includes("english") ? 27 : 22 }).map((_, index) => {
-                        const isClickable = currentModule?.answers?.some(answer => answer?.index === index + 1);
+                        const answer = currentModule?.answers?.find(answer => answer?.question_no === index + 1);
+                        const isClickable = answer && !answer.not_attempted;
 
                         return (
-                            <TouchableOpacity
-                                key={index}
-                                style={[
-                                    styles.questionCircle,
-                                    isClickable && styles.activeQuestionCircle,
-                                    currentQuestionIndex === index && styles.selectedQuestionCircle,
-                                ]}
-                                onPress={() => {
-                                    if (isClickable) {
-                                        handleQuestionSelect(index);
-                                    }
-                                }}
-                                disabled={!isClickable}
-                            >
-                                <Text
+                            <View key={index} style={{ alignItems: 'center' }}>
+                                <TouchableOpacity
                                     style={[
-                                        styles.questionCircleText,
-                                        isClickable && styles.activeQuestionCircleText,
-                                        !isClickable && styles.disabledQuestionCircleText,
-                                        currentQuestionIndex === index && styles.selectedQuestionCircleText,
+                                        styles.questionCircle,
+                                        isClickable && styles.activeQuestionCircle,
+                                        currentQuestionIndex === index && styles.selectedQuestionCircle,
                                     ]}
+                                    onPress={() => {
+                                        if (isClickable) {
+                                            handleQuestionSelect(index);
+                                        }
+                                    }}
+                                    disabled={!isClickable}
                                 >
-                                    {index + 1}
-                                </Text>
-                            </TouchableOpacity>
+                                    <Text
+                                        style={[
+                                            styles.questionCircleText,
+                                            isClickable && styles.activeQuestionCircleText,
+                                            !isClickable && styles.disabledQuestionCircleText,
+                                            currentQuestionIndex === index && styles.selectedQuestionCircleText,
+                                        ]}
+                                    >
+                                        {index + 1}
+                                    </Text>
+                                </TouchableOpacity>
+
+                                {/* Black pin below the selected question button */}
+                                {currentQuestionIndex === index && <View style={styles.trianglePin} />}
+                            </View>
                         );
                     })}
                 </ScrollView>
+
 
 
                 <View style={styles.questionContainer}>
@@ -453,6 +478,7 @@ const styles = StyleSheet.create({
         color: "#FFF",
         fontSize: 14,
         textAlign: "center",
+        fontWeight: '700'
     },
     centeredContainer: {
         flex: 1,
@@ -489,6 +515,17 @@ const styles = StyleSheet.create({
     },
     activeQuestionCircleText: {
         color: "#FFF",
+    },
+    trianglePin: {
+        width: 0,
+        height: 0,
+        borderLeftWidth: 8,
+        borderRightWidth: 8,
+        borderBottomWidth: 10,
+        borderLeftColor: 'transparent',
+        borderRightColor: 'transparent',
+        borderBottomColor: '#0470B8',
+        marginTop: 5,
     },
     webView: {
         height: hp('20%'),

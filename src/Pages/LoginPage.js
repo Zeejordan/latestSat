@@ -51,10 +51,10 @@ const LoginPage = () => {
                     style={styles.keyboardAvoidingContainer}
                 >
                     <LinearGradient
-                        colors={[COLORS.linearGradientColor1, COLORS.linearGradientColor2]}
+                        colors={["rgba(4, 112, 184, 0.5)", "#FFFFFF"]}
                         style={styles.gradientContainer}
-                        start={{ x: 0.5, y: 0 }}
-                        end={{ x: 0.5, y: 1 }}
+                        start={{ x: 0, y: 0 }}
+                        end={{ x: 0, y: 1 }}
                     >
                         <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
                             <View style={styles.container}>
@@ -129,7 +129,8 @@ const styles = StyleSheet.create({
     },
     container: {
         flex: 1,
-        marginTop: hp('6%')
+        marginTop: hp('6%'),
+
     },
     emailInput: {
         backgroundColor: 'white',
@@ -139,7 +140,7 @@ const styles = StyleSheet.create({
         paddingLeft: hp('2%')
     },
     loginText: {
-        color: "#D1EFFF",
+        color: "#0470B8",
         fontSize: hp('4%'),
         alignSelf: 'center',
         fontWeight: '800',
@@ -150,13 +151,13 @@ const styles = StyleSheet.create({
         marginTop: hp('2%')
     },
     loginGif: {
-        height: hp("32%"),
+        height: hp("40%"),
         width: hp("40%"),
         alignSelf: 'center'
     },
     secondBox: {
         marginHorizontal: wp('12%'),
-        gap: hp('10%')
+        gap: hp('5%'),
     },
     secondSemi: {
         gap: hp('5%')

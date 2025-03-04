@@ -91,7 +91,7 @@ const SelectSubject = () => {
     };
     return (
         <SafeAreaView style={styles.mainContainer}>
-            <LinearGradient colors={[COLORS.linearGradientColor1, COLORS.linearGradientColor2]} style={styles.gradientContainer}>
+            <LinearGradient colors={[COLORS.linearGradientColor1, COLORS.linearGradientColor2]} style={styles.gradientContainer} start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }}>
 
                 <TouchableOpacity onPress={handleBack} style={styles.backButton}>
                     <FontAwesome5 name={"arrow-left"} size={30} color={'white'} />
@@ -170,7 +170,7 @@ const styles = StyleSheet.create({
         marginTop: hp("22%")
     },
     headingText: {
-        color: '#fff',
+        color: '#0470B8',
         fontSize: hp('3.5%'),
         fontWeight: 'bold',
         textAlign: 'center',

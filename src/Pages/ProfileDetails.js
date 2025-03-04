@@ -83,8 +83,8 @@ const ProfileDetails = ({ navigation }) => {
             <LinearGradient
                 colors={[COLORS.linearGradientColor1, COLORS.linearGradientColor2]}
                 style={styles.gradientContainer}
-                start={{ x: 0.5, y: 0 }}
-                end={{ x: 0.5, y: 1 }}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 0, y: 1 }}
             >
                 <View style={styles.container}>
                     <View style={styles.profileImageContainer}>
@@ -172,7 +172,7 @@ const styles = StyleSheet.create({
     },
     profileContainer: {},
     profileText: {
-        color: "#D1EFFF",
+        color: "#0470B8",
         fontSize: hp('3%'),
         textAlign: 'center',
         fontWeight: '700'
@@ -191,7 +191,7 @@ const styles = StyleSheet.create({
         gap: hp('1%'),
     },
     inputfieldText: {
-        color: 'white',
+        color: '#0470B8',
         fontWeight: 'bold',
         fontSize: hp('2%')
     },

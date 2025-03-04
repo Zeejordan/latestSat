@@ -132,7 +132,7 @@ const styles = StyleSheet.create({
 
     },
     completedText: {
-        color: '#6ADA65',
+        color: '#0470B8',
         fontSize: hp('5%'),
         fontWeight: '700',
         textAlign: 'center',
@@ -192,7 +192,7 @@ const styles = StyleSheet.create({
         paddingVertical: hp('0.2%')
     },
     scoreContainer: {
-        backgroundColor: 'rgba(255, 255, 255, 0.15)',
+        backgroundColor: 'rgba(255, 255, 255, 0.8)',
         borderRadius: 12,
         paddingVertical: hp('2%'),
         paddingHorizontal: wp('8%'),
@@ -205,7 +205,7 @@ const styles = StyleSheet.create({
     },
 
     scoreText: {
-        color: "white",
+        color: "#0470B8",
         fontSize: hp('2.5%'),
         fontWeight: '600',
         textAlign: 'center',

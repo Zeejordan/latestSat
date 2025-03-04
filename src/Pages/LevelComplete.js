@@ -44,12 +44,12 @@ const LevelComplete = ({ route }) => {
             <LinearGradient
                 colors={[COLORS.linearGradientColor1, COLORS.linearGradientColor2]}
                 style={styles.gradientContainer}
-                start={{ x: 0.5, y: 0 }}
-                end={{ x: 0.5, y: 1 }}>
+                start={{ x: 0, y: 0 }}
+                end={{ x: 0, y: 1 }}>
 
                 <View style={styles.container}>
                     <View style={styles.levelContainer}>
-                        <Text style={styles.levelText}>Level Finished</Text>
+                        <Text style={styles.levelText}>Completed</Text>
                     </View>
 
                     <View style={styles.imageContainer}>
@@ -103,10 +103,13 @@ const styles = StyleSheet.create({
         marginBottom: hp('3%'),
     },
     levelText: {
-        color: 'white',
-        fontSize: hp('4%'),
+        color: '#6ADA65',
+        fontSize: hp('4.5%'),
         fontWeight: 'bold',
         textAlign: 'center',
+        textShadowColor: 'rgba(0, 0, 0, 0.5)',
+        textShadowOffset: { width: 2, height: 2 },
+        textShadowRadius: 3,
     },
     imageContainer: {
         justifyContent: 'center',
@@ -122,7 +125,7 @@ const styles = StyleSheet.create({
         marginVertical: hp('2%'),
     },
     messageText: {
-        color: '#6ADA65',
+        color: '#0470B8',
         fontSize: hp('3.5%'),
         fontWeight: 'bold',
         textAlign: 'center',
@@ -132,9 +135,9 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     scoreLabel: {
-        color: 'white',
+        color: '#0470B8',
         fontSize: hp('2.5%'),
-        fontWeight: '600',
+        fontWeight: '700',
     },
     scoreBox: {
         backgroundColor: '#26A5E6',

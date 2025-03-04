@@ -101,13 +101,13 @@ const Levels = ({ route }) => {
             <LinearGradient
                 colors={[COLORS.linearGradientColor1, COLORS.linearGradientColor2]}
                 style={styles.gradientContainer}
-                start={{ x: 0.5, y: 0 }}
-                end={{ x: 0.5, y: 1 }}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 0, y: 1 }}
             >
 
                 <View style={styles.topHeader}>
                     <TouchableOpacity style={styles.backArrow} onPress={handleGoBack}>
-                        <AntDesign name={'left'} size={25} color={'white'} />
+                        <AntDesign name={'left'} size={25} color={'#0470B8'} style={styles.backArrow} />
                     </TouchableOpacity>
 
                     <View style={styles.levelsContainer}>
@@ -151,7 +151,7 @@ const styles = StyleSheet.create({
     },
     backArrow: {
         // marginTop: hp('2%'),
-        // marginLeft: wp('4%')
+        // marginLeft: wp('4%'),
     },
     container: {
         flex: 1,
@@ -190,6 +190,7 @@ const styles = StyleSheet.create({
     },
     levelsText: {
         fontSize: hp('4%'),
-        color: 'white'
+        color: '#0470B8',
+        fontWeight: '700'
     }
 });

@@ -128,7 +128,7 @@ const TestQuestion = ({ route }) => {
                     scrollEnabled={false}
                 /> */}
                 <WebView
-                    source={{ html: `<style>body { font-size: ${dynamicFontSize}; color:white; font-weight: bold; }</style>${item.data.stem}` }}
+                    source={{ html: `<style>body { font-size: ${dynamicFontSize}; color:#0470B8; font-weight: bold; }</style>${item.data.stem}` }}
                     style={styles.webView}
                     originWhitelist={['*']}
                     scalesPageToFit={true}
@@ -146,7 +146,7 @@ const TestQuestion = ({ route }) => {
                         scrollEnabled={false}
                     /> */}
                     <WebView
-                        source={{ html: `<style>body { font-size: ${dynamicFontSize};  color:white; font-weight: bold;}</style>${item.data.question}` }}
+                        source={{ html: `<style>body { font-size: ${dynamicFontSize};  color:#0470B8; font-weight: bold;}</style>${item.data.question}` }}
                         style={styles.webView}
                         originWhitelist={['*']}
                         scalesPageToFit={true}
@@ -220,8 +220,8 @@ const TestQuestion = ({ route }) => {
             <LinearGradient
                 colors={[COLORS.linearGradientColor1, COLORS.linearGradientColor2]}
                 style={styles.gradientContainer}
-                start={{ x: 0.5, y: 0 }}
-                end={{ x: 0.5, y: 1 }}>
+                start={{ x: 0, y: 0 }}
+                end={{ x: 0, y: 1 }}>
 
                 <FlatList
                     renderItem={renderItem}
@@ -307,7 +307,7 @@ const styles = StyleSheet.create({
     },
     webViewWrapper: {
         width: '100%',
-        height: hp('7%'),  // Prevents overflow
+        height: hp('7%'),
         overflow: 'hidden',
         justifyContent: 'center',
     },
