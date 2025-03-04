@@ -8,9 +8,11 @@ import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { LOGIN } from '../../config/api';
 import AwesomeAlert from 'react-native-awesome-alerts';
+import { useTranslation } from 'react-i18next';
 
 const LoginPage = () => {
     const navigation = useNavigation();
+    const { t } = useTranslation();
 
     const baseUrlLogin = LOGIN;
     const [email, setEmail] = useState('');
@@ -67,7 +69,7 @@ const LoginPage = () => {
 
                                 <View style={styles.secondBox}>
                                     <View style={styles.secondSemi}>
-                                        <Text style={styles.loginText}>Log in</Text>
+                                        <Text style={styles.loginText}>{t('welcome')}</Text>
                                         <TextInput
                                             placeholder='abc@gmail.com'
                                             style={styles.emailInput}
@@ -86,7 +88,7 @@ const LoginPage = () => {
                                                 style={styles.getOtpButton}
                                                 onPress={handleGetOtp}
                                             >
-                                                <Text style={styles.getOtpText}>Send OTP</Text>
+                                                <Text style={styles.getOtpText}>{t("SendOtp")}</Text>
                                             </TouchableOpacity>
                                         )}
                                     </View>

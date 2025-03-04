@@ -7,7 +7,7 @@ import { useNavigation } from '@react-navigation/native';
 const WelcomeScreen4 = () => {
     const navigation = useNavigation();
     const handleNavigation = () => {
-        navigation.navigate('Login')
+        navigation.navigate('Select-Language')
     }
     return (
         <SafeAreaView style={styles.mainContainer}>

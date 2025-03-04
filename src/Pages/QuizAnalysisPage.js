@@ -16,7 +16,7 @@ import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-nat
 import { WebView } from 'react-native-webview';
 import { useNavigation } from '@react-navigation/native';
 
-// stop stop stop stop stop stop stop stop stop stop stop stop stop 
+// stop stop stop stop stop stops stop stop stop stop stop 
 
 const QuizAnalysisPage = ({ route }) => {
 
@@ -81,8 +81,35 @@ const QuizAnalysisPage = ({ route }) => {
         fetchQuizAnswers();
     }, [moduleName])
 
-    const handleQuestionSelect = (index) => {
-        setCurrentQuestionIndex(index);
+    const handleQuestionSelect = async (index) => {
+        setLoading(true);
+        setError(null);
+
+        const token = await AsyncStorage.getItem("token");
+        const url = `${QUIZ_ANSWERS}${userSession}?module_name=${moduleName}&index=${index}`;
+
+        try {
+            const response = await axios.get(url, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    "Content-Type": "application/json",
+                },
+            });
+
+            if (!response?.data?.error) {
+                const modulesData = response?.data?.meta?.modules_data || [];
+                if (modulesData.length > 0) {
+                    setModules(modulesData);
+                } else {
+                    setError("No modules available.");
+                }
+            }
+        } catch (err) {
+            setError("Failed to fetch data. Please try again later.");
+            console.log("An Error Occured in get all answers", err);
+        } finally {
+            setLoading(false);
+        }
     };
 
 
@@ -261,7 +288,7 @@ const QuizAnalysisPage = ({ route }) => {
                                     </Text>
                                 </TouchableOpacity>
 
-                                {/* Black pin below the selected question button */}
+
                                 {currentQuestionIndex === index && <View style={styles.trianglePin} />}
                             </View>
                         );

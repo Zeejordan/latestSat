@@ -27,7 +27,9 @@ import WelcomeScreen1 from './src/welcomeScreens/WelcomeScreen1';
 import WelcomeScreen2 from './src/welcomeScreens/WelcomeScreen2';
 import WelcomeScreen3 from './src/welcomeScreens/WelcomeScreen3';
 import WelcomeScreen4 from './src/welcomeScreens/WelcomeScreen4';
-
+import { I18nextProvider } from 'react-i18next';
+import i18n from './i18n'; // Import your i18n config
+import SelectLanguage from './src/Pages/SelectLanguage';
 
 const Stack = createNativeStackNavigator();
 
@@ -41,39 +43,43 @@ const App = () => {
         backgroundColor="#0470B8"
       />
 
-      <GlobalProvider>
-        <NavigationContainer>
-          <Stack.Navigator
-            initialRouteName={initialRoute}
-            screenOptions={{
-              headerShown: false,
-            }}>
-            {/* <Stack.Screen name="SplashScreen" component={SplashScreen} /> */}
-            <Stack.Screen name="Welcome-Screen-1" component={WelcomeScreen1} />
-            <Stack.Screen name="Welcome-Screen-2" component={WelcomeScreen2} />
-            <Stack.Screen name="Welcome-Screen-3" component={WelcomeScreen3} />
-            <Stack.Screen name="Welcome-Screen-4" component={WelcomeScreen4} />
-            <Stack.Screen name="GoogleLogin" component={GoogleSplashScreen} />
-            <Stack.Screen name="TestQuestion" component={TestQuestion} />
-            <Stack.Screen name="LevelComplete" component={LevelComplete} />
-            <Stack.Screen name="QuizComplete" component={QuizComplete} />
-            <Stack.Screen name="Login" component={LoginPage} />
-            <Stack.Screen name="OtpVerification" component={OtpVerification} />
-            <Stack.Screen name="HomeScreen" component={HomeScreen} />
-            <Stack.Screen name="ProfileDetails" component={ProfileDetails} />
-            <Stack.Screen name="Levels" component={Levels} />
-            <Stack.Screen name="Quiz" component={Quiz} />
-            <Stack.Screen name="English-Quiz-1" component={EnglishQuizModule1} />
-            <Stack.Screen name="Module-Gap" component={ModuleGap} />
-            <Stack.Screen name="Maths-Quiz" component={MathsQuiz} />
-            <Stack.Screen name="Statistics" component={Statistics} />
-            <Stack.Screen name="Select-Subject" component={SelectSubject} />
-            <Stack.Screen name="StatusPage" component={StatusPage} />
-            <Stack.Screen name="Update-Profile" component={UpdateProfile} />
-            <Stack.Screen name="Quiz-Analysis" component={QuizAnalysisPage} />
-          </Stack.Navigator>
-        </NavigationContainer>
-      </GlobalProvider>
+      <I18nextProvider i18n={i18n}>
+        <GlobalProvider>
+          <NavigationContainer>
+            <Stack.Navigator
+              initialRouteName={initialRoute}
+              screenOptions={{
+                headerShown: false,
+              }}>
+              {/* <Stack.Screen name="SplashScreen" component={SplashScreen} /> */}
+              <Stack.Screen name="Welcome-Screen-1" component={WelcomeScreen1} />
+              <Stack.Screen name="Welcome-Screen-2" component={WelcomeScreen2} />
+              <Stack.Screen name="Welcome-Screen-3" component={WelcomeScreen3} />
+              <Stack.Screen name="Welcome-Screen-4" component={WelcomeScreen4} />
+              <Stack.Screen name="Select-Language" component={SelectLanguage} />
+              <Stack.Screen name="GoogleLogin" component={GoogleSplashScreen} />
+              <Stack.Screen name="TestQuestion" component={TestQuestion} />
+              <Stack.Screen name="LevelComplete" component={LevelComplete} />
+              <Stack.Screen name="QuizComplete" component={QuizComplete} />
+              <Stack.Screen name="Login" component={LoginPage} />
+              <Stack.Screen name="OtpVerification" component={OtpVerification} />
+              <Stack.Screen name="HomeScreen" component={HomeScreen} />
+              <Stack.Screen name="ProfileDetails" component={ProfileDetails} />
+              <Stack.Screen name="Levels" component={Levels} />
+              <Stack.Screen name="Quiz" component={Quiz} />
+              <Stack.Screen name="English-Quiz-1" component={EnglishQuizModule1} />
+              <Stack.Screen name="Module-Gap" component={ModuleGap} />
+              <Stack.Screen name="Maths-Quiz" component={MathsQuiz} />
+              <Stack.Screen name="Statistics" component={Statistics} />
+              <Stack.Screen name="Select-Subject" component={SelectSubject} />
+              <Stack.Screen name="StatusPage" component={StatusPage} />
+              <Stack.Screen name="Update-Profile" component={UpdateProfile} />
+              <Stack.Screen name="Quiz-Analysis" component={QuizAnalysisPage} />
+            </Stack.Navigator>
+          </NavigationContainer>
+        </GlobalProvider>
+      </I18nextProvider>
+
     </>
   )
 }
