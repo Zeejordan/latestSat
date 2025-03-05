@@ -4,6 +4,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { COLORS, FONTS } from '../theme';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
+import AntDesign from "react-native-vector-icons/AntDesign";
 import Footer from '../Components/Footer';
 import { GET_USER_DETAILS, UPDATE_USER_DETAILS, IMG_URL } from '../../config/api';
 import axios from 'axios';
@@ -139,7 +140,10 @@ const UpdateProfile = () => {
                 style={styles.topGradient}
             >
                 <View style={styles.profileContainer}>
-                    <Text style={styles.profileText}>Profile</Text>
+                    <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+                        <AntDesign name={"arrowleft"} size={27} color={"white"} style={styles.backArrow} />
+                    </TouchableOpacity>
+                    <Text style={styles.profileText}>Update Profile</Text>
                 </View>
             </LinearGradient>
             <View style={styles.imageContainer}>
@@ -311,13 +315,18 @@ const styles = StyleSheet.create({
         width: wp('100%')
     },
     profileContainer: {
-        marginTop: hp("1%")
+        marginTop: hp("1%"),
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginLeft: wp('5%')
     },
     profileText: {
         color: 'white',
         fontSize: hp('3.4%'),
         margin: '2.3%',
         paddingLeft: wp('5%'),
+        fontWeight: '600',
+        textDecorationLine: 'underline'
 
     },
     modalContainer: {

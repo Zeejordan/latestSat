@@ -5,6 +5,7 @@ import { COLORS, FONTS } from '../theme';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import Feather from "react-native-vector-icons/Feather";
+import AntDesign from "react-native-vector-icons/AntDesign";
 import Footer from '../Components/Footer';
 import { GET_USER_DETAILS, LOGOUT, BASE_URL, IMG_URL } from '../../config/api';
 import axios from 'axios';
@@ -78,7 +79,11 @@ const Statistics = () => {
                 end={{ x: 1, y: 0 }}
                 style={styles.topGradient}
             >
+                <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+                    <AntDesign name={"arrowleft"} size={27} color={"white"} style={styles.backArrow} />
+                </TouchableOpacity>
                 <Text style={styles.profileText}>Profile</Text>
+                <Text>                    </Text>
             </LinearGradient>
             <Image source={userData?.avatar_image_url ? { uri: `${IMG_URL}${userData?.avatar_image_url}` } : require('../../assets/images/profileStatistics.png')} style={styles.profileStatisticsImage} onError={(e) => console.log("Image Load Error:", e.nativeEvent.error)} />
             {
@@ -183,7 +188,12 @@ const styles = StyleSheet.create({
     },
     topGradient: {
         height: hp('12%'),
-        width: wp('100%')
+        width: wp('100%'),
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        paddingLeft: wp('4%'),
+        paddingTop: hp('1%')
+        // alignItems: 'center'
     },
     profileText: {
         color: 'white',
@@ -191,6 +201,10 @@ const styles = StyleSheet.create({
         marginLeft: wp('8%'),
         marginTop: hp('1%'),
         fontWeight: '600'
+    },
+    backArrow: {
+        // marginLeft: wp('8%'),
+        marginTop: hp('1%'),
     },
     profileStatisticsImage: {
         position: 'absolute',

@@ -9,6 +9,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { LOGIN } from '../../config/api';
 import AwesomeAlert from 'react-native-awesome-alerts';
 import { useTranslation } from 'react-i18next';
+import AntDesign from 'react-native-vector-icons/AntDesign';
 
 const LoginPage = () => {
     const navigation = useNavigation();
@@ -59,6 +60,9 @@ const LoginPage = () => {
                         end={{ x: 0, y: 1 }}
                     >
                         <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+                            <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+                                <AntDesign name={"arrowleft"} size={27} color={"white"} />
+                            </TouchableOpacity>
                             <View style={styles.container}>
                                 <View style={styles.loginGifContainer}>
                                     <Image
@@ -175,5 +179,9 @@ const styles = StyleSheet.create({
         borderColor: '#0470B8',
         borderRadius: 10,
         paddingVertical: hp('1.2%'),
+    },
+    backButton: {
+        marginLeft: wp('5%'),
+        marginTop: hp('2.5%')
     }
 });

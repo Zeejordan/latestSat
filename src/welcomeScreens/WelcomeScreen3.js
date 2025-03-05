@@ -21,14 +21,16 @@ const WelcomeScreen3 = () => {
                     >
                         {/* Rounded White Container */}
                         <View style={styles.secondView}>
-                            <Text style={styles.aceText}>
-                                Your go-to app for real {"\n"}<Text style={styles.satText}>SAT papers</Text> and smart{"\n"} prep.
-                            </Text>
+                            <View style={styles.thirdView}>
+                                <Text style={styles.aceText}>
+                                    Your go-to app for real {"\n"}<Text style={styles.satText}>SAT papers</Text> and smart{"\n"} prep.
+                                </Text>
 
-                            {/* Fixed Button */}
-                            <TouchableOpacity style={styles.buttonContainer} onPress={handleNavigation}>
-                                <AntDesign name={"arrowright"} size={30} style={styles.arrow} />
-                            </TouchableOpacity>
+                                {/* Fixed Button */}
+                                <TouchableOpacity style={styles.buttonContainer} onPress={handleNavigation}>
+                                    <AntDesign name={"arrowright"} size={30} style={styles.arrow} />
+                                </TouchableOpacity>
+                            </View>
                         </View>
                     </ImageBackground>
                 </View>
@@ -64,6 +66,12 @@ const styles = StyleSheet.create({
         borderTopRightRadius: 130,
         alignItems: 'center',
         paddingTop: hp('8%'),
+    },
+    thirdView: {
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'center',
+        // marginTop: hp('5%')
     },
     aceText: {
         textAlign: 'center',

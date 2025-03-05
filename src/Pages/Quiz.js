@@ -9,11 +9,14 @@ import {
     ScrollView,
     StatusBar,
     Modal,
-    TouchableWithoutFeedback, Keyboard
+    TouchableWithoutFeedback, Keyboard,
+    TextInput,
+    ActivityIndicator
 } from "react-native";
-import RBSheet from "react-native-raw-bottom-sheet"; // Importing Bottom Sheet
+import RBSheet from "react-native-raw-bottom-sheet";
 import AntDesign from "react-native-vector-icons/AntDesign";
 import Octicons from "react-native-vector-icons/Octicons";
+import FontAwesome from "react-native-vector-icons/FontAwesome";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import Footer from "../Components/Footer";
 import axios from "axios";
@@ -37,7 +40,9 @@ const Quiz = ({ navigation }) => {
     const [mathScore, setMathScore] = useState('');
     const [userSession, setUserSession] = useState('');
     const [modal, setModal] = useState(false);
-    const bottomSheetRef = useRef(); // Ref to manage Bottom Sheet visibility
+    const bottomSheetRef = useRef();
+    const [searchValue, setSearchValue] = useState('');
+    const [loading, setLoading] = useState(false);
 
     const { mode, setMode } = useContext(GlobalContext);
 
@@ -46,7 +51,8 @@ const Quiz = ({ navigation }) => {
     }, []);
 
     const quizList = async () => {
-        const baseUrlGet = QUIZ_LIST;
+        setLoading(true);
+        const baseUrlGet = `${QUIZ_LIST}?search=${searchValue}`;
         const token = await AsyncStorage.getItem("token");
         try {
             const response = await axios.get(baseUrlGet, {
@@ -61,6 +67,9 @@ const Quiz = ({ navigation }) => {
             }
         } catch (error) {
             console.error("An Error Occurred", error);
+        }
+        finally {
+            setLoading(false)
         }
     };
 
@@ -83,7 +92,7 @@ const Quiz = ({ navigation }) => {
         } catch (error) {
             console.error("An Error Occurred", error);
         } finally {
-            bottomSheetRef.current.open(); // Open the bottom sheet after data is fetched
+            bottomSheetRef.current.open();
         }
     };
 
@@ -121,6 +130,8 @@ const Quiz = ({ navigation }) => {
             navigation.navigate('Quiz-Analysis', { userSession })
         }
     };
+
+
 
     const renderItem = ({ item }) => {
         const opacity = item.Status === "Locked" ? 0.5 : 1;
@@ -302,6 +313,20 @@ const Quiz = ({ navigation }) => {
                                 <AntDesign name="filter" color="black" style={styles.infoIcon} />
                             </TouchableOpacity>
                         </View>
+                    </View>
+
+                    <View style={styles.searchBar}>
+                        <TextInput
+                            style={styles.inputStyles}
+                            placeholder="Search Here"
+                            value={searchValue}
+                            onChangeText={(text) => setSearchValue(text)}
+                        />
+
+                        <TouchableOpacity style={styles.searchButton} onPress={() => quizList(searchValue)}>
+                            {/* <Text style={styles.searchText}>Search</Text> */}
+                            {loading ? (<ActivityIndicator color={'white'} size={10} />) : (<FontAwesome name={'search'} color={'white'} size={18} style={styles.magnify} />)}
+                        </TouchableOpacity>
                     </View>
 
                     {filterVisible && renderFilterDropdown()}
@@ -538,6 +563,26 @@ const styles = StyleSheet.create({
     infoIcon: {
         fontSize: hp('2.8%')
     },
+    searchBar: {
+        borderWidth: 1,
+        borderColor: 'grey',
+        borderRadius: 15,
+        marginTop: hp("2%"),
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        paddingHorizontal: wp("3%")
+    },
+    searchButton: {
+        backgroundColor: '#0470B8',
+        padding: 6,
+        borderRadius: 5,
+        width: wp('15%'),
+    },
+    searchText: {
+        color: 'white',
+        textAlign: "center"
+    },
     dropdownContainer: {
         position: "absolute",
         right: 15,
@@ -683,4 +728,7 @@ const styles = StyleSheet.create({
         fontSize: hp('2%'),
         fontWeight: '600',
     },
+    magnify: {
+        alignSelf: 'center'
+    }
 });

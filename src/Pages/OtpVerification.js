@@ -69,15 +69,22 @@ const OtpVerification = ({ route, navigation }) => {
 
             if (!response.data.error) {
                 // Alert.alert("Success", "OTP verified! you are logged in.");
-                navigation.navigate('ProfileDetails')
+
+
+                if (response?.data?.message === "No OTP found for this user.") {
+                    Alert.alert("Invalid OTP", "Something went wrong while verifying the OTP. Please try again.");
+                }
+                else {
+                    navigation.navigate('ProfileDetails')
+                }
             }
-            else {
-                Alert.alert('Invalid OTP', 'The OTP you entered is incorrect , please try again.');
-            }
+            // else {
+            //     Alert.alert('Invalid OTP', 'The OTP you entered is incorrect , please try again.');
+            // }
 
         } catch (error) {
-            Alert.alert("Error", "Something went wrong while verifying the OTP. Please try again.");
-            console.error("Error during OTP verification:", error);
+            Alert.alert("Invalid OTP", "Something went wrong while verifying the OTP. Please try again.");
+            // console.error("Error during OTP verification:", error);
         }
         finally {
             setLoadingVerify(false);

@@ -40,7 +40,7 @@ const App = () => {
     <>
       <StatusBar
         barStyle="light-content"
-        backgroundColor="#0470B8"
+        backgroundColor="white"
       />
 
       <I18nextProvider i18n={i18n}>

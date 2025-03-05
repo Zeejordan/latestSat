@@ -20,13 +20,15 @@ const WelcomeScreen4 = () => {
                         resizeMode="cover"
                     >
                         <View style={styles.secondView}>
-                            <Text style={styles.aceText}>
-                                Your <Text style={styles.satText}>SAT</Text> success story{"\n"} starts <Text style={styles.satText}>here!.</Text>
-                            </Text>
+                            <View style={styles.thirdView}>
+                                <Text style={styles.aceText}>
+                                    Your <Text style={styles.satText}>SAT</Text> success story{"\n"} starts <Text style={styles.satText}>here!.</Text>
+                                </Text>
 
-                            <TouchableOpacity style={styles.buttonContainer} onPress={handleNavigation}>
-                                <AntDesign name={"arrowright"} size={30} style={styles.arrow} />
-                            </TouchableOpacity>
+                                <TouchableOpacity style={styles.buttonContainer} onPress={handleNavigation}>
+                                    <AntDesign name={"arrowright"} size={30} style={styles.arrow} />
+                                </TouchableOpacity>
+                            </View>
                         </View>
                     </ImageBackground>
                 </View>
@@ -51,7 +53,7 @@ const styles = StyleSheet.create({
         resizeMode: 'cover',
         height: hp("45%"),
         width: hp("49%"),
-        marginTop: hp("10%"),
+        marginTop: hp("7%"),
     },
     secondView: {
         backgroundColor: 'white',
@@ -62,6 +64,12 @@ const styles = StyleSheet.create({
         borderTopRightRadius: 130,
         alignItems: 'center',
         paddingTop: hp('8%'),
+    },
+    thirdView: {
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginTop: hp('5%')
     },
     aceText: {
         textAlign: 'center',

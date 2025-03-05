@@ -4,6 +4,8 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation } from "@react-navigation/native";
 // import { theme } from "../theme/theme";
 import i18n from "../../i18n";
+import Ionicons from 'react-native-vector-icons/Ionicons';
+import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 
 const SelectLanguage = () => {
     const [selectedLanguage, setSelectedLanguage] = useState(null);
@@ -45,8 +47,12 @@ const SelectLanguage = () => {
 
         >
             <View style={styles.contentContainer}>
-
-                <Text style={styles.heading}>Select Language</Text>
+                <View style={styles.topContainer}>
+                    {/* <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+                        <Ionicons name="arrow-back" size={24} color="black" />
+                    </TouchableOpacity> */}
+                    <Text style={styles.heading}>Select Language</Text>
+                </View>
                 <View style={styles.languageButtonsContainer}>
                     <Text style={styles.instructionText}>
                         Choose your preferred language
@@ -75,6 +81,10 @@ const SelectLanguage = () => {
                 <TouchableOpacity style={styles.nextButton} onPress={handleNext}>
                     <Text style={styles.nextButtonText}>Next</Text>
                 </TouchableOpacity>
+
+                <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+                    <Text style={styles.goBackText}>Go Back</Text>
+                </TouchableOpacity>
             </View>
         </View>
     );
@@ -94,6 +104,12 @@ const styles = StyleSheet.create({
         borderRadius: 20,
         width: "90%",
         height: 450
+    },
+    topContainer: {
+        flexDirection: 'row',
+        justifyContent: 'center',
+        alignItems: 'center',
+        gap: wp('27')
     },
     heading: {
         fontSize: 24,
@@ -141,6 +157,11 @@ const styles = StyleSheet.create({
         fontSize: 16,
         fontWeight: "bold",
     },
+    goBackText: {
+        fontSize: hp('2%'),
+        fontWeight: '700',
+        textDecorationLine: 'underline'
+    }
 });
 
 export default SelectLanguage;

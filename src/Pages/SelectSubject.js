@@ -9,7 +9,7 @@ import { useNavigation } from '@react-navigation/native';
 import Footer from '../Components/Footer';
 import { COLORS } from '../theme';
 import { LEVELS_STARTING } from '../../config/api';
-import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
+import AntDesign from "react-native-vector-icons/AntDesign";
 
 const SelectSubject = () => {
     const navigation = useNavigation();
@@ -93,8 +93,8 @@ const SelectSubject = () => {
         <SafeAreaView style={styles.mainContainer}>
             <LinearGradient colors={[COLORS.linearGradientColor1, COLORS.linearGradientColor2]} style={styles.gradientContainer} start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }}>
 
-                <TouchableOpacity onPress={handleBack} style={styles.backButton}>
-                    <FontAwesome5 name={"arrow-left"} size={30} color={'white'} />
+                <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+                    <AntDesign name={"arrowleft"} size={27} color={"white"} />
                 </TouchableOpacity>
 
                 <View style={styles.semiContainer}>
