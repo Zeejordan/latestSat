@@ -144,6 +144,7 @@ const UpdateProfile = () => {
                         <AntDesign name={"arrowleft"} size={27} color={"white"} style={styles.backArrow} />
                     </TouchableOpacity>
                     <Text style={styles.profileText}>Update Profile</Text>
+                    <Text>                       </Text>
                 </View>
             </LinearGradient>
             <View style={styles.imageContainer}>
@@ -318,7 +319,8 @@ const styles = StyleSheet.create({
         marginTop: hp("1%"),
         flexDirection: 'row',
         alignItems: 'center',
-        marginLeft: wp('5%')
+        marginLeft: wp('5%'),
+        justifyContent: 'space-between'
     },
     profileText: {
         color: 'white',
@@ -326,7 +328,7 @@ const styles = StyleSheet.create({
         margin: '2.3%',
         paddingLeft: wp('5%'),
         fontWeight: '600',
-        textDecorationLine: 'underline'
+        // textDecorationLine: 'underline'
 
     },
     modalContainer: {

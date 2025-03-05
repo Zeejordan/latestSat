@@ -20,16 +20,14 @@ const ProfileDetails = ({ navigation }) => {
     const registerProfileUrl = REGISTER_PROFILE;
 
     const handleRegister = async () => {
-        if (!name.trim()) {
-            Alert.alert("Invalid Name", "Please enter a valid name.");
+        // Name Validation: At least 2 letters, only alphabets & spaces allowed
+        const nameRegex = /^[A-Za-z\s]{2,}$/;
+        if (!name.trim() || !nameRegex.test(name)) {
+            Alert.alert("Invalid Name", "Please enter a valid name with at least 2 letters.");
             return;
         }
 
-        if (!username.trim()) {
-            Alert.alert("Invalid Username", "Please enter a valid username.");
-            return;
-        }
-
+        // Phone Number Validation: Must be exactly 10 digits
         const phoneRegex = /^[0-9]{10}$/;
         if (!phone.trim() || !phoneRegex.test(phone)) {
             Alert.alert("Invalid Phone Number", "Please enter a valid 10-digit phone number.");
@@ -45,12 +43,17 @@ const ProfileDetails = ({ navigation }) => {
             console.log("User ID:", userId);
             console.log("Token:", token);
 
-            const payload = {
+            // Creating the payload dynamically
+            let payload = {
                 "user_id": userId,
                 "name": name.trim(),
-                "username": username.trim(),
                 "phone_number": phone.trim(),
             };
+
+            // Only include username if it's provided
+            if (username.trim()) {
+                payload.username = username.trim();
+            }
 
             const response = await axios.post(registerProfileUrl, payload, {
                 headers: {
@@ -189,11 +192,12 @@ const styles = StyleSheet.create({
     fieldContainer: {
         flexDirection: 'column',
         gap: hp('1%'),
+
     },
     inputfieldText: {
         color: '#0470B8',
         fontWeight: 'bold',
-        fontSize: hp('2%')
+        fontSize: hp('2%'),
     },
     semiContainer: {
         flexDirection: 'column',

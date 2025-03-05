@@ -49,10 +49,9 @@ const QuizAnalysisPage = ({ route }) => {
         setLoading(true);
         setError(null);
 
-        const token = await AsyncStorage.getItem("token");
-        const url = `${QUIZ_ANSWERS}${userSession}?module_name=${moduleName}`;
-
         try {
+            const token = await AsyncStorage.getItem("token");
+            const url = `${QUIZ_ANSWERS}${userSession}?module_name=${moduleName}`;
             const response = await axios.get(url, {
                 headers: {
                     Authorization: `Bearer ${token}`,
@@ -62,55 +61,44 @@ const QuizAnalysisPage = ({ route }) => {
 
             if (!response?.data?.error) {
                 const modulesData = response?.data?.meta?.modules_data || [];
+
                 if (modulesData.length > 0) {
                     setModules(modulesData);
+                    setCurrentModuleIndex(0);  // Reset to the first module
+                    setCurrentQuestionIndex(0); // Reset question index
                 } else {
+                    setModules([]);  // Ensure modules is an empty array instead of undefined
                     setError("No modules available.");
                 }
             }
         } catch (err) {
             setError("Failed to fetch data. Please try again later.");
-            console.log("An Error Occured in get all answers", err);
+            console.log("An error occurred in fetching quiz answers:", err);
         } finally {
             setLoading(false);
         }
     };
+
 
 
     useEffect(() => {
         fetchQuizAnswers();
     }, [moduleName])
 
-    const handleQuestionSelect = async (index) => {
-        setLoading(true);
-        setError(null);
-
-        const token = await AsyncStorage.getItem("token");
-        const url = `${QUIZ_ANSWERS}${userSession}?module_name=${moduleName}&index=${index}`;
-
-        try {
-            const response = await axios.get(url, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                    "Content-Type": "application/json",
-                },
-            });
-
-            if (!response?.data?.error) {
-                const modulesData = response?.data?.meta?.modules_data || [];
-                if (modulesData.length > 0) {
-                    setModules(modulesData);
-                } else {
-                    setError("No modules available.");
-                }
-            }
-        } catch (err) {
-            setError("Failed to fetch data. Please try again later.");
-            console.log("An Error Occured in get all answers", err);
-        } finally {
-            setLoading(false);
+    const handleQuestionSelect = (index) => {
+        if (!currentModule || !currentModule.answers) {
+            console.log("No module data available");
+            return;
         }
+
+        if (index < 0 || index >= currentModule.answers.length) {
+            console.log("Invalid question index:", index);
+            return;
+        }
+
+        setCurrentQuestionIndex(index);
     };
+
 
 
     const handleNextModule = async () => {
@@ -188,11 +176,17 @@ const QuizAnalysisPage = ({ route }) => {
 
     const handleNext = () => {
         let newIndex = currentQuestionIndex + 1;
+        console.log('YAINDEX', newIndex)
+        console.log('YAHA CONDITION DEKH', currentModule.answers.length)
+        console.log('YAHA OR KUCH DEKH', currentModule?.answers[newIndex])
+        console.log('YAHA OR KUCH DEKH', currentModule?.answers[newIndex]?.not_attempted)
+
 
         while (
             newIndex < currentModule.answers.length &&
-            currentModule.answers[newIndex]?.not_attempted
+            currentModule?.answers[newIndex]?.not_attempted
         ) {
+            console.log("THIS IS NEW INDEX", newIndex)
             newIndex++;
         }
 
@@ -257,7 +251,7 @@ const QuizAnalysisPage = ({ route }) => {
                     </Text>
                 </View>
                 <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.horizontalScroll}>
-                    {Array.from({ length: currentModule.module_name.includes("english") ? 27 : 22 }).map((_, index) => {
+                    {Array.from({ length: currentModule?.module_name?.includes("english") ? 27 : 22 }).map((_, index) => {
                         const answer = currentModule?.answers?.find(answer => answer?.question_no === index + 1);
                         const isClickable = answer && !answer.not_attempted;
 

@@ -24,7 +24,7 @@ const SelectSubject = () => {
     const subjects = ['Math', 'Reading and Writing'];
 
     const categories = {
-        Math: ['Advancement Math', 'Problem-Solving', 'Algebra', 'Geometry'],
+        Math: ['Advanced Math', 'Problem-Solving and Data Analysis', 'Algebra', 'Geometry and Trigonometry'],
         'Reading and Writing': ['Expression of Ideas', 'Craft and Structure', 'Information and Ideas', 'Standard English Conventions'],
     };
 

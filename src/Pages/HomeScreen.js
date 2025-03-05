@@ -155,7 +155,7 @@ const HomeScreen = () => {
           <Icon name="account-circle" size={25} color="#0651C6" />
         </TouchableOpacity>
       </View>
-      <Text style={styles.bigheading}>What would you like to play today?</Text>
+      <Text style={styles.bigheading}>What would you like to do today?</Text>
 
       <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
         {quizStatus ?
@@ -178,7 +178,7 @@ const HomeScreen = () => {
       </ScrollView>
 
 
-      <Text style={styles.unfinishheading}>Unfinished Test</Text>
+      <Text style={styles.unfinishheading}>Levels Progress</Text>
 
       <ScrollView>
         {mathUnfinished ?

@@ -539,7 +539,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: wp('1%')
     },
     quizStartButton: {
-        backgroundColor: "#26A5E6",
+        backgroundColor: "#0470B8",
         // marginHorizontal: wp("10%"),
         borderRadius: 10,
         // marginVertical: hp("4%"),
@@ -576,8 +576,8 @@ const styles = StyleSheet.create({
     searchButton: {
         backgroundColor: '#0470B8',
         padding: 6,
-        borderRadius: 5,
-        width: wp('15%'),
+        borderRadius: 30,
+        width: wp('8%'),
     },
     searchText: {
         color: 'white',
