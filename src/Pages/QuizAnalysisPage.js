@@ -15,8 +15,8 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import { WebView } from 'react-native-webview';
 import { useNavigation } from '@react-navigation/native';
+import AntDesign from 'react-native-vector-icons/AntDesign';
 
-// stop stop stop stop stop stops stop stop stop stop stop 
 
 const QuizAnalysisPage = ({ route }) => {
 
@@ -64,10 +64,10 @@ const QuizAnalysisPage = ({ route }) => {
 
                 if (modulesData.length > 0) {
                     setModules(modulesData);
-                    setCurrentModuleIndex(0);  // Reset to the first module
-                    setCurrentQuestionIndex(0); // Reset question index
+                    setCurrentModuleIndex(0);
+                    setCurrentQuestionIndex(0);
                 } else {
-                    setModules([]);  // Ensure modules is an empty array instead of undefined
+                    setModules([]);
                     setError("No modules available.");
                 }
             }
@@ -111,17 +111,41 @@ const QuizAnalysisPage = ({ route }) => {
         } else if (moduleName === "math_module_1") {
             nextModuleName = "math_module_2";
         } else {
-            return; // Prevent updating if there's no further module
+            return;
         }
 
-        setModuleName(nextModuleName);
+        setLoading(true);
+        setError(null);
 
-        // Fetch new module data and check if it exists
-        await fetchQuizAnswers();
-        if (modules.length === 0) {
-            setError("No modules available.");
+        try {
+            const token = await AsyncStorage.getItem("token");
+            const url = `${QUIZ_ANSWERS}${userSession}?module_name=${nextModuleName}`;
+            const response = await axios.get(url, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    "Content-Type": "application/json",
+                },
+            });
+
+            const modulesData = response?.data?.meta?.modules_data || [];
+
+
+            const isModuleEmpty = modulesData.length === 0 || modulesData.every(mod => mod.answers.every(q => q.not_attempted));
+
+            if (!isModuleEmpty) {
+                setModuleName(nextModuleName);
+                setModules(modulesData);
+            } else {
+                setError("Next module has no attempted questions.");
+            }
+        } catch (err) {
+            console.error("Error loading next module:", err);
+            setError("Failed to load module.");
+        } finally {
+            setLoading(false);
         }
     };
+
 
 
     const handlePreviousModule = async () => {
@@ -134,17 +158,40 @@ const QuizAnalysisPage = ({ route }) => {
         } else if (moduleName === "english_module_2") {
             prevModuleName = "english_module_1";
         } else {
-            return; // Prevent updating if there's no previous module
+            return;
         }
 
-        setModuleName(prevModuleName);
+        setLoading(true);
+        setError(null);
 
-        // Fetch previous module data and check if it exists
-        await fetchQuizAnswers();
-        if (modules.length === 0) {
-            setError("No modules available.");
+        try {
+            const token = await AsyncStorage.getItem("token");
+            const url = `${QUIZ_ANSWERS}${userSession}?module_name=${prevModuleName}`;
+            const response = await axios.get(url, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    "Content-Type": "application/json",
+                },
+            });
+
+            const modulesData = response?.data?.meta?.modules_data || [];
+
+            const isModuleEmpty = modulesData.length === 0 || modulesData.every(mod => mod.answers.every(q => q.not_attempted));
+
+            if (!isModuleEmpty) {
+                setModuleName(prevModuleName);
+                setModules(modulesData);
+            } else {
+                setError("Previous module has no attempted questions.");
+            }
+        } catch (err) {
+            console.error("Error loading previous module:", err);
+            setError("Failed to load module.");
+        } finally {
+            setLoading(false);
         }
     };
+
 
 
     if (loading) {
@@ -242,6 +289,9 @@ const QuizAnalysisPage = ({ route }) => {
     return (
         <SafeAreaView style={styles.container}>
             <ScrollView contentContainerStyle={styles.scrollContainer}>
+                <TouchableOpacity onPress={() => navigation.goBack()} style={{ marginBottom: hp("2%") }}>
+                    <AntDesign name={"arrowleft"} size={23} />
+                </TouchableOpacity>
                 <View style={styles.moduleContainer}>
                     <Text style={styles.moduleText}>
                         Question No.{currentQuestionIndex + 1}

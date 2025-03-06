@@ -33,16 +33,28 @@ const OtpVerification = ({ route, navigation }) => {
 
     const handleInputChange = (text, index) => {
         const newOtp = [...otp];
-        newOtp[index] = text;
 
-        setOtp(newOtp);
+        if (text.length === 1) {
+            newOtp[index] = text;
+            setOtp(newOtp);
 
-        if (text && index < 5) {
-            inputs[index + 1]?.focus();
+            if (index < 5) {
+                inputs[index + 1]?.focus();
+            }
         }
 
-        if (text === "" && index > 0) {
-            inputs[index - 1]?.focus();
+
+        else {
+            newOtp[index] = "";
+            setOtp(newOtp);
+        }
+    };
+
+    const handleKeyPress = ({ nativeEvent }, index) => {
+        if (nativeEvent.key === "Backspace") {
+            if (otp[index] === "" && index > 0) {
+                inputs[index - 1]?.focus();
+            }
         }
     };
 
@@ -111,7 +123,8 @@ const OtpVerification = ({ route, navigation }) => {
         }
     };
 
-    const inputs = [];
+    const inputs = Array(6).fill(null);
+
     console.log("yeh hai inputs array", inputs)
     return (
         <SafeAreaView style={styles.container}>
@@ -136,6 +149,7 @@ const OtpVerification = ({ route, navigation }) => {
                             maxLength={1}
                             value={otp[index]}
                             onChangeText={(text) => handleInputChange(text, index)}
+                            onKeyPress={(event) => handleKeyPress(event, index)}
                         />
                     ))}
                 </View>

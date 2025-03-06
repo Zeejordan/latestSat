@@ -44,8 +44,8 @@ const LevelComplete = ({ route }) => {
             <LinearGradient
                 colors={[COLORS.linearGradientColor1, COLORS.linearGradientColor2]}
                 style={styles.gradientContainer}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 0, y: 1 }}>
+                start={{ x: 0, y: 1 }}
+                end={{ x: 0, y: 0 }}>
 
                 <View style={styles.container}>
                     <View style={styles.levelContainer}>

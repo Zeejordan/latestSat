@@ -323,7 +323,7 @@ const Quiz = ({ navigation }) => {
                             onChangeText={(text) => setSearchValue(text)}
                         />
 
-                        <TouchableOpacity style={styles.searchButton} onPress={() => quizList(searchValue)}>
+                        <TouchableOpacity style={styles.searchButton} onPress={quizList}>
                             {/* <Text style={styles.searchText}>Search</Text> */}
                             {loading ? (<ActivityIndicator color={'white'} size={10} />) : (<FontAwesome name={'search'} color={'white'} size={18} style={styles.magnify} />)}
                         </TouchableOpacity>
@@ -337,6 +337,11 @@ const Quiz = ({ navigation }) => {
                         renderItem={renderItem}
                         contentContainerStyle={styles.flatListContent}
                         showsVerticalScrollIndicator={false}
+                        ListEmptyComponent={() => (
+                            <View style={styles.noDataContainer}>
+                                <Text style={styles.noDataText}>No data found for your search.</Text>
+                            </View>
+                        )}
                     />
                 </View>
             )}
@@ -445,6 +450,15 @@ const styles = StyleSheet.create({
     flatListContent: {
         marginTop: hp("3%"),
         gap: 20,
+    },
+    noDataContainer: {
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginTop: 20,
+    },
+    noDataText: {
+        fontSize: 16,
+        color: 'gray',
     },
     time: {
         flexDirection: "row",

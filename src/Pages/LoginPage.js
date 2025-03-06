@@ -86,7 +86,7 @@ const LoginPage = () => {
                                     </View>
                                     <View style={styles.getOtpContainer}>
                                         {loading ? (
-                                            <ActivityIndicator color="white" size={'large'} />
+                                            <ActivityIndicator color="#0470B8" size={'large'} />
                                         ) : (
                                             <TouchableOpacity
                                                 style={styles.getOtpButton}
