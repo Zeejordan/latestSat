@@ -143,7 +143,7 @@ const Quiz = ({ navigation }) => {
                 disabled={item.Status === "Locked"}
             >
                 <View style={styles.firstBox}>
-                    <Text style={styles.titleText}>SAT - {item.Test_Name}</Text>
+                    <Text style={styles.titleText}>{item.Test_Name}</Text>
                     <View style={styles.time}>
                         <MaterialCommunityIcons name="timer" color={"grey"} size={17} />
                         <Text style={styles.timeText}>{item.Time}</Text>
@@ -236,7 +236,7 @@ const Quiz = ({ navigation }) => {
                     <View style={styles.semiInstructions}>
                         <Text style={styles.quizHeading}>Quiz Instructions</Text>
                     </View>
-                    <ScrollView showsVerticalScrollIndicator={false}>
+                    <ScrollView contentContainerStyle={styles.scrollViewContent} showsVerticalScrollIndicator={false}>
                         <Text style={styles.sectionTitle}>Reading And Writing:</Text>
                         <Text style={styles.paragraph}>
                             This section focuses on key reading and writing skills. Each question
@@ -280,21 +280,18 @@ const Quiz = ({ navigation }) => {
                             -37/4    =     -37/4, -9.25                              {"\n"}
                             10√(3)   =     10root(3), 17.320, 17.321                 {"\n"} */}
                         </Text>
-
-                        <View style={styles.buttonsContainer}>
-
-                            <TouchableOpacity style={styles.quizStartButton} onPress={handleQuizClose}>
-                                <Text style={styles.quizStartButtonText}>Go Back</Text>
-                            </TouchableOpacity>
-
-                            <TouchableOpacity
-                                onPress={handleNavigation}
-                                style={styles.quizStartButton}
-                            >
-                                <Text style={styles.quizStartButtonText}>Start Quiz</Text>
-                            </TouchableOpacity>
-                        </View>
                     </ScrollView>
+
+
+                    <View style={styles.stickyButtonsContainer}>
+                        <TouchableOpacity style={styles.quizStartButton} onPress={handleQuizClose}>
+                            <Text style={styles.quizStartButtonText}>Go Back</Text>
+                        </TouchableOpacity>
+
+                        <TouchableOpacity onPress={handleNavigation} style={styles.quizStartButton}>
+                            <Text style={styles.quizStartButtonText}>Start Quiz</Text>
+                        </TouchableOpacity>
+                    </View>
                 </View>
             ) : (
                 <View style={styles.container}>
@@ -425,6 +422,7 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         padding: 15,
+        backgroundColor: 'white'
     },
     topBar: {
         flexDirection: "row",
@@ -566,13 +564,43 @@ const styles = StyleSheet.create({
         fontWeight: "700",
         fontSize: hp("2%"),
     },
-    buttonsContainer: {
+    scrollViewContent: {
+        flexGrow: 1,
+        paddingBottom: 80,
+    },
+    stickyButtonsContainer: {
+        position: 'absolute',
+        bottom: 0,
+        left: 0,
+        right: 0,
+        backgroundColor: 'white',
+        paddingVertical: 15,
+        paddingHorizontal: 20,
         flexDirection: 'row',
-        justifyContent: 'space-around',
+        justifyContent: 'space-between',
         alignItems: 'center',
-        borderWidth: 1,
-        marginTop: hp('3%'),
-        borderColor: 'transparent'
+        borderTopWidth: 1,
+        borderColor: '#ccc',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: -2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+        elevation: 5,
+    },
+
+    buttonsContainer: {
+        position: 'absolute',
+        bottom: 0,
+        left: 0,
+        right: 0,
+        backgroundColor: 'white', // Add a background color to make sure it’s visible
+        paddingVertical: 10, // Adds spacing
+        paddingHorizontal: 20,
+        flexDirection: 'row',
+        justifyContent: 'space-between', // Ensures buttons are spaced properly
+        alignItems: 'center',
+        borderTopWidth: 1, // Optional: Adds a border for separation
+        borderColor: '#ccc',
     },
     infoIcon: {
         fontSize: hp('2.8%')

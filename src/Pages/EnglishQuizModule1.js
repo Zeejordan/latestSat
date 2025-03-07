@@ -13,15 +13,13 @@ import { useNavigation } from '@react-navigation/native';
 import { WebView } from 'react-native-webview';
 import Tooltip from 'react-native-walkthrough-tooltip';
 import { GlobalContext } from '../context/GlobalContext';
-import RBSheet from "react-native-raw-bottom-sheet"; // Importing Bottom Sheet
+import RBSheet from "react-native-raw-bottom-sheet";
 
-
-// stop stop stop stop stop stop stop stop stop 
+// stop stop stop stop stop stop stop stop stop stop stop stop stop stop 
 
 const EnglishQuizModule1 = () => {
 
     const { mode, setMode } = useContext(GlobalContext);
-
 
     const navigation = useNavigation();
     const [data, setData] = useState([]);
@@ -489,6 +487,10 @@ const EnglishQuizModule1 = () => {
                     </TouchableOpacity>
                 </View>
 
+                <View style={styles.chooseBox}>
+                    <Text style={styles.chooseText}>Choose the Correct Answer:</Text>
+                </View>
+
                 <View style={styles.optionContainer}>
                     {['A', 'B', 'C', 'D'].map((option) => (
                         <TouchableOpacity
@@ -706,8 +708,17 @@ const styles = StyleSheet.create({
         alignSelf: 'center',
         fontWeight: '700'
     },
-    optionContainer: {
+    chooseBox: {
         marginTop: hp('3%'),
+        paddingLeft: wp('1%')
+    },
+    chooseText: {
+        color: "black",
+        fontSize: hp("2%"),
+        fontWeight: '700'
+    },
+    optionContainer: {
+        marginTop: hp('1%'),
         flexDirection: 'column',
         gap: hp('2%'),
     },

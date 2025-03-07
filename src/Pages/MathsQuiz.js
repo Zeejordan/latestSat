@@ -1,5 +1,5 @@
 import { StyleSheet, Text, View, SafeAreaView, TouchableOpacity, FlatList, Alert, ActivityIndicator, TextInput, ScrollView, Modal, TouchableWithoutFeedback } from 'react-native'
-import React, { memo, useState, useContext } from 'react'
+import React, { memo, useState, useContext, useRef } from 'react'
 import { useEffect } from 'react';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import { MATHS_FIRST_MODULE, MATHS_FIRST_MODULE_SUBMIT, MATHS_SECOND_MODULE, MATHS_SECOND_MODULE_SUBMIT } from '../../config/api';
@@ -13,6 +13,7 @@ import { WebView } from 'react-native-webview';
 import CalculatorModal from '../Components/CalculatorModal';
 import Tooltip from 'react-native-walkthrough-tooltip';
 import { GlobalContext } from '../context/GlobalContext';
+import RBSheet from "react-native-raw-bottom-sheet"; 
 
 const MathsQuiz = () => {
 
@@ -44,6 +45,9 @@ const MathsQuiz = () => {
 
     const [showCalculator, setShowCalculator] = useState(false);
     const [tooltipVisible, setTooltipVisible] = useState(true);
+    const [showAnswer, setShowAnswer] = useState(false)
+
+    const bottomSheetRef = useRef();
 
 
     useEffect(() => {
@@ -456,7 +460,42 @@ const dynamicFontSize = hp("5%");
                             </Text>
                         </TouchableOpacity>
                     </View>
+
+                    <RBSheet
+                        ref={bottomSheetRef}
+                        height={350}
+                        closeOnDragDown={true}
+                        customStyles={{
+                            container: {
+                                padding: 20,
+                                backgroundColor: '#fff',
+                                borderTopLeftRadius: 15,
+                                borderTopRightRadius: 15,
+                            },
+                        }}
+                    >
+                        <View style={styles.answerBoxNew}>
+                            <View style={styles.answerExplanationContainer}>
+                                <Text style={styles.answerExplanationText}>Answer Explanation: </Text>
+                            </View>
+                            <WebView
+                                originWhitelist={['*']}
+                                source={{ html: `<style>body { font-size: ${dynamicFontSize}; padding:40px; }</style>${item.Rational}` }}
+                                style={[styles.webView, { flex: 1 }]}
+                                scalesPageToFit={true}
+                                javaScriptEnabled={true}
+                                showsVerticalScrollIndicator={false}
+                            />
+                        </View>
+                    </RBSheet>
                     <View style={styles.calculatorInfoContainer}>
+
+                        {mode === "practice_mode" && (
+                                                    <TouchableOpacity onPress={() => bottomSheetRef.current.open()}>
+                                                        <Entypo name={showAnswer ? "eye-with-line" : "eye"} color={"black"} size={20} />
+                                                    </TouchableOpacity>
+                                                )}
+                                                
                         <TouchableOpacity onPress={() => setShowCalculator(true)}>
                             <Entypo name='calculator' color="black" style={styles.infoIcon} />
                         </TouchableOpacity>
@@ -554,6 +593,12 @@ const dynamicFontSize = hp("5%");
                 </View>
 
                 {/* {item.type === 'MCQ' ? setQuestionType('MCQ') : setQuestionType('SPR')} */}
+                {item.type==="MCQ" && (
+                    <View style={styles.chooseBox}>
+                    <Text style={styles.chooseText}>Choose the Correct Answer:</Text>
+                </View>
+                )}
+                
 
                 {item.type === 'MCQ' ? (
                     <View style={styles.optionContainer}>
@@ -583,6 +628,8 @@ const dynamicFontSize = hp("5%");
                             value={sprInput}
                             onChangeText={(text) => handleSprInput(text, item.externalid)}
                             style={styles.sprInputStyling}
+                            placeholder="Enter Your Answer"
+                            keyboardType="numeric"
                         />
                     </View>
                 )}
@@ -749,11 +796,20 @@ const styles = StyleSheet.create({
         alignSelf: 'center',
         fontWeight: '700'
     },
+    chooseBox: {
+        marginTop: hp('3%'),
+        paddingLeft: wp('1%')
+    },
+    chooseText: {
+        color: "black",
+        fontSize: hp("2%"),
+        fontWeight: '700'
+    },
     sprContainer: {
         marginTop: hp('3%'),
     },
     optionContainer: {
-        marginTop: hp('3%'),
+        marginTop: hp('1%'),
         flexDirection: 'column',
         gap: hp('2%'),
     },
@@ -1027,7 +1083,7 @@ const styles = StyleSheet.create({
     },
     tooltipContent: {
         padding: 10,
-        maxHeight: 300,  // To make sure the content doesn't overflow the screen
+        maxHeight: 300,  
     },
     tooltipBackground: {
         backgroundColor: 'rgba(0, 0, 0, 0.7)',
@@ -1035,6 +1091,20 @@ const styles = StyleSheet.create({
     },
     scrollViewContainer: {
         padding: 10,
+    },
+    answerBoxNew: {
+        flex: 1,
+        // height: 300,
+    },
+    answerExplanationContainer: {
+        marginLeft: wp('5%')
+    },
+    answerExplanationText: {
+        color: '#0470B8',
+        fontSize: hp('3%'),
+        fontWeight: '700',
+        textDecorationLine: 'underline',
+        marginBottom: 5
     },
 })
 

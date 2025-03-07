@@ -226,7 +226,7 @@ const styles = StyleSheet.create({
     },
     skipText: {
         textAlign: 'center',
-        color: "white",
+        color: "#0470B8",
         fontWeight: '600',
         fontSize: hp('1.8%'),
         textDecorationLine: 'underline'

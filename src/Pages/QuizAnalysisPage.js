@@ -59,8 +59,11 @@ const QuizAnalysisPage = ({ route }) => {
                 },
             });
 
+            console.log("API Response Data:", response.data);
+
             if (!response?.data?.error) {
                 const modulesData = response?.data?.meta?.modules_data || [];
+                console.log('THIS IS SESSION ID:', response.data.meta.session_id)
 
                 if (modulesData.length > 0) {
                     setModules(modulesData);
@@ -102,95 +105,87 @@ const QuizAnalysisPage = ({ route }) => {
 
 
     const handleNextModule = async () => {
-        let nextModuleName = "";
+        const moduleSequence = ["english_module_1", "english_module_2", "math_module_1", "math_module_2"];
+        let currentIndex = moduleSequence.indexOf(moduleName);
 
-        if (moduleName === "english_module_1") {
-            nextModuleName = "english_module_2";
-        } else if (moduleName === "english_module_2") {
-            nextModuleName = "math_module_1";
-        } else if (moduleName === "math_module_1") {
-            nextModuleName = "math_module_2";
-        } else {
-            return;
-        }
+        if (currentIndex === -1 || currentIndex === moduleSequence.length - 1) return;
 
         setLoading(true);
         setError(null);
 
-        try {
-            const token = await AsyncStorage.getItem("token");
-            const url = `${QUIZ_ANSWERS}${userSession}?module_name=${nextModuleName}`;
-            const response = await axios.get(url, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                    "Content-Type": "application/json",
-                },
-            });
+        while (currentIndex < moduleSequence.length - 1) {
+            currentIndex++;
+            const nextModuleName = moduleSequence[currentIndex];
 
-            const modulesData = response?.data?.meta?.modules_data || [];
+            try {
+                const token = await AsyncStorage.getItem("token");
+                const url = `${QUIZ_ANSWERS}${userSession}?module_name=${nextModuleName}`;
+                const response = await axios.get(url, {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                        "Content-Type": "application/json",
+                    },
+                });
 
+                const modulesData = response?.data?.meta?.modules_data || [];
+                const isModuleEmpty = modulesData.length === 0 || modulesData.every(mod => mod.answers.every(q => q.not_attempted));
 
-            const isModuleEmpty = modulesData.length === 0 || modulesData.every(mod => mod.answers.every(q => q.not_attempted));
-
-            if (!isModuleEmpty) {
-                setModuleName(nextModuleName);
-                setModules(modulesData);
-            } else {
-                setError("Next module has no attempted questions.");
+                if (!isModuleEmpty) {
+                    setModuleName(nextModuleName);
+                    setModules(modulesData);
+                    return;
+                }
+            } catch (err) {
+                console.error("Error loading next module:", err);
+                setError("Failed to load module.");
             }
-        } catch (err) {
-            console.error("Error loading next module:", err);
-            setError("Failed to load module.");
-        } finally {
-            setLoading(false);
         }
+
+        setError("No further attempted modules available.");
+        setLoading(false);
     };
-
-
 
     const handlePreviousModule = async () => {
-        let prevModuleName = "";
+        const moduleSequence = ["english_module_1", "english_module_2", "math_module_1", "math_module_2"];
+        let currentIndex = moduleSequence.indexOf(moduleName);
 
-        if (moduleName === "math_module_2") {
-            prevModuleName = "math_module_1";
-        } else if (moduleName === "math_module_1") {
-            prevModuleName = "english_module_2";
-        } else if (moduleName === "english_module_2") {
-            prevModuleName = "english_module_1";
-        } else {
-            return;
-        }
+        if (currentIndex <= 0) return;
 
         setLoading(true);
         setError(null);
 
-        try {
-            const token = await AsyncStorage.getItem("token");
-            const url = `${QUIZ_ANSWERS}${userSession}?module_name=${prevModuleName}`;
-            const response = await axios.get(url, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                    "Content-Type": "application/json",
-                },
-            });
+        while (currentIndex > 0) {
+            currentIndex--;
+            const prevModuleName = moduleSequence[currentIndex];
 
-            const modulesData = response?.data?.meta?.modules_data || [];
+            try {
+                const token = await AsyncStorage.getItem("token");
+                const url = `${QUIZ_ANSWERS}${userSession}?module_name=${prevModuleName}`;
+                const response = await axios.get(url, {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                        "Content-Type": "application/json",
+                    },
+                });
 
-            const isModuleEmpty = modulesData.length === 0 || modulesData.every(mod => mod.answers.every(q => q.not_attempted));
+                const modulesData = response?.data?.meta?.modules_data || [];
+                const isModuleEmpty = modulesData.length === 0 || modulesData.every(mod => mod.answers.every(q => q.not_attempted));
 
-            if (!isModuleEmpty) {
-                setModuleName(prevModuleName);
-                setModules(modulesData);
-            } else {
-                setError("Previous module has no attempted questions.");
+                if (!isModuleEmpty) {
+                    setModuleName(prevModuleName);
+                    setModules(modulesData);
+                    return;
+                }
+            } catch (err) {
+                console.error("Error loading previous module:", err);
+                setError("Failed to load module.");
             }
-        } catch (err) {
-            console.error("Error loading previous module:", err);
-            setError("Failed to load module.");
-        } finally {
-            setLoading(false);
         }
+
+        setError("No previous attempted modules available.");
+        setLoading(false);
     };
+
 
 
 
@@ -434,6 +429,7 @@ const QuizAnalysisPage = ({ route }) => {
                                 javaScriptEnabled={true}
                             />
                         )}
+                        {console.log("YEH HAI RATIONALE", currentQuestion.rationale)}
                     </View>
 
                 </View>

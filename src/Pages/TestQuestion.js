@@ -162,7 +162,11 @@ const TestQuestion = ({ route }) => {
                         style={styles.sprInput}
                         value={sprValue}
                         placeholder="Enter Your Answer"
-                        onChangeText={(text) => setSprValue(text)}
+                        keyboardType="numeric"
+                        onChangeText={(text) => {
+                            const numericText = text.replace(/[^0-9]/g, '');
+                            setSprValue(numericText);
+                        }}
                     />
                 </View>
             ) : (
