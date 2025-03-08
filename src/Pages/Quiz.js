@@ -27,6 +27,9 @@ import {
     heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
 import { GlobalContext } from '../context/GlobalContext';
+import { LinearGradient } from 'expo-linear-gradient';
+import { COLORS } from "../theme";
+
 
 const Quiz = ({ navigation }) => {
     const [quizData, setQuizData] = useState([]);
@@ -294,7 +297,10 @@ const Quiz = ({ navigation }) => {
                     </View>
                 </View>
             ) : (
-                <View style={styles.container}>
+                <LinearGradient style={styles.container}
+                    colors={[COLORS.linearGradientColor2, COLORS.linearGradientColor1]}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 0, y: 1 }}>
                     <View style={styles.topBar}>
                         <View style={styles.miniContainer}>
                             <TouchableOpacity onPress={handleBack}>
@@ -340,7 +346,7 @@ const Quiz = ({ navigation }) => {
                             </View>
                         )}
                     />
-                </View>
+                </LinearGradient>
             )}
 
             {modal && (

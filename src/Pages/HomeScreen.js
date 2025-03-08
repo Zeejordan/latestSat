@@ -166,7 +166,7 @@ const HomeScreen = () => {
         </View>
         <Text style={styles.bigheading}>What would you like to do today?</Text>
 
-        <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
+        {/* <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
           {quizStatus ?
             quizStatus.map((item, index) => (
               <TouchableOpacity key={item.id || index} style={styles.card} onPress={handleQuizNavigation}>
@@ -184,7 +184,29 @@ const HomeScreen = () => {
             ))
             : (<ActivityIndicator size={'large'} color={"white"} />)
           }
-        </ScrollView>
+        </ScrollView> */}
+
+        <TouchableOpacity style={styles.imageMockContainer}>
+          <Image
+            source={require('../../assets/images/writing.jpeg')}
+            style={styles.imageMock} // Set width and height
+            resizeMode="cover"
+          />
+          <TouchableOpacity style={styles.showMoreButton} onPress={() => navigation.navigate('Quiz')}>
+            <LinearGradient
+              colors={['#0651C6', '#0470B8']} // Define gradient colors
+              start={{ x: 1, y: 0 }}
+              end={{ x: 0, y: 1 }}
+              style={styles.gradientContainerOnlyButton}
+            >
+              <Text style={styles.showMoreText}>Show More</Text>
+            </LinearGradient>
+          </TouchableOpacity>
+
+          <View style={styles.mockTestContainer}>
+            <Text style={styles.mockTestText}>Mock Test</Text>
+          </View>
+        </TouchableOpacity>
 
 
         <Text style={styles.unfinishheading}>Levels Progress</Text>
@@ -277,6 +299,52 @@ const styles = StyleSheet.create({
     color: "#0470B8",
     paddingHorizontal: 10,
     fontWeight: "500",
+  },
+  imageMockContainer: {
+    // height: hp("30%"),
+    // width: wp('92%'),
+    // backgroundColor: "white",
+    // width: '100%',
+    marginHorizontal: wp('4%'),
+    marginBottom: hp("2.5%"),
+    position: 'relative',
+    marginTop: hp('1%')
+  },
+  imageMock: {
+    width: wp('92%'),
+    height: hp('30%'),
+    borderRadius: 10,
+  },
+  showMoreButton: {
+    position: 'absolute',
+    bottom: 6,
+    left: 6,
+    borderRadius: 15,
+    paddingHorizontal: wp("2.5%"),
+    paddingVertical: hp("0.1%"),
+  },
+  gradientContainerOnlyButton: {
+    paddingHorizontal: wp("2.5%"),
+    paddingVertical: hp("0.1%"),
+    borderRadius: 15,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  showMoreText: {
+    color: 'white',
+    fontSize: hp("1.7%"),
+    fontWeight: '700'
+  },
+  mockTestContainer: {
+    position: 'absolute',
+    top: 3,
+    left: 15
+
+  },
+  mockTestText: {
+    color: '#0470B8',
+    fontWeight: '600',
+    fontSize: hp('2.5%')
   },
   scrollContainer: {
     marginTop: 5,

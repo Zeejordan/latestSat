@@ -99,7 +99,7 @@ const Levels = ({ route }) => {
     return (
         <SafeAreaView style={styles.mainContainer}>
             <LinearGradient
-                colors={[COLORS.linearGradientColor1, COLORS.linearGradientColor2]}
+                colors={[COLORS.linearGradientColor2, COLORS.linearGradientColor1]}
                 style={styles.gradientContainer}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 0, y: 1 }}

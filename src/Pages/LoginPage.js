@@ -136,7 +136,7 @@ const styles = StyleSheet.create({
     },
     container: {
         flex: 1,
-        marginTop: hp('6%'),
+        // marginTop: hp('6%'),
 
     },
     emailInput: {
@@ -147,7 +147,7 @@ const styles = StyleSheet.create({
         paddingLeft: hp('2%')
     },
     loginText: {
-        color: "#0470B8",
+        color: "white",
         fontSize: hp('4%'),
         alignSelf: 'center',
         fontWeight: '800',
@@ -155,7 +155,7 @@ const styles = StyleSheet.create({
     },
     loginGifContainer: {
         alignSelf: 'center',
-        marginTop: hp('2%')
+        // marginTop: hp('2%')
     },
     loginGif: {
         height: hp("40%"),
