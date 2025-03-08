@@ -585,7 +585,7 @@ const dynamicFontSize = hp("5%");
 
                 <View style={styles.buttonsContainer}>
                     <TouchableOpacity style={styles.navigateButton} onPress={handlePrevious}>
-                        <Text style={styles.navigateText}>Previous</Text>
+                        <Text style={styles.navigateText}>Prev</Text>
                     </TouchableOpacity>
                     <TouchableOpacity style={styles.navigateButton} onPress={handleNext}>
                         <Text style={styles.navigateText}>Next</Text>
@@ -779,7 +779,7 @@ const styles = StyleSheet.create({
         borderColor: 'transparent',
     },
     navigateButton: {
-        backgroundColor: "#0470B8",
+        backgroundColor: "#C5E6FD",
         paddingVertical: hp('1%'),
         paddingHorizontal: wp('3%'),
         marginTop: hp('1.5%'),
@@ -789,7 +789,7 @@ const styles = StyleSheet.create({
     },
     navigateText: {
         fontSize: hp('2.2%'),
-        color: 'white',
+        color: '#0470B8',
         textAlign: 'center',
         alignItems: 'center',
         justifyContent: 'center',
@@ -858,11 +858,11 @@ const styles = StyleSheet.create({
     submitText: {
         textAlign: "center",
         fontSize: hp('2.5%'),
-        color: "#0470B8",
+        color: "white",
         fontWeight: '600'
     },
     submitButton: {
-        backgroundColor: "#C5E6FD",
+        backgroundColor: "#0470B8",
         marginVertical: hp('4%'),
         paddingVertical: hp('1.8%'),
         marginHorizontal: wp('20%'),

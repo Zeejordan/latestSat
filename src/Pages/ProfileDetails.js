@@ -84,7 +84,7 @@ const ProfileDetails = ({ navigation }) => {
     return (
         <SafeAreaView style={styles.mainContainer}>
             <LinearGradient
-                colors={[COLORS.linearGradientColor1, COLORS.linearGradientColor2]}
+                colors={[COLORS.linearGradientColor2, COLORS.linearGradientColor1]}
                 style={styles.gradientContainer}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 0, y: 1 }}
@@ -175,7 +175,7 @@ const styles = StyleSheet.create({
     },
     profileContainer: {},
     profileText: {
-        color: "#0470B8",
+        color: "white",
         fontSize: hp('3%'),
         textAlign: 'center',
         fontWeight: '700'
@@ -195,7 +195,7 @@ const styles = StyleSheet.create({
 
     },
     inputfieldText: {
-        color: '#0470B8',
+        color: 'white',
         fontWeight: 'bold',
         fontSize: hp('2%'),
     },
@@ -210,7 +210,8 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderColor: '#0470B8',
         borderRadius: 5,
-        marginTop: hp('6%')
+        marginTop: hp('6%'),
+        elevation: 5
     },
     signInText: {
         color: 'white',
@@ -226,7 +227,7 @@ const styles = StyleSheet.create({
     },
     skipText: {
         textAlign: 'center',
-        color: "#0470B8",
+        color: "white",
         fontWeight: '600',
         fontSize: hp('1.8%'),
         textDecorationLine: 'underline'

@@ -11,7 +11,7 @@ const LevelComplete = ({ route }) => {
     const [score, setScore] = useState(null);
 
     const handleNavigation = () => {
-        navigation.navigate('HomeScreen');
+        navigation.pop(2);
     };
 
     const handleRetake = () => {

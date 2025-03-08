@@ -19,6 +19,8 @@ import { useState, useEffect } from "react";
 import CircularProgress from 'react-native-circular-progress-indicator';
 import { useNavigation } from '@react-navigation/native';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
+import { LinearGradient } from 'expo-linear-gradient';
+import { COLORS } from "../theme";
 
 const HomeScreen = () => {
 
@@ -148,92 +150,101 @@ const HomeScreen = () => {
   }
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.textIconContainer}>
-        {username ? (<Text style={styles.text}>Hello, {username}</Text>) : (<Text style={styles.text}>Hello, User</Text>)}
-        {/* <Text style={styles.text}>Hello, User</Text> */}
-        {/* <Icon name="account-circle" size={25} color="#0651C6" /> */}
-        <TouchableOpacity onPress={() => navigation.navigate("Statistics")}>
-          <Icon name="account-circle" size={25} color="#0651C6" />
-        </TouchableOpacity>
-      </View>
-      <Text style={styles.bigheading}>What would you like to do today?</Text>
+      <LinearGradient
+        colors={[COLORS.linearGradientColor2, COLORS.linearGradientColor1]}
+        style={styles.gradientContainer}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 0, y: 1 }}
+      >
+        <View style={styles.textIconContainer}>
+          {username ? (<Text style={styles.text}>Hello, {username}</Text>) : (<Text style={styles.text}>Hello, User</Text>)}
+          {/* <Text style={styles.text}>Hello, User</Text> */}
+          {/* <Icon name="account-circle" size={25} color="#0651C6" /> */}
+          <TouchableOpacity onPress={() => navigation.navigate("Statistics")}>
+            <Icon name="account-circle" size={25} color="#0651C6" />
+          </TouchableOpacity>
+        </View>
+        <Text style={styles.bigheading}>What would you like to do today?</Text>
 
-      <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
-        {quizStatus ?
-          quizStatus.map((item, index) => (
-            <TouchableOpacity key={item.id || index} style={styles.card} onPress={handleQuizNavigation}>
-              <Image source={item?.Image_URL ? { uri: `${IMG_URL}${item?.Image_URL}` } : require("../../assets/images/maths.jpeg")} style={styles.cardImage} />
-              <View style={styles.cardContent}>
-                <View style={styles.textContainer}>
-                  <Text style={styles.cardTitle}>SAT {item.Test_Name}</Text>
-                  <Text style={styles.cardDescription}>Total Score : {item.Total_Score}</Text>
+        <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
+          {quizStatus ?
+            quizStatus.map((item, index) => (
+              <TouchableOpacity key={item.id || index} style={styles.card} onPress={handleQuizNavigation}>
+                <Image source={item?.Image_URL ? { uri: `${IMG_URL}${item?.Image_URL}` } : require("../../assets/images/maths.jpeg")} style={styles.cardImage} />
+                <View style={styles.cardContent}>
+                  <View style={styles.textContainer}>
+                    <Text style={styles.cardTitle}>SAT {item.Test_Name}</Text>
+                    <Text style={styles.cardDescription}>Total Score : {item.Total_Score}</Text>
+                  </View>
+                  <View style={styles.progressBarContainer}>
+                    <View style={[styles.progressBarFill]} />
+                  </View>
                 </View>
-                <View style={styles.progressBarContainer}>
-                  <View style={[styles.progressBarFill]} />
+              </TouchableOpacity>
+            ))
+            : (<ActivityIndicator size={'large'} color={"white"} />)
+          }
+        </ScrollView>
+
+
+        <Text style={styles.unfinishheading}>Levels Progress</Text>
+
+        <ScrollView>
+          {mathUnfinished ?
+            mathUnfinished.map((item, index) => (
+              <TouchableOpacity key={item.id || index} style={styles.additionalCard} onPress={() => handleLevelNavigation(item.subject, item.section)}>
+                <View style={styles.imageContainer}>
+                  <Image source={item?.image ? { uri: `${IMG_URL}${item?.image}` } : require("../../assets/images/maths.jpeg")} style={styles.cardImage2} />
                 </View>
-              </View>
-            </TouchableOpacity>
-          ))
-          : (<ActivityIndicator size={'large'} color={"white"} />)
-        }
-      </ScrollView>
+                <View style={styles.additionalCardContent}>
+                  <Text style={styles.cardTitle2}>{item.section}</Text>
+                  <Text style={styles.cardDescription2}>Attempted Levels : {item.attempted_levels}</Text>
+                  <Text style={styles.cardDescription2}>Total Levels : {item.total_levels}</Text>
+                </View>
+                <View style={styles.progressCircleContainer}>
+                  <CircularProgress
+                    value={item.percentage}
+                    activeStrokeWidth={6}
+                    inActiveStrokeWidth={6}
+                    radius={25}
+                    progressValueColor={'#0470B8'}
+                    activeStrokeColor={'#26A5E6'}
+                    inActiveStrokeColor={'#ccc'}
+                  />
+                </View>
+              </TouchableOpacity>
+            ))
+            : (<ActivityIndicator size={'large'} color={"white"} />)
+          }
 
-
-      <Text style={styles.unfinishheading}>Levels Progress</Text>
-
-      <ScrollView>
-        {mathUnfinished ?
-          mathUnfinished.map((item, index) => (
-            <TouchableOpacity key={item.id || index} style={styles.additionalCard} onPress={() => handleLevelNavigation(item.subject, item.section)}>
-              <View style={styles.imageContainer}>
-                <Image source={item?.image ? { uri: `${IMG_URL}${item?.image}` } : require("../../assets/images/maths.jpeg")} style={styles.cardImage2} />
-              </View>
-              <View style={styles.additionalCardContent}>
-                <Text style={styles.cardTitle2}>{item.section}</Text>
-                <Text style={styles.cardDescription2}>Attempted Levels : {item.attempted_levels}</Text>
-                <Text style={styles.cardDescription2}>Total Levels : {item.total_levels}</Text>
-              </View>
-              <View style={styles.progressCircleContainer}>
-                <CircularProgress
-                  value={item.percentage}
-                  activeStrokeWidth={8}
-                  radius={20}
-                  progressValueColor={'#26A5E6'}
-                  activeStrokeColor={'#26A5E6'}
-                  inActiveStrokeColor={'black'}
-                />
-              </View>
-            </TouchableOpacity>
-          ))
-          : (<ActivityIndicator size={'large'} color={"white"} />)
-        }
-
-        {englishUnfinished ?
-          englishUnfinished.map((item, index) => (
-            <TouchableOpacity key={item.id || index} style={styles.additionalCard} onPress={() => handleLevelNavigation(item.subject, item.section)}>
-              <View style={styles.imageContainer}>
-                <Image source={item?.image ? { uri: `${IMG_URL}${item?.image}` } : require("../../assets/images/writing.jpeg")} style={styles.cardImage2} />
-              </View>
-              <View style={styles.additionalCardContent}>
-                <Text style={styles.cardTitle2}>{item.section}</Text>
-                <Text style={styles.cardDescription2}>Attempted Levels : {item.attempted_levels}</Text>
-                <Text style={styles.cardDescription2}>Total Levels : {item.total_levels}</Text>
-              </View>
-              <View style={styles.progressCircleContainer}>
-                <CircularProgress
-                  value={item.percentage}
-                  activeStrokeWidth={8}
-                  radius={20}
-                  progressValueColor={'#26A5E6'}
-                  activeStrokeColor={'#26A5E6'}
-                  inActiveStrokeColor={'black'}
-                />
-              </View>
-            </TouchableOpacity>
-          ))
-          : (<ActivityIndicator size={'large'} color={"white"} />)
-        }
-      </ScrollView>
+          {englishUnfinished ?
+            englishUnfinished.map((item, index) => (
+              <TouchableOpacity key={item.id || index} style={styles.additionalCard} onPress={() => handleLevelNavigation(item.subject, item.section)}>
+                <View style={styles.imageContainer}>
+                  <Image source={item?.image ? { uri: `${IMG_URL}${item?.image}` } : require("../../assets/images/writing.jpeg")} style={styles.cardImage2} />
+                </View>
+                <View style={styles.additionalCardContent}>
+                  <Text style={styles.cardTitle2}>{item.section}</Text>
+                  <Text style={styles.cardDescription2}>Attempted Levels : {item.attempted_levels}</Text>
+                  <Text style={styles.cardDescription2}>Total Levels : {item.total_levels}</Text>
+                </View>
+                <View style={styles.progressCircleContainer}>
+                  <CircularProgress
+                    value={item.percentage}
+                    activeStrokeWidth={6}
+                    inActiveStrokeWidth={6}
+                    radius={25}
+                    progressValueColor={'#0470B8'}
+                    activeStrokeColor={'#26A5E6'}
+                    inActiveStrokeColor={'#ccc'}
+                  />
+                </View>
+              </TouchableOpacity>
+            ))
+            : (<ActivityIndicator size={'large'} color={"white"} />)
+          }
+        </ScrollView>
+      </LinearGradient>
 
       <Footer />
     </SafeAreaView>
@@ -245,6 +256,9 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     flex: 1,
   },
+  gradientContainer: {
+    flex: 1,
+  },
   textIconContainer: {
     flexDirection: "row",
     alignItems: "center",
@@ -253,14 +267,14 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   text: {
-    color: "#46557B",
+    color: "#0470B8",
     fontWeight: "600",
   },
   bigheading: {
     marginTop: 20,
     fontSize: 25,
     width: "80%",
-    color: "#46557B",
+    color: "#0470B8",
     paddingHorizontal: 10,
     fontWeight: "500",
   },
@@ -328,6 +342,9 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     paddingHorizontal: 10,
     fontWeight: "500",
+    color: 'white',
+    fontWeight: '700',
+    marginLeft: 7
   },
   additionalCard: {
     flexDirection: "row",
@@ -339,6 +356,8 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#E0E0E0",
     alignItems: "center",
+    backgroundColor: 'white',
+    marginHorizontal: wp("3.5%")
   },
   imageContainer: {
     justifyContent: "center",

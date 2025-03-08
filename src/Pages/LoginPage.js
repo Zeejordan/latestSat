@@ -10,6 +10,7 @@ import { LOGIN } from '../../config/api';
 import AwesomeAlert from 'react-native-awesome-alerts';
 import { useTranslation } from 'react-i18next';
 import AntDesign from 'react-native-vector-icons/AntDesign';
+import theme from "../theme"
 
 const LoginPage = () => {
     const navigation = useNavigation();
@@ -54,7 +55,7 @@ const LoginPage = () => {
                     style={styles.keyboardAvoidingContainer}
                 >
                     <LinearGradient
-                        colors={["rgba(4, 112, 184, 0.5)", "#FFFFFF"]}
+                        colors={[COLORS.linearGradientColor2, COLORS.linearGradientColor1]}
                         style={styles.gradientContainer}
                         start={{ x: 0, y: 0 }}
                         end={{ x: 0, y: 1 }}
@@ -86,7 +87,7 @@ const LoginPage = () => {
                                     </View>
                                     <View style={styles.getOtpContainer}>
                                         {loading ? (
-                                            <ActivityIndicator color="#0470B8" size={'large'} />
+                                            <ActivityIndicator color="white" size={'large'} />
                                         ) : (
                                             <TouchableOpacity
                                                 style={styles.getOtpButton}
