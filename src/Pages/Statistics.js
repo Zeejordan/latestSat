@@ -80,14 +80,14 @@ const Statistics = () => {
     const RenderItem = ({ title, listHeadings, listItems }) => {
         const isVisible = collapsedSections[title];
         return (
-            <View style={[styles.titleBox, { backgroundColor: isVisible ? 'white' : "#F5F5F5" }]}>
+            <TouchableOpacity style={[styles.titleBox, { backgroundColor: isVisible ? 'white' : "#F5F5F5" }]} onPress={() => handleCollapse(title)}>
                 <View style={styles.titleSemiBox}>
                     <View style={styles.titleTextContainer}>
                         <Text style={styles.titleText}>{title}</Text>
                     </View>
-                    <TouchableOpacity style={styles.arrowDown} onPress={() => handleCollapse(title)}>
+                    <View style={styles.arrowDown}>
                         {isVisible ? <AntDesign name="up" size={18} /> : <AntDesign name="down" size={15} />}
-                    </TouchableOpacity>
+                    </View>
                 </View>
                 {isVisible &&
                     listHeadings.map((item, index) => (
@@ -101,7 +101,7 @@ const Statistics = () => {
                         </View>
                     ))
                 }
-            </View>
+            </TouchableOpacity>
         )
     }
 
@@ -120,7 +120,7 @@ const Statistics = () => {
                     <AntDesign name={"arrowleft"} size={27} color={"white"} style={styles.backArrow} />
                 </TouchableOpacity>
                 <Text style={styles.profileText}>Profile</Text>
-                <Text>                    </Text>
+
             </LinearGradient>
             <Image source={userData?.avatar_image_url ? { uri: `${IMG_URL}${userData?.avatar_image_url}` } : require('../../assets/images/profileStatistics.png')} style={styles.profileStatisticsImage} onError={(e) => console.log("Image Load Error:", e.nativeEvent.error)} />
             {
@@ -177,21 +177,21 @@ const styles = StyleSheet.create({
         height: hp('12%'),
         width: wp('100%'),
         flexDirection: 'row',
-        justifyContent: 'space-between',
+        // justifyContent: 'center',
         paddingLeft: wp('4%'),
-        paddingTop: hp('1%')
-        // alignItems: 'center'
+        paddingTop: hp('1%'),
+        // alignItems: 'flex-start'
     },
     profileText: {
         color: 'white',
         fontSize: hp('3.4%'),
         marginLeft: wp('8%'),
-        marginTop: hp('1%'),
+        // marginTop: hp('1%'),
         fontWeight: '600'
     },
     backArrow: {
         // marginLeft: wp('8%'),
-        marginTop: hp('1%'),
+        marginTop: hp('0.5%'),
     },
     profileStatisticsImage: {
         position: 'absolute',

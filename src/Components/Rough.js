@@ -1,829 +1,588 @@
-import { StyleSheet, Text, View, SafeAreaView, TouchableOpacity, FlatList, Alert, ActivityIndicator, ScrollView } from 'react-native'
-import React, { useState } from 'react'
-import { useEffect } from 'react';
+import { StyleSheet, Text, View, SafeAreaView, Image, FlatList, TextInput, TouchableOpacity, ScrollView, ActivityIndicator, Modal, Alert } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { LinearGradient } from 'expo-linear-gradient';
+import { COLORS, FONTS } from '../theme';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
-import { ENGLISH_MODULE, ENGLISH_SUBMIT_MODULE_FIRST, ENGLISH_SECOND_MODULE, ENGLISH_SUBMIT_MODULE_SECOND } from '../../config/api';
+import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
+import AntDesign from "react-native-vector-icons/AntDesign";
+import Footer from '../Components/Footer';
+import { GET_USER_DETAILS, UPDATE_USER_DETAILS, IMG_URL } from '../../config/api';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import Octicons from 'react-native-vector-icons/Octicons';
-import Entypo from 'react-native-vector-icons/Entypo';
-import { COLORS, FONTS } from '../theme';
 import { useNavigation } from '@react-navigation/native';
-// import RenderHTML from 'react-native-render-html';
-import { WebView } from 'react-native-webview';
-import Tooltip from 'react-native-walkthrough-tooltip';
 
-const EnglishQuizModule1 = () => {
 
+import avatar_1 from '../../assets/images/avatar_1.png';
+import avatar_2 from '../../assets/images/avatar_2.png';
+import avatar_3 from '../../assets/images/avatar_3.png';
+import avatar_4 from '../../assets/images/avatar_4.png';
+import avatar_5 from '../../assets/images/avatar_5.png';
+import avatar_6 from '../../assets/images/avatar_6.png';
+import avatar_7 from '../../assets/images/avatar_7.png';
+import avatar_8 from '../../assets/images/avatar_8.png';
+import avatar_9 from '../../assets/images/avatar_9.png';
+import avatar_10 from '../../assets/images/avatar_10.png';
+import avatar_11 from '../../assets/images/avatar_11.png';
+import avatar_12 from '../../assets/images/avatar_12.png';
+import avatar_13 from '../../assets/images/avatar_13.png';
+import avatar_14 from '../../assets/images/avatar_14.png';
+
+
+const UpdateProfile = () => {
 
   const navigation = useNavigation();
-  const [data, setData] = useState([]);
-  const [flatlistData, setFlatlistData] = useState([]);
-  const [currentQuestion, setCurrentQuestion] = useState(1);
-  const [selectedOption, setSelectedOption] = useState(null);
-  const [questionsAttempted, setQuestionsAttempted] = useState(0);
-  const [totalQuestions, setTotalQuestions] = useState(0);
-  const [sessionId, setSessionId] = useState(null);
-  const [answers, setAnswers] = useState({});
-  const [submitLoading, setSubmitLoading] = useState(false);
-  const [moduleName, setModuleName] = useState("");
-  const [submitCount, setSubmitCount] = useState(1);
+  useEffect(() => {
+    getUserDetails();
+  }, [])
 
-  const [timeLeft, setTimeLeft] = useState(32 * 60);
-  const [stopTimer, setStopTimer] = useState(false);
+  const [collapseVisible, setCollapseVisible] = useState(false);
+  const [collapsedSections, setCollapsedSections] = useState({});
 
-  const [statusData, setStatusData] = useState([]);
-  const [showStatus, setShowStatus] = useState(false);
-  const [tooltipVisible, setTooltipVisible] = useState(true);
+  const [userData, setUserData] = useState(null);
+  const [payload, setPayload] = useState({
+    name: "",
+    date_of_birth: "",
+    gender: "",
+    phone_number: "",
+    high_school_name: "",
+    high_school_graduation_year: "",
+    gpa: "",
+    sat_subject_test_preferences: "",
+    intended_major: "",
+    sat_registration_number: "",
+    sat_exam_center: "",
+    previous_sat_score: "",
+    target_sat_score: "",
+    target_college_location: "",
+    intended_college_start_year: "",
+    application_type: "",
+    financial_aid_required: "",
+    scholarships_interested_in: "",
+    family_annual_income: "",
+    extracurricular_activities: "",
+    volunteer_experience: "",
+    internships: "",
+    awards: "",
+    username: "",
+    avatar: "",
+    avatar_image_url: "",
+    email: "",
+    user_id: ""
+  });
+
+
+  const [modalVisible, setModalVisible] = useState(false);
+  const [selectedImage, setSelectedImage] = useState("");
+
+  const images = [
+    { key: "avatar_1", image: avatar_1 },
+    { key: "avatar_2", image: avatar_2 },
+    { key: "avatar_3", image: avatar_3 },
+    { key: "avatar_4", image: avatar_4 },
+    { key: "avatar_5", image: avatar_5 },
+    { key: "avatar_6", image: avatar_6 },
+    { key: "avatar_7", image: avatar_7 },
+    { key: "avatar_8", image: avatar_8 },
+    { key: "avatar_9", image: avatar_9 },
+    { key: "avatar_10", image: avatar_10 },
+    { key: "avatar_11", image: avatar_11 },
+    { key: "avatar_12", image: avatar_12 },
+    { key: "avatar_13", image: avatar_13 },
+    { key: "avatar_14", image: avatar_14 }
+  ];
+
 
   useEffect(() => {
-    getData();
-  }, []);
+    if (userData) {
+      setPayload({
+        name: userData.name || "",
+        date_of_birth: userData.date_of_birth || "",
+        gender: userData.gender || "",
+        phone_number: userData.phone_number || "",
+        high_school_name: userData.high_school_name || "",
+        high_school_graduation_year: userData.high_school_graduation_year || "",
+        gpa: userData.gpa || "",
+        sat_subject_test_preferences: userData.sat_subject_test_preferences || "",
+        intended_major: userData.intended_major || "",
+        sat_registration_number: userData.sat_registration_number || "",
+        sat_exam_center: userData.sat_exam_center || "",
+        previous_sat_score: userData.previous_sat_score || "",
+        target_sat_score: userData.target_sat_score || "",
+        target_college_location: userData.target_college_location || "",
+        intended_college_start_year: userData.intended_college_start_year || "",
+        application_type: userData.application_type || "",
+        financial_aid_required: userData.financial_aid_required || "",
+        scholarships_interested_in: userData.scholarships_interested_in || "",
+        family_annual_income: userData.family_annual_income || "",
+        extracurricular_activities: userData.extracurricular_activities || "",
+        volunteer_experience: userData.volunteer_experience || "",
+        internships: userData.internships || "",
+        awards: userData.awards || "",
+        username: userData.username || "",
+        avatar: userData.avatar || "",
+        avatar_image_url: userData.avatar_image_url || "",
+        email: userData.email || "",
+        user_id: userData.user_id || ""
+      });
 
-  useEffect(() => {
-    setCurrentQuestion(1);
-    setSelectedOption(null);
-    setQuestionsAttempted(0);
-    setAnswers({});
-    setTotalQuestions(0);
-    setTimeLeft(32 * 60);
-    if (submitCount < 3) {
-      setStopTimer(false);
-
+      console.log("THIS IS USERDATA", userData)
     }
-  }, [submitCount])
+  }, [userData])
 
-  useEffect(() => {
-    if (stopTimer) {
-      return;
-    }
-    if (timeLeft <= 0) {
-      submitCheck("onTimeUp");
-      return;
-    }
-
-    const timerInterval = setInterval(() => {
-      setTimeLeft((prevTime) => prevTime - 1);
-    }, 1000);
-
-    return () => clearInterval(timerInterval);
-  }, [timeLeft, stopTimer]);
-
-
-  const formatTime = (seconds) => {
-    const minutes = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${minutes}:${secs < 10 ? '0' : ''}${secs}`;
-  };
-
-  const getData = async () => {
+  const getUserDetails = async () => {
+    const baseUrlGet = GET_USER_DETAILS;
     const token = await AsyncStorage.getItem('token');
-    const baseUrlGet = ENGLISH_MODULE;
     try {
       const response = await axios.get(baseUrlGet, {
         headers: {
-          'Authorization': `Bearer ${token}`,
-          "Content-Type": "multipart/form-data"
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
         }
       })
-
-      if (!response?.data?.error) {
-        setData(response?.data?.meta?.questions);
-
-        const singleQuestion = response.data.meta.questions.filter((item) => item.Question_No === 1);
-        setFlatlistData(singleQuestion);
-
-        // const newSessionId = response.data.meta.session_id;
-        setSessionId(response?.data?.meta?.session_id);
-
-        console.log("Storing Session ID abhi kaam chal raha hai:", response?.data?.meta?.session_id);
-        await AsyncStorage.setItem("sessionId", response?.data?.meta?.session_id);
-
-        setTotalQuestions(response?.data?.meta?.Total_Questions);
-        setModuleName(response?.data?.meta?.module_name)
-      }
+      setUserData(response?.data?.meta);
     } catch (error) {
       console.log("An Error Occured", error)
     }
   }
 
-  const getNextData = async () => {
-    console.log("ab tum getNext function k andar ho")
+  const handleSave = async () => {
+    const baseUrlPut = UPDATE_USER_DETAILS;
     const token = await AsyncStorage.getItem('token');
-    const baseUrlPost = ENGLISH_SECOND_MODULE;
-
-    const payload = {
-      "session_id": sessionId
-    };
-
     try {
-      const response = await axios.post(baseUrlPost, payload, {
+      const response = await axios.put(baseUrlPut, payload, {
         headers: {
-          'Authorization': `Bearer ${token}`,
-          "Content-Type": "multipart/form-data"
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
         }
       })
-
-      if (!response?.data?.error) {
-        console.log("yaha pe dekh questions ko second module k", response?.data?.meta?.questions);
-        setData(response?.data?.meta?.questions);
-
-        const singleQuestion = response?.data?.meta?.questions.filter((item) => item.Question_No === 1);
-        console.log("yeh hai single question yaha pe dekh second module", singleQuestion)
-        setFlatlistData(singleQuestion);
-        console.log("yeh hai flatlist ka data yaha dekh second module", flatlistData);
-
-        setTotalQuestions(response?.data?.meta?.Total_Questions);
-
-        setModuleName(response?.data?.meta?.module_name);
-        console.log('yeh hai module ka naam second module', response?.data?.meta?.module_name);
-      }
     } catch (error) {
       console.log("An Error Occured", error)
+    } finally {
+      navigation.navigate('Statistics')
     }
   }
 
-  const submitCheck = (source) => {
-    if (source === "onSubmitClick") {
-      Alert.alert(
-        "Alert",
-        "Once the test is submitted then you cannot change the response!",
-        [
-          { text: "Cancel", style: "cancel" },
-          { text: "Submit", onPress: () => SubmitQuestions() }
-        ]
-      );
-    } else {
-      Alert.alert("Time Up", "Test Submitted Successfully!");
-      SubmitQuestions();
-    }
-  };
-  const SubmitQuestions = async () => {
-    setStopTimer(true)
-    console.log("yeh hai answers submit function k andar:", answers)
-    setSubmitLoading(true);
-    const token = await AsyncStorage.getItem('token');
-    const baseUrlPost1 = ENGLISH_SUBMIT_MODULE_FIRST;
-    const baseUrlPost2 = ENGLISH_SUBMIT_MODULE_SECOND;
-
-    const payload = {
-      session_id: sessionId,
-      answers,
-    }
-    console.log("yeh hai submit ka payload : ", payload);
-    try {
-      const response = await axios.post(submitCount === 2 ? baseUrlPost2 : baseUrlPost1, payload, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          "Content-Type": "application/json"
-        }
-      })
-      console.log("yeh hai submit ka response:", response?.data?.meta)
-      if (!response?.data?.error) {
-        Alert.alert("Test Submitted Successfully");
-      }
-    } catch (error) {
-      console.log("An Error Occured", error)
-    }
-    finally {
-      setSubmitLoading(false);
-      if (submitCount === 1) {
-        getNextData();
-      }
-      setSubmitCount((prev) => prev + 1)
-      submitCount === 2 ? (console.log("yeh hai second module ka submit check")) : (console.log("yeh hai first module ka submit check"))
-      if (submitCount === 2) {
-        navigation.navigate('Module-Gap')
-      }
-    }
+  const handleCancel = () => {
+    navigation.navigate("Statistics")
   }
 
-  const handlePrevious = () => {
-    if (currentQuestion > 1) {
-      const previousQuestionNo = currentQuestion - 1;
-
-      const previousQuestion = data.filter((item) => item.Question_No === previousQuestionNo);
-      setFlatlistData(previousQuestion);
-
-      setCurrentQuestion(previousQuestionNo);
-      console.log("yeh hai current question", currentQuestion);
-
-      const previousQuestionId = previousQuestion[0].id;
-      setSelectedOption(answers[previousQuestionId] || null);
-    }
-  };
-
-  const handleNext = () => {
-    if (currentQuestion < data.length) {
-      const nextQuestionNo = currentQuestion + 1;
-
-      const nextQuestion = data.filter((item) => item.Question_No === nextQuestionNo);
-      setFlatlistData(nextQuestion);
-
-      setCurrentQuestion(nextQuestionNo);
-      console.log("yeh hai current question", currentQuestion);
-
-      const nextQuestionId = nextQuestion[0].id;
-      setSelectedOption(answers[nextQuestionId] || null);
-    }
-  };
-
-  // const handleOptionSelection = (option, questionId) => {
-  //     if (selectedOption === option) {
-  //         setSelectedOption(null);
-  //         if (questionsAttempted > 0) {
-  //             const newStatus = questionsAttempted - 1;
-  //             setQuestionsAttempted(newStatus);
-  //             if (answers[questionId]) {
-  //                 setAnswers((prev) => {
-  //                     const updated = { ...prev }
-  //                     delete updated[questionId]
-  //                     return updated;
-  //                 })
-  //             }
-  //         }
-  //     }
-  //     else {
-  //         setSelectedOption(option);
-  //         if (!answers[questionId]) {
-  //             const newStatus = questionsAttempted + 1;
-  //             setQuestionsAttempted(newStatus);
-  //         }
-
-  //         setAnswers((prev) => ({
-  //             ...prev, [questionId]: option
-  //         }))
-  //     }
-
-  //     console.log("yaha dekh answers : ", answers)
-  // };
-
-  const handleOptionSelection = (option, questionId) => {
-    const question = data.find((item) => item.id === questionId);
-    const questionNo = question?.Question_No;
-
-    if (selectedOption === option) {
-      setSelectedOption(null);
-      if (questionsAttempted > 0) {
-        const newStatus = questionsAttempted - 1;
-        setQuestionsAttempted(newStatus);
-
-        if (answers[questionId]) {
-          setAnswers((prev) => {
-            const updated = { ...prev };
-            delete updated[questionId];
-            return updated;
-          });
-        }
-      }
-    } else {
-
-      setSelectedOption(option);
-      if (!answers[questionId]) {
-        const newStatus = questionsAttempted + 1;
-        setQuestionsAttempted(newStatus);
-      }
-
-      setAnswers((prev) => ({
-        ...prev,
-        [questionId]: {
-          answer: option,
-          index: questionNo,
-        },
-      }));
-    }
-
-    console.log("Updated answers: ", answers);
-  };
-
-  const handleGoBack = () => {
-    setShowStatus(false);
-  }
-  const [markedForReview, setMarkedForReview] = useState({});
-
-  const handleMarkForReview = (questionId) => {
-    setMarkedForReview((prev) => ({
+  const handleSelectImage = (imageKey) => {
+    console.log("Selected image key:", imageKey);
+    setPayload((prev) => ({
       ...prev,
-      [questionId]: !prev[questionId],
+      avatar: imageKey,
     }));
-  };
-
-  const toggleTooltip = () => {
-    setTooltipVisible((prev) => !prev)
-  }
-
-  const renderHorizontalScroll = () => {
-    return (
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        contentContainerStyle={styles.horizontalScrollContainer}
-      >
-        {Array.from({ length: totalQuestions }, (_, index) => index + 1).map((questionNo) => {
-          const questionId = data.find((item) => item.Question_No === questionNo)?.id;
-          const isAttempted = Object.keys(answers).includes(questionId?.toString() || "");
-          const isMarked = markedForReview[questionId];
-
-          return (
-            <View key={questionNo} style={{ alignItems: 'center' }}>
-              <TouchableOpacity
-                style={[
-                  styles.questionCircle,
-                  currentQuestion === questionNo && styles.currentQuestionCircle,
-                  isAttempted && styles.attemptedQuestionCircle, // Light-blue for attempted
-                ]}
-                onPress={() => {
-                  const selectedQuestion = data.filter(
-                    (item) => item.Question_No === questionNo
-                  );
-                  setFlatlistData(selectedQuestion);
-                  setCurrentQuestion(questionNo);
-                  const selectedQuestionId = selectedQuestion[0]?.id;
-                  setSelectedOption(answers[selectedQuestionId] || null);
-                }}
-              >
-
-                {isMarked && (
-                  <View style={styles.bookmarkIconContainer}>
-                    <Entypo name="bookmarks" size={14} color="red" />
-                  </View>
-                )}
-                <Text
-                  style={
-                    currentQuestion === questionNo
-                      ? [styles.questionText, styles.currentQuestionText]
-                      : styles.questionText
-                  }
-                >
-                  {questionNo}
-                </Text>
-              </TouchableOpacity>
-              {currentQuestion === questionNo && (
-                <View style={styles.pin} />
-              )}
-            </View>
-          );
-        })}
-      </ScrollView>
-    );
+    setSelectedImage(imageKey);
+    setModalVisible(false);
   };
 
 
-  const renderItem = ({ item }) => {
-    const handleStatusPageDisplay = () => {
-      const statusDataTemp = Array.from({ length: totalQuestions }, (_, index) => {
-        const questionNo = index + 1;
-        const questionId = data.find((item) => item.Question_No === questionNo)?.id;
+  const RenderItem = ({ title, listHeadings, listItems, fieldKeys }) => {
+    const isVisible = collapsedSections[title];
 
-        return {
-          questionNo,
-          isAttempted: Object.keys(answers).includes(questionId?.toString() || ""),
-          isMarked: markedForReview[questionId] || false,
-        };
-      });
-
-      setStatusData(statusDataTemp);
-      setShowStatus(true);
-    };
     return (
-      <View>
-        {renderHorizontalScroll()}
-        <View style={styles.questionHeading}>
-          <View style={styles.questionTextReview}>
-            <View style={styles.questionBox}>
-              <Text style={styles.questionTextMain}>{item.Question_No}</Text>
-            </View>
-
-            <TouchableOpacity
-              style={styles.markForReviewContainer}
-              onPress={() => handleMarkForReview(item.id)}
-            >
-              <Entypo
-                name={markedForReview[item.id] ? "bookmarks" : "bookmark"}
-                size={20}
-                color={markedForReview[item.id] ? "red" : "#ccc"}
-              />
-              <Text style={styles.markText}>
-                {markedForReview[item.id] ? "Unmark Review" : "Mark For Review"}
-              </Text>
-            </TouchableOpacity>
+      <View style={[styles.titleBox, { backgroundColor: isVisible ? 'white' : "#F5F5F5" }]}>
+        <View style={styles.titleSemiBox}>
+          <View style={styles.titleTextContainer}>
+            <Text style={styles.titleText}>{title}</Text>
           </View>
-
-          {/* below is tooltip functionality */}
-          <Tooltip
-            isVisible={tooltipVisible}
-            content={
-              <Text style={styles.tooltipText}>
-                This section focuses on key reading and writing skills. Each question is based on one or more passages, which may include tables or graphs. Read the passages and questions thoroughly, then choose the best answer based on the information provided.
-
-                All questions are multiple-choice with four options, and each has only one correct answer.
-
-              </Text>
-            }
-            placement="bottom"
-            onClose={() => setTooltipVisible(false)}
-            showChildInTooltip={false}
-            backgroundStyle={styles.tooltipBackground}
-          >
-            <TouchableOpacity onPress={toggleTooltip}>
-              <Octicons name="info" color="black" style={styles.infoIcon} />
-            </TouchableOpacity>
-          </Tooltip>
-        </View>
-
-        <View style={styles.questionDescription}>
-          <WebView
-            originWhitelist={['*']}
-            source={{ html: `<html><body style='font-size: 14px; color: black;'>${item.Stem}</body></html>` }}
-            style={{ width: '90%', height: 100 }}
-            scrollEnabled={false}
-          />
-          <WebView
-            originWhitelist={['*']}
-            source={{ html: `<html><body style='font-size: 14px; color: black;'>${item.Question}</body></html>` }}
-            style={{ width: '90%', height: 100 }}
-            scrollEnabled={false}
-          />
-        </View>
-
-        <View style={styles.buttonsContainer}>
-          <TouchableOpacity style={styles.navigateButton} onPress={handlePrevious}>
-            <Text style={styles.navigateText}>Previous</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.navigateButton} onPress={handleNext}>
-            <Text style={styles.navigateText}>Next</Text>
+          <TouchableOpacity style={styles.arrowDown} onPress={() => handleCollapse(title)}>
+            {isVisible ? <AntDesign name="up" size={18} /> : <AntDesign name="down" size={15} />}
           </TouchableOpacity>
         </View>
-
-        <View style={styles.optionContainer}>
-          {['A', 'B', 'C', 'D'].map((option) => (
-            <TouchableOpacity
-              key={option}
-              style={selectedOption === option ? styles.selectedOptionBox : styles.optionBox}
-              onPress={() => handleOptionSelection(option, item.id)}
-            >
-              <WebView
-                originWhitelist={['*']}
-                source={{ html: `<html><body style='font-size: 14px; color: black;'>${item[`Option${option}`]}</body></html>` }}
-                style={{ width: '80%', height: 50 }}
-                scrollEnabled={false}
-              />
-            </TouchableOpacity>
-          ))}
-        </View>
-
-        {submitLoading ? (
-          <ActivityIndicator color={COLORS.blueColor} size={"large"} style={styles.submitButtonLoader} />
-        ) : (
-          <TouchableOpacity style={styles.submitButton} onPress={handleStatusPageDisplay}>
-            <Text style={styles.submitText}>Submit</Text>
-          </TouchableOpacity>
-        )}
+        {isVisible &&
+          listHeadings.map((item, index) => (
+            <View key={index.toString()} style={styles.infoBoxes}>
+              <View style={styles.section}>
+                <Text style={styles.fieldHeading}>{item}</Text>
+                <View style={styles.singleField}>
+                  <TextInput
+                    style={styles.fieldInput}
+                    value={payload[fieldKeys[index]] || ""}
+                    onChangeText={(text) => setPayload(prev => ({
+                      ...prev,
+                      [fieldKeys[index]]: text
+                    }))}
+                    placeholder={`Enter ${item}`}
+                    placeholderTextColor="#A9A9A9"
+                  />
+                </View>
+              </View>
+            </View>
+          ))
+        }
       </View>
     );
   };
+
+
   return (
     <SafeAreaView style={styles.mainContainer}>
+      <LinearGradient
+        colors={[COLORS.profileGradientColor1, COLORS.profileGradientColor2, COLORS.profileGradientColor3]}
+        locations={[0, 0.5, 1]}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 0 }}
+        style={styles.topGradient}
+      >
+        <View style={styles.profileContainer}>
+          <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+            <AntDesign name={"arrowleft"} size={27} color={"white"} style={styles.backArrow} />
+          </TouchableOpacity>
+          <Text style={styles.profileText}>Update Profile</Text>
+          <Text>                       </Text>
+        </View>
+      </LinearGradient>
+      <View style={styles.imageContainer}>
+        <View style={styles.imageWrapper}>
+          <TouchableOpacity style={styles.editIcon} onPress={() => {
+            setModalVisible(true);
 
-      {showStatus ? (
-        <View style={styles.statusPageContainer}>
-          <View style={styles.questionsBox}>
-            <Text style={styles.statusPageHeader}>Summary</Text>
+          }}>
+            <MaterialCommunityIcons
+              name={"image-edit-outline"}
+              size={20}
+              color="#000"
+            />
+          </TouchableOpacity>
 
-            <View style={styles.statusSummary}>
-              {statusData.map((question) => (
-                <View
-                  key={question.questionNo}
-                  style={[
-                    styles.statusItem,
-                    { backgroundColor: question.isAttempted ? '#0470B8' : '#ccc' },
-                  ]}
-                >
-                  {question.isMarked && (
-                    <Entypo
-                      name="bookmarks"
-                      size={14}
-                      color="red"
-                      style={styles.bookmarkIcon}
-                    />
-                  )}
-                  <Text style={styles.statusText}>{question.questionNo}</Text>
-                </View>
-              ))}
+          {payload?.avatar ? (
+            <Image
+              source={
+                payload.avatar.includes("avatar_")
+                  ? images.find(img => img.key === payload.avatar)?.image
+                  : { uri: `${IMG_URL}${payload.avatar}` }
+              }
+              style={styles.profileStatisticsImage}
+            />
+          ) : (
+            <Image
+              source={require('../../assets/images/profileStatistics.png')}
+              style={styles.profileStatisticsImage}
+            />
+          )}
+        </View>
+      </View>
+
+      {
+        userData ? (
+          <View style={styles.container}>
+            <ScrollView
+              style={styles.subContainer}
+              contentContainerStyle={{ paddingBottom: hp('10%') }}
+              showsVerticalScrollIndicator={false}
+            >
+              <TouchableOpacity style={styles.editIconContainer} onPress={handleUpdateProfile}>
+                <Feather name={"edit"} size={25} style={styles.editIcon} />
+              </TouchableOpacity>
+
+              <View style={styles.masterContainer}>
+                <RenderItem
+                  title={"Basic Student Information"}
+                  listHeadings={["Name", "Username", "Email", "Phone Number"]}
+                  listItems={[userData.name, userData.username, userData.email, userData.phone_number]}
+                  fieldKeys={["name", "username", "email", "phone_number"]}
+                />
+
+                <RenderItem
+                  title={"Academic Information"}
+                  listHeadings={["High School Name", "SAT Subject Test Preferences", "GPA", "Intended Major"]}
+                  listItems={[userData.high_school_name, userData.sat_subject_test_preferences, userData.gpa, userData.intended_major]}
+                  fieldKeys={["high_school_name", "sat_subject_test_preferences", "gpa", "intended_major"]}
+                />
+
+                <RenderItem
+                  title={"SAT Exam Details"}
+                  listHeadings={["SAT Registration Number", "Exam Center & Location", "Previous SAT Score", "Target SAT Score"]}
+                  listItems={[userData.sat_registration_number, userData.sat_exam_center, userData.previous_sat_score, userData.target_sat_score]}
+                  fieldKeys={["sat_registration_number", "sat_exam_center", "previous_sat_score", "target_sat_score"]}
+                />
+
+                <RenderItem
+                  title={"Target College Information"}
+                  listHeadings={["Target College Location", "Intended College Start Year", "Application Type"]}
+                  listItems={[userData.target_college_location, userData.intended_college_start_year, userData.application_type]}
+                  fieldKeys={["target_college_location", "intended_college_start_year", "application_type"]}
+                />
+
+                <RenderItem
+                  title={"Financial & Scholarship Information"}
+                  listHeadings={["Financial Aid Requirement", "Scholarships Interested In", "Family Annual Income"]}
+                  listItems={[userData.financial_aid_required, userData.scholarships_interested_in, userData.family_annual_income]}
+                  fieldKeys={["financial_aid_required", "scholarships_interested_in", "family_annual_income"]}
+                />
+
+                <RenderItem
+                  title={"Extracurricular & Other Details"}
+                  listHeadings={["Extra Curricular Activities", "Volunteer Experience", "Internships/Work Experience", "Awards & Achievements"]}
+                  listItems={[userData.extracurricular_activities, userData.volunteer_experience, userData.internships, userData.awards]}
+                  fieldKeys={["extracurricular_activities", "volunteer_experience", "internships", "awards"]}
+                />
+
+              </View>
+
+              <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+                <Text style={styles.logoutText}>Log Out</Text>
+                <MaterialCommunityIcons name={"logout"} size={22} color={'white'} />
+              </TouchableOpacity>
+
+            </ScrollView>
+            <Footer />
+          </View>
+        ) : (
+          <ActivityIndicator size="large" color="blue" />
+        )
+      }
+
+
+      <Modal
+        transparent={true}
+        visible={modalVisible}
+        animationType="slide"
+        onRequestClose={() => setModalVisible(false)}
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <View style={styles.avatarContainer}>
+              <Text style={styles.avatarText}>Choose Your Avatar</Text>
             </View>
-          </View>
-
-          <View style={styles.buttonsContainer}>
-            <TouchableOpacity
-              style={styles.navigateButton}
-              onPress={handleGoBack}
-            >
-              <Text style={styles.navigateText}>Go Back</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.navigateButton}
-              onPress={() => {
-                setShowStatus(false)
-                submitCheck("onSubmitClick");
+            <FlatList
+              data={images}
+              numColumns={1}
+              renderItem={({ item }) => {
+                return (
+                  <TouchableOpacity
+                    onPress={() => handleSelectImage(item.key)}
+                    style={styles.imageOption}
+                  >
+                    <Image
+                      source={item.image}
+                      style={styles.imageThumbnail}
+                    />
+                  </TouchableOpacity>
+                );
               }}
-            >
-              <Text style={styles.navigateText}>Finish</Text>
+              keyExtractor={(item) => item.key}
+              showsVerticalScrollIndicator={false}
+            />
+            <TouchableOpacity style={styles.closeModal} onPress={() => setModalVisible(false)}>
+              <Text style={styles.closeText}>Close</Text>
             </TouchableOpacity>
           </View>
         </View>
-      ) : (<View style={styles.container}>
-        <View style={styles.topBar}>
-          <Text style={styles.topText}>{moduleName}</Text>
-          <Text style={styles.topText}>Questions-{totalQuestions}</Text>
-          <Text style={styles.topText}>Time-{formatTime(timeLeft)}</Text>
-        </View>
+      </Modal>
 
-        <FlatList
-          keyExtractor={(item) => item.id}
-          data={flatlistData}
-          renderItem={renderItem}
-          contentContainerStyle={styles.flatListContent}
-          showsVerticalScrollIndicator={false}
-        />
-
-      </View>)}
 
 
     </SafeAreaView>
   )
 }
 
-
-export default EnglishQuizModule1
+export default UpdateProfile
 
 const styles = StyleSheet.create({
   mainContainer: {
-    flex: 1,
+    flex: 1
   },
   container: {
     flex: 1,
-    paddingHorizontal: wp('3%'),
   },
-  topBar: {
+  topGradient: {
+    height: hp('10%'),
+    width: wp('100%')
+  },
+  profileContainer: {
+    marginTop: hp("1%"),
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginLeft: wp('5%'),
+    justifyContent: 'space-between'
+  },
+  profileText: {
+    color: 'white',
+    fontSize: hp('3.4%'),
+    margin: '2.3%',
+    paddingLeft: wp('5%'),
+    fontWeight: '600',
+    // textDecorationLine: 'underline'
+
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  modalContent: {
+    backgroundColor: 'white',
+    padding: 20,
+    borderRadius: 10,
+    width: wp('80%'),
+    maxHeight: hp('80%'),
+  },
+  imageOption: {
+    margin: wp('1%'),
+    alignItems: 'center',
+    margin: hp('2%')
+  },
+  imageThumbnail: {
+    height: hp('20%'),
+    width: hp('20%'),
+    borderRadius: 5,
+  },
+  closeModal: {
+    marginTop: hp('2%'),
+    alignItems: 'center',
+    paddingVertical: hp('1%'),
+    backgroundColor: '#26A5E6',
+    borderRadius: 10,
+  },
+  closeText: {
+    color: 'white',
+    fontSize: hp('2%'),
+  },
+  flatListContent: {
+    marginTop: hp('7%'),
+    paddingBottom: hp('10%'),
+  },
+  singleField: {
+    borderWidth: 1,
+    borderColor: '#7C7C7C',
+    borderRadius: 5,
+    paddingVertical: hp('1%'),
+    paddingHorizontal: wp('4%'),
+    color: "#2562C1",
+    fontWeight: "700"
+  },
+  fieldHeading: {
+    fontSize: hp('2.5%')
+  },
+  fieldText: {
+    color: '#2562C1',
+    fontWeight: '700',
+    fontSize: hp('2%')
+  },
+  subContainer: {
+    marginHorizontal: wp('7%'),
+    flexDirection: 'column',
+    gap: hp('10%'),
+    marginTop: hp("2%")
+  },
+  section: {
+    gap: hp("0.8%"),
+    marginVertical: hp('1%')
+  },
+  statisticsText: {
+    fontSize: hp("4%"),
+    marginBottom: hp('1%')
+  },
+  statisticsContainer: {},
+  levelSection: {
+    borderWidth: 1,
+    borderRadius: 8,
+    borderColor: '#7C7C7C',
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginTop: hp('3%'),
-    paddingHorizontal: wp('3%'),
-    paddingVertical: hp('1%'),
-    backgroundColor: '#fff',
-    borderBottomWidth: 1,
-    borderColor: '#ccc',
+    alignItems: 'center',
+    paddingVertical: 8,
+    paddingHorizontal: hp('2%')
+  },
+  levelText: {
+    fontSize: hp('2%'),
+    fontWeight: '600',
+    marginTop: hp('2%'),
+    marginBottom: hp('1.5%')
+  },
+  pointsEarnedText: {
+    color: "#7C7C7C",
+    fontSize: hp('2%'),
+  },
+  Text50: {
+    color: "black",
+    fontSize: hp('2%'),
+    fontWeight: '500'
+  },
+  secondSection: {
+    gap: hp('2%')
+  },
+  cancelButton: {
+    backgroundColor: 'white',
+    paddingVertical: hp('0.8%'),
+    borderWidth: 1,
+    borderColor: 'white',
     borderRadius: 10,
     elevation: 5,
-  },
-  flatListContent: {},
-  questionHeading: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: "transparent",
-    // paddingVertical: hp('1%'),
-    paddingHorizontal: wp('3%'),
-    marginTop: hp('2%'),
-  },
-  questionText: {
-    fontSize: hp('2.5%'),
-    fontWeight: '600'
-  },
-  infoIcon: {
-    fontSize: hp('2.6%')
-  },
-  questionDescription: {
-    borderWidth: 1,
-    borderColor: '#888888',
-    paddingVertical: hp('2%'),
-    paddingHorizontal: wp('6%'),
-    marginTop: hp('2%'),
-  },
-  questionDescriptionText: {
-    marginTop: hp('1%'),
-    fontWeight: '500',
-    fontSize: hp('1.8%')
-  },
-  questionParagraphText: {
-    fontWeight: '500',
-    fontSize: hp('1.8%')
-  },
-  navigateButton: {
-    backgroundColor: "#0470B8",
     paddingVertical: hp('1%'),
-    paddingHorizontal: wp('3%'),
-    marginTop: hp('1.5%'),
-    borderRadius: 10,
-    width: hp("15%"),
-    height: hp("5%"),
+    paddingHorizontal: hp("6%")
   },
-  navigateText: {
-    fontSize: hp('2.2%'),
-    color: 'white',
-    textAlign: 'center',
-    alignItems: 'center',
-    justifyContent: 'center',
-    alignSelf: 'center',
-    fontWeight: '700'
-  },
-  optionContainer: {
-    marginTop: hp('3%'),
-    flexDirection: 'column',
-    gap: hp('2%'),
-  },
-  optionBox: {
-    borderWidth: 1,
-    borderRadius: 10,
-    padding: 8,
-    borderColor: '#D9D9D9',
-    backgroundColor: '#fff',
-    elevation: 5
-  },
-  optionText: {
-    fontWeight: '500',
-    fontSize: hp('1.8%'),
-    color: '#7C7C7C',
-  },
-  selectedOptionBox: {
-    borderWidth: 1,
-    borderRadius: 10,
-    padding: 8,
-    borderColor: '#D9D9D9',
-    backgroundColor: '#C5E6FD',
-    elevation: 5
-  },
-  selectedOptionText: {
-    fontWeight: '500',
-    fontSize: hp('1.8%'),
-    color: 'black',
-  },
-  submitText: {
-    textAlign: "center",
-    fontSize: hp('2.5%'),
-    color: "#0470B8",
-    fontWeight: '600'
-  },
-  submitButton: {
-    backgroundColor: "#C5E6FD",
-    marginVertical: hp('4%'),
-    paddingVertical: hp('1.8%'),
-    marginHorizontal: wp('20%'),
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: '#D9D9D9',
-    elevation: 5
-
-  },
-  submitButtonLoader: {
-    marginVertical: hp('4%'),
-  },
-  disabledSubmitButton: {
-    backgroundColor: '#ccc',
-  },
-
-  horizontalScrollContainer: {
-    paddingVertical: hp('1%'),
-    paddingHorizontal: wp('2%'),
+  saveButton: {
     backgroundColor: 'white',
-    marginTop: hp('2%'),
-    flexDirection: 'row',
-    gap: 10
-  },
-
-  questionCircle: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    borderWidth: 2,
-    borderColor: '#ccc',
-    justifyContent: 'center',
-    alignItems: 'center',
-    position: 'relative',
-  },
-  currentQuestionCircle: {
-    borderColor: '#3498db',
-    borderWidth: 2,
-  },
-  pin: {
-    width: 0,
-    height: 0,
-    borderLeftWidth: wp('2%'),
-    borderRightWidth: wp('2%'),
-    borderBottomWidth: wp('3%'),
-    borderLeftColor: 'transparent',
-    borderRightColor: 'transparent',
-    borderBottomColor: '#3498db',
-    alignSelf: 'center',
-    marginTop: wp('1%'),
-  },
-  attemptedQuestionCircle: {
-    backgroundColor: 'lightblue',
-    borderColor: 'lightblue',
-  },
-  bookmarkIconContainer: {
-    position: 'absolute',
-    top: -5,
-    right: -5,
-  },
-  questionTextReview: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    gap: 10
-  },
-  questionTextMain: {
-    fontSize: hp('2.5%'),
-    fontWeight: '600',
-    color: 'white',
-    textAlign: 'center',
-    // borderWidth: 1,
-    borderColor: '#0470B8',
-  },
-  markForReviewContainer: {
-    flexDirection: 'row',
-    gap: 5
-  },
-  questionBox: {
-    width: 40, // Adjust the size as needed
-    height: 40,
-    borderRadius: 20, // Half of width/height for perfect circle
-    backgroundColor: '#0470B8', // Example background color
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  statusPageContainer: {
-    flex: 1,
-    padding: 20,
-    backgroundColor: '#fff',
-    justifyContent: 'center',
-  },
-  statusPageHeader: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 20,
-    textAlign: 'center',
-    textDecorationLine: 'underline',
-    color: '#0470B8',
-  },
-  statusSummary: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'center',
-  },
-  statusItem: {
-    width: 50,
-    height: 50,
-    justifyContent: 'center',
-    alignItems: 'center',
-    margin: 5,
+    paddingVertical: hp('0.8%'),
     borderWidth: 1,
-    borderRadius: 25,
-    borderColor: '#ccc',
-    position: 'relative', // Necessary for absolute positioning of the bookmark icon
+    borderColor: 'white',
+    borderRadius: 10,
+    elevation: 5,
+    paddingVertical: hp('1%'),
+    paddingHorizontal: hp("6%")
+
   },
-  bookmarkIcon: {
-    position: 'absolute',
-    top: 5,
-    right: 5,
+  cancelText: {
+    textAlign: 'center',
+    color: '#737373',
+    fontSize: hp('2.3%')
   },
-  statusText: {
-    fontSize: 14,
-    fontWeight: 'bold',
-    color: '#fff', // Text color set to white for better contrast
+  saveText: {
+    textAlign: 'center',
+    color: '#26A5E6',
+    fontSize: hp('2.3%'),
   },
+  editIconContainer: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+  },
+  // editIcon: {
+  //     marginRight: wp('0.5%'),
+  // },
   buttonsContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    borderWidth: 1,
-    borderColor: 'transparent'
+    paddingHorizontal: wp('5%'),
+    paddingVertical: hp('2%'),
+    marginTop: hp('5%'),
   },
-  // navigateButton: {
-  //     padding: 15,
-  //     borderRadius: 5,
-  //     backgroundColor: '#0470B8',
-  // },
-  // navigateText: {
-  //     color: '#fff',
-  //     fontSize: 16,
-  //     fontWeight: '700',
-  // },
-  questionsBox: {
-    borderWidth: 1,
-    paddingHorizontal: 20,
-    paddingVertical: 20,
-    borderColor: '#ccc',
+  imageContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: hp("4%"),
+  },
+  imageWrapper: {
+    position: 'relative',
+  },
+  editIcon: {
+    position: 'absolute',
+    top: 5,
+    right: 5,
+    backgroundColor: 'white',
     borderRadius: 10,
+    padding: 5,
+    elevation: 3,
+    zIndex: 10,
   },
-  tooltipText: {
-    fontSize: 16,
-    color: 'black',
-    padding: 10,
+  profileStatisticsImage: {
+    height: hp('18%'),
+    width: hp('18%'),
+    borderRadius: 8,
   },
-  tooltipBackground: {
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-  },
-})
+  avatarContainer: {
+    alignSelf: 'center'
 
-// iss code mai mai chahta hoon ki jab showStatus activate ho tab statusPage poore page pe display ho jo ki abhi nahi ho raha
+  },
+  avatarText: {
+    textAlign: 'center',
+    color: '#0470B8',
+    fontWeight: '700',
+    marginBottom: hp('2%'),
+    fontSize: hp('2.5%')
+  }
+})
+// update profile mai image select ki functionality set karna hai

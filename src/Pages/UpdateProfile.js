@@ -35,6 +35,9 @@ const UpdateProfile = () => {
         getUserDetails();
     }, [])
 
+    const [collapseVisible, setCollapseVisible] = useState(false);
+    const [collapsedSections, setCollapsedSections] = useState({});
+
     const [userData, setUserData] = useState(null);
     const [payload, setPayload] = useState({
         "name": "",
@@ -106,6 +109,12 @@ const UpdateProfile = () => {
                     "Content-Type": "application/json",
                 }
             })
+
+            if (!response?.data?.error) {
+                console.log("BOLNE LAGI")
+            } else {
+                Alert.alert("Error", "Could not update profile");
+            }
         } catch (error) {
             console.log("An Error Occured", error)
         } finally {
@@ -117,6 +126,13 @@ const UpdateProfile = () => {
         navigation.navigate("Statistics")
     }
 
+    const handleCollapse = (title) => {
+        setCollapsedSections((prev) => ({
+            ...prev,
+            [title]: !prev[title],
+        }));
+    };
+
     const handleSelectImage = (imageKey) => {
         console.log("Selected image key:", imageKey);
         setPayload((prev) => ({
@@ -127,9 +143,45 @@ const UpdateProfile = () => {
         setModalVisible(false);
     };
 
+    // stop stop stop stop stop stop stop stop stop stop sto 
+    const RenderItem = ({ title, listHeadings, listItems, fieldKeys }) => {
+        const isVisible = collapsedSections[title];
 
+        return (
+            <TouchableOpacity style={[styles.titleBox, { backgroundColor: isVisible ? 'white' : "#F5F5F5" }]} onPress={() => handleCollapse(title)}>
+                <View style={styles.titleSemiBox}>
+                    <View style={styles.titleTextContainer}>
+                        <Text style={styles.titleText}>{title}</Text>
+                    </View>
+                    <View style={styles.arrowDown} >
+                        {isVisible ? <AntDesign name="up" size={18} /> : <AntDesign name="down" size={15} />}
+                    </View>
+                </View>
+                {isVisible &&
+                    listHeadings.map((item, index) => (
+                        <View key={index.toString()} style={styles.infoBoxes}>
+                            <View style={styles.section}>
+                                <Text style={styles.fieldHeading}>{item}</Text>
 
+                                <TextInput
+                                    style={styles.singleField}
+                                    value={payload[fieldKeys[index]] || ""}
+                                    onChangeText={(text) => setPayload(prev => ({
+                                        ...prev,
+                                        [fieldKeys[index]]: text
+                                    }))}
+                                    placeholder={`Enter ${item}`}
+                                    placeholderTextColor="#A9A9A9"
+                                />
 
+                            </View>
+                        </View>
+                    ))
+                }
+            </TouchableOpacity>
+        );
+    };
+    // stop stop stop stop stop stop stop sto pstop stop stop sto p
     return (
         <SafeAreaView style={styles.mainContainer}>
             <LinearGradient
@@ -144,7 +196,6 @@ const UpdateProfile = () => {
                         <AntDesign name={"arrowleft"} size={27} color={"white"} style={styles.backArrow} />
                     </TouchableOpacity>
                     <Text style={styles.profileText}>Update Profile</Text>
-                    <Text>                       </Text>
                 </View>
             </LinearGradient>
             <View style={styles.imageContainer}>
@@ -186,59 +237,49 @@ const UpdateProfile = () => {
                             contentContainerStyle={{ paddingBottom: hp('10%') }}
                             showsVerticalScrollIndicator={false}
                         >
-                            <View style={styles.section}>
-                                <Text style={styles.fieldHeading}>Name</Text>
-                                <TextInput
-                                    style={styles.singleField}
-                                    value={payload.name}
-                                    editable={true}
-                                    onChangeText={(text) =>
-                                        setPayload((prev) => ({
-                                            ...prev,
-                                            name: text
-                                        }))
-                                    }
+                            <View style={styles.masterContainer}>
+                                <RenderItem
+                                    title={"Basic Student Information"}
+                                    listHeadings={["Name", "Username", "Email", "Phone Number"]}
+                                    listItems={[userData.name, userData.username, userData.email, userData.phone_number]}
+                                    fieldKeys={["name", "username", "email", "phone_number"]}
                                 />
-                            </View>
 
-                            <View style={styles.section}>
-                                <Text style={styles.fieldHeading}>Username</Text>
-                                <TextInput
-                                    style={styles.singleField}
-                                    value={payload.username}
-                                    editable={true}
-                                    onChangeText={(text) =>
-                                        setPayload((prev) => ({
-                                            ...prev,
-                                            username: text
-                                        }))
-                                    }
+                                <RenderItem
+                                    title={"Academic Information"}
+                                    listHeadings={["High School Name", "SAT Subject Test Preferences", "GPA", "Intended Major"]}
+                                    listItems={[userData.high_school_name, userData.sat_subject_test_preferences, userData.gpa, userData.intended_major]}
+                                    fieldKeys={["high_school_name", "sat_subject_test_preferences", "gpa", "intended_major"]}
                                 />
-                            </View>
 
-                            <View style={styles.section}>
-                                <Text style={styles.fieldHeading}>Email</Text>
-                                <TextInput
-                                    style={styles.singleField}
-                                    value={payload.email}
-                                    editable={false}
+                                <RenderItem
+                                    title={"SAT Exam Details"}
+                                    listHeadings={["SAT Registration Number", "Exam Center & Location", "Previous SAT Score", "Target SAT Score"]}
+                                    listItems={[userData.sat_registration_number, userData.sat_exam_center, userData.previous_sat_score, userData.target_sat_score]}
+                                    fieldKeys={["sat_registration_number", "sat_exam_center", "previous_sat_score", "target_sat_score"]}
                                 />
-                            </View>
 
-                            <View style={styles.section}>
-                                <Text style={styles.fieldHeading}>Phone Number</Text>
-                                <TextInput
-                                    style={styles.singleField}
-                                    value={payload.phone_number}
-                                    editable={true}
-                                    keyboardType="phone-pad"
-                                    onChangeText={(text) =>
-                                        setPayload((prev) => ({
-                                            ...prev,
-                                            phone_number: text
-                                        }))
-                                    }
+                                <RenderItem
+                                    title={"Target College Information"}
+                                    listHeadings={["Target College Location", "Intended College Start Year", "Application Type"]}
+                                    listItems={[userData.target_college_location, userData.intended_college_start_year, userData.application_type]}
+                                    fieldKeys={["target_college_location", "intended_college_start_year", "application_type"]}
                                 />
+
+                                <RenderItem
+                                    title={"Financial & Scholarship Information"}
+                                    listHeadings={["Financial Aid Requirement", "Scholarships Interested In", "Family Annual Income"]}
+                                    listItems={[userData.financial_aid_required, userData.scholarships_interested_in, userData.family_annual_income]}
+                                    fieldKeys={["financial_aid_required", "scholarships_interested_in", "family_annual_income"]}
+                                />
+
+                                <RenderItem
+                                    title={"Extracurricular & Other Details"}
+                                    listHeadings={["Extra Curricular Activities", "Volunteer Experience", "Internships/Work Experience", "Awards & Achievements"]}
+                                    listItems={[userData.extracurricular_activities, userData.volunteer_experience, userData.internships, userData.awards]}
+                                    fieldKeys={["extracurricular_activities", "volunteer_experience", "internships", "awards"]}
+                                />
+
                             </View>
 
                             <View style={styles.buttonsContainer}>
@@ -306,26 +347,37 @@ export default UpdateProfile
 
 const styles = StyleSheet.create({
     mainContainer: {
-        flex: 1
+        flex: 1,
+        backgroundColor: 'white'
     },
     container: {
         flex: 1,
+        backgroundColor: 'white'
     },
     topGradient: {
         height: hp('10%'),
-        width: wp('100%')
+        width: wp('100%'),
+        flexDirection: 'row',
+        // justifyContent: 'center',
+        paddingLeft: wp('4%'),
+        paddingTop: hp('1%'),
+        // alignItems: 'flex-start'
     },
     profileContainer: {
-        marginTop: hp("1%"),
+        // marginTop: hp("1%"),
         flexDirection: 'row',
         alignItems: 'center',
-        marginLeft: wp('5%'),
+        // marginLeft: wp('5%'),
         justifyContent: 'space-between'
+    },
+    backArrow: {
+        // marginLeft: wp('8%'),
+        marginTop: hp('0.5%'),
     },
     profileText: {
         color: 'white',
         fontSize: hp('3.4%'),
-        margin: '2.3%',
+        // margin: '2.3%',
         paddingLeft: wp('5%'),
         fontWeight: '600',
         // textDecorationLine: 'underline'
@@ -390,7 +442,11 @@ const styles = StyleSheet.create({
         marginHorizontal: wp('7%'),
         flexDirection: 'column',
         gap: hp('10%'),
-        marginTop: hp("2%")
+        marginTop: hp("2%"),
+        backgroundColor: "white"
+    },
+    masterContainer: {
+        backgroundColor: 'white'
     },
     section: {
         gap: hp("0.8%"),
@@ -478,6 +534,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         marginTop: hp("4%"),
+        backgroundColor: 'white'
     },
     imageWrapper: {
         position: 'relative',
@@ -507,6 +564,33 @@ const styles = StyleSheet.create({
         fontWeight: '700',
         marginBottom: hp('2%'),
         fontSize: hp('2.5%')
-    }
+    },
+    titleBox: {
+        flexDirection: 'column',
+        justifyContent: 'center',
+        // alignItems: 'center',
+        borderWidth: 1,
+        borderColor: '#ccc',
+        backgroundColor: '#F5F5F5',
+        paddingHorizontal: wp('3%'),
+        paddingVertical: hp('1.5%'),
+        borderRadius: 10,
+        elevation: 4,
+        marginTop: hp('2%')
+    },
+    titleSemiBox: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        // backgroundColor: '#F5F5F5'
+    },
+    titleTextContainer: {
+
+    },
+    titleText: {
+        color: '#3A6EA5',
+        fontSize: hp('2.2%'),
+        fontWeight: '600'
+    },
 })
 // update profile mai image select ki functionality set karna hai
