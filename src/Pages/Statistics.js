@@ -6,6 +6,7 @@ import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-nat
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import Feather from "react-native-vector-icons/Feather";
 import AntDesign from "react-native-vector-icons/AntDesign";
+import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 import Footer from '../Components/Footer';
 import { GET_USER_DETAILS, LOGOUT, BASE_URL, IMG_URL } from '../../config/api';
 import axios from 'axios';
@@ -83,31 +84,41 @@ const Statistics = () => {
 
     const RenderItem = ({ title, listHeadings, listItems }) => {
         const isVisible = collapsedSections[title];
+
         return (
-            <TouchableOpacity style={[styles.titleBox, { backgroundColor: isVisible ? 'white' : "#F5F5F5" }]} onPress={() => handleCollapse(title)}>
+            <TouchableOpacity
+                style={[
+                    styles.titleBox,
+                    { backgroundColor: isVisible ? 'white' : "#F5F5F5", borderColor: isVisible ? "#3A6EA5" : "#ccc" }
+                ]}
+                onPress={() => handleCollapse(title)}
+                activeOpacity={0.8}
+            >
                 <View style={styles.titleSemiBox}>
-                    <View style={styles.titleTextContainer}>
-                        <Text style={styles.titleText}>{title}</Text>
-                    </View>
-                    <View style={styles.arrowDown}>
-                        {isVisible ? <AntDesign name="up" size={18} /> : <AntDesign name="down" size={15} />}
-                    </View>
+                    <Text style={styles.titleText}>{title}</Text>
+                    <AntDesign
+                        name={isVisible ? "up" : "down"}
+                        size={18}
+                        color={"#3A6EA5"}
+                    />
                 </View>
-                {isVisible &&
-                    listHeadings.map((item, index) => (
-                        <View key={index.toString()} style={styles.infoBoxes}>
-                            <View style={styles.section}>
+
+                {isVisible && (
+                    <View style={styles.listContainer}>
+                        {listHeadings.map((item, index) => (
+                            <View key={index.toString()} style={styles.infoBoxes}>
                                 <Text style={styles.fieldHeading}>{listHeadings[index]}</Text>
                                 <View style={styles.singleField}>
                                     <Text style={styles.fieldText}>{listItems[index] || "N/A"}</Text>
                                 </View>
                             </View>
-                        </View>
-                    ))
-                }
+                        ))}
+                    </View>
+                )}
             </TouchableOpacity>
-        )
-    }
+        );
+    };
+
 
 
 
@@ -148,15 +159,18 @@ const Statistics = () => {
                                 <RenderItem title={"Extracurricular & Other Details"} listHeadings={["Extra Curricular Activities", "Volunteer Experience", "Internships/Work Experience", "Awards & Achievements"]} listItems={[userData.extracurricular_activities, userData.volunteer_experience, userData.internships, userData.awards]} />
                             </View>
 
+                            <TouchableOpacity style={styles.subscriptionButton} onPress={handleSubscription}>
+                                <FontAwesome5 name={"crown"} size={15} color={'white'} />
+                                <Text style={styles.subscriptionText}>Get Subscription</Text>
+                                <FontAwesome5 name={"crown"} size={15} color={'white'} />
+                            </TouchableOpacity>
+
                             <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
                                 <Text style={styles.logoutText}>Log Out</Text>
                                 <MaterialCommunityIcons name={"logout"} size={22} color={'white'} />
                             </TouchableOpacity>
 
-                            <TouchableOpacity style={styles.subscriptionButton} onPress={handleSubscription}>
-                                <Text style={styles.subscriptionText}>Get Subscription</Text>
-                                {/* <MaterialCommunityIcons name={"logout"} size={22} color={'white'} /> */}
-                            </TouchableOpacity>
+
 
                         </ScrollView>
                         <Footer />
@@ -214,30 +228,30 @@ const styles = StyleSheet.create({
         marginTop: hp('7%'),
         paddingBottom: hp('10%'),
     },
-    singleField: {
-        borderWidth: 1,
-        borderColor: '#7C7C7C',
-        borderRadius: 5,
-        paddingVertical: hp('1%'),
-        paddingHorizontal: wp('4%'),
-    },
-    fieldHeading: {
-        fontSize: hp('2.5%')
-    },
-    fieldText: {
-        color: '#2562C1',
-        fontWeight: '700',
-        fontSize: hp('2%')
-    },
+    // singleField: {
+    //     borderWidth: 1,
+    //     borderColor: '#7C7C7C',
+    //     borderRadius: 5,
+    //     paddingVertical: hp('1%'),
+    //     paddingHorizontal: wp('4%'),
+    // },
+    // fieldHeading: {
+    //     fontSize: hp('2.5%')
+    // },
+    // fieldText: {
+    //     color: '#2562C1',
+    //     fontWeight: '700',
+    //     fontSize: hp('2%')
+    // },
     subContainer: {
         marginHorizontal: wp('7%'),
         flexDirection: 'column',
         gap: hp('10%'),
         marginTop: hp("3%")
     },
-    infoBoxes: {
-        marginTop: hp('1%')
-    },
+    // infoBoxes: {
+    //     marginTop: hp('0.5%')
+    // },
     section: {
         gap: hp("0.8%"),
         marginVertical: hp('1%')
@@ -278,7 +292,7 @@ const styles = StyleSheet.create({
     logoutButton: {
         flexDirection: 'row',
         backgroundColor: 'red',
-        marginVertical: hp("6%"),
+        marginVertical: hp("3%"),
         marginHorizontal: wp('25%'),
         paddingVertical: hp('0.8%'),
         borderWidth: 1,
@@ -296,14 +310,18 @@ const styles = StyleSheet.create({
     subscriptionButton: {
         backgroundColor: '#D98324',
         // marginVertical: hp("6%"),
-        marginHorizontal: wp('20%'),
-        paddingVertical: hp('0.8%'),
+        marginHorizontal: wp('15%'),
+        paddingVertical: hp('1%'),
         borderWidth: 1,
         borderColor: '#D98324',
         justifyContent: 'center',
         alignItems: 'center',
         gap: 5,
-        borderRadius: 10
+        borderRadius: 10,
+        marginTop: hp("6%"),
+        flexDirection: 'row',
+        justifyContent: 'center',
+        alignItems: 'center'
     },
     subscriptionText: {
         textAlign: 'center',
@@ -322,56 +340,70 @@ const styles = StyleSheet.create({
 
     },
     titleBox: {
-        flexDirection: 'column',
-        justifyContent: 'center',
-        // alignItems: 'center',
         borderWidth: 1,
         borderColor: '#ccc',
         backgroundColor: '#F5F5F5',
-        paddingHorizontal: wp('3%'),
-        paddingVertical: hp('1.5%'),
+        paddingHorizontal: wp('4%'),
+        paddingVertical: hp('2%'),
         borderRadius: 10,
-        elevation: 4,
-        marginTop: hp('2%')
+        elevation: 3,
+        marginTop: hp('2%'),
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 5,
     },
+
     titleSemiBox: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        // backgroundColor: '#F5F5F5'
     },
-    titleTextContainer: {
 
-    },
     titleText: {
         color: '#3A6EA5',
-        fontSize: hp('2.2%'),
-        fontWeight: '600'
+        fontSize: hp('2.4%'),
+        fontWeight: 'bold',
     },
-    arrowDown: {},
+
+    listContainer: {
+        marginTop: hp('1%'),
+        paddingTop: hp('1%'),
+        borderTopWidth: 1,
+        borderTopColor: "#E0E0E0",
+    },
+
+    infoBoxes: {
+        marginTop: hp('1%'),
+        backgroundColor: "#fff",
+        padding: hp('1.5%'),
+        borderRadius: 8,
+        // borderWidth: 1,
+        // borderColor: "#E0E0E0",
+    },
+
+    fieldHeading: {
+        fontSize: hp('2%'),
+        fontWeight: 'bold',
+        color: "#333",
+    },
+
+    singleField: {
+        borderWidth: 1,
+        borderColor: '#B0B0B0',
+        borderRadius: 5,
+        paddingVertical: hp('1%'),
+        paddingHorizontal: wp('4%'),
+        marginTop: hp('0.5%'),
+        backgroundColor: "white",
+    },
+
+    fieldText: {
+        color: '#2562C1',
+        fontWeight: '600',
+        fontSize: hp('2%'),
+    },
+
 })
 
-// < View style = { styles.section } >
-//                             <Text style={styles.fieldHeading}>Name</Text>
-//                             <View style={styles.singleField}>
-//                                 <Text style={styles.fieldText}>{userData.name}</Text>
-//                             </View>
-//                         </ >
-//                         <View style={styles.section}>
-//                             <Text style={styles.fieldHeading}>Username</Text>
-//                             <View style={styles.singleField}>
-//                                 <Text style={styles.fieldText}>{userData.username}</Text>
-//                             </View>
-//                         </View>
-//                         <View style={styles.section}>
-//                             <Text style={styles.fieldHeading}>Email</Text>
-//                             <View style={styles.singleField}>
-//                                 <Text style={styles.fieldText}>{userData.email}</Text>
-//                             </View>
-//                         </View>
-//                         <View style={styles.section}>
-//                             <Text style={styles.fieldHeading}>Phone Number</Text>
-//                             <View style={styles.singleField}>
-//                                 <Text style={styles.fieldText}>{userData.phone_number}</Text>
-//                             </View>
-//                         </View>
+// stop stop stop stop stop sto stop stop stop stop stop 

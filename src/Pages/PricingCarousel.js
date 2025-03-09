@@ -2,16 +2,20 @@ import React, { useEffect, useRef, useState } from "react";
 import { View, Text, FlatList, Dimensions, TouchableOpacity, StyleSheet, StatusBar } from "react-native";
 import AntDesign from "react-native-vector-icons/AntDesign";
 import Entypo from "react-native-vector-icons/Entypo";
+// import AntDesign from "react-native-vector-icons/AntDesign";
 import axios from "axios";
 import { SUBSCRIPTION } from "../../config/api";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import { LinearGradient } from 'expo-linear-gradient';
 import { COLORS } from "../theme";
+import { useNavigation } from "@react-navigation/native";
 
 const { width } = Dimensions.get("window");
 
 const PricingCarousel = () => {
+
+    const navigation = useNavigation();
     const flatListRef = useRef(null);
     const [currentIndex, setCurrentIndex] = useState(0);
     const [data, setData] = useState([]);
@@ -58,7 +62,12 @@ const PricingCarousel = () => {
                 end={{ x: 0, y: 0 }}
                 style={styles.container}>
 
-                <Text style={styles.chooseText}>CHOOSE YOUR PLAN</Text>
+                <View style={styles.topBar}>
+                    <TouchableOpacity onPress={() => navigation.pop(1)}>
+                        <AntDesign name={"arrowleft"} color={'white'} size={30} />
+                    </TouchableOpacity>
+                    <Text style={styles.chooseText}>CHOOSE YOUR PLAN</Text>
+                </View>
                 <FlatList
                     ref={flatListRef}
                     data={data}
@@ -66,6 +75,10 @@ const PricingCarousel = () => {
                     pagingEnabled
                     showsHorizontalScrollIndicator={false}
                     onScroll={handleScroll}
+                    snapToAlignment="center"
+                    snapToInterval={wp("80%") + 20} // Width of card + margin
+                    decelerationRate="fast"
+                    contentContainerStyle={{ alignItems: 'center' }} // Helps with vertical centering
                     renderItem={({ item }) => (
                         <LinearGradient
                             colors={[COLORS.semiGradient2, COLORS.semiGradient1]}
@@ -79,7 +92,6 @@ const PricingCarousel = () => {
                                 <Text style={styles.planTitle}>{item.duration === '1_month' ? "1 Month" : "1 Year"}</Text>
                                 <Text style={styles.price}>Quiz Limit : {item.quiz_limit}</Text>
                                 <Text style={styles.price}>Levels Limit : {item.level_limit}</Text>
-
                                 <Text style={styles.subtitle}>Basic SAT preparation essentials</Text>
                             </View>
                             <TouchableOpacity style={styles.button}>
@@ -89,6 +101,7 @@ const PricingCarousel = () => {
                     )}
                     keyExtractor={(_, index) => index.toString()}
                 />
+
                 <View style={styles.indicatorContainer}>
                     {data.map((_, index) => (
                         <Entypo
@@ -114,6 +127,12 @@ const styles = StyleSheet.create({
         alignItems: "center",
         backgroundColor: "#0470B8",
         paddingVertical: hp("3%"),
+    },
+    topBar: {
+        flexDirection: 'row',
+        alignItems: "center",
+        gap: wp('5%'),
+        justifyContent: 'flex-start'
     },
     chooseText: {
         fontSize: hp("3.5%"),

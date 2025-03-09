@@ -173,6 +173,13 @@ const Quiz = ({ navigation }) => {
                 <Text style={styles.detailsText}>
                     Test Details - Maths, English (reading - writing)
                 </Text>
+
+                {item.Status === 'Completed' && (
+                    <Text style={styles.detailsTextMode}>
+                        <Text style={styles.specialText}>{item.mode === 'practice_mode' ? "Practise Mode" : "Exam Mode"}</Text> Attempted
+                    </Text>
+                )}
+
             </TouchableOpacity>
         );
     };
@@ -287,14 +294,15 @@ const Quiz = ({ navigation }) => {
 
 
                     <View style={styles.stickyButtonsContainer}>
-                        <TouchableOpacity style={styles.quizStartButton} onPress={handleQuizClose}>
+                        <TouchableOpacity style={[styles.quizStartButton, styles.goBackButton]} onPress={handleQuizClose}>
                             <Text style={styles.quizStartButtonText}>Go Back</Text>
                         </TouchableOpacity>
 
-                        <TouchableOpacity onPress={handleNavigation} style={styles.quizStartButton}>
+                        <TouchableOpacity onPress={handleNavigation} style={[styles.quizStartButton, styles.startQuizButton]}>
                             <Text style={styles.quizStartButtonText}>Start Quiz</Text>
                         </TouchableOpacity>
                     </View>
+
                 </View>
             ) : (
                 <LinearGradient style={styles.container}
@@ -322,6 +330,7 @@ const Quiz = ({ navigation }) => {
                         <TextInput
                             style={styles.inputStyles}
                             placeholder="Search Here"
+                            placeholderTextColor={"#0470B8"}
                             value={searchValue}
                             onChangeText={(text) => setSearchValue(text)}
                         />
@@ -533,6 +542,16 @@ const styles = StyleSheet.create({
     },
     detailsText: {
         color: "#5D5D5D",
+        textAlign: 'center'
+    },
+    detailsTextMode: {
+        color: "#5D5D5D",
+        marginTop: hp("0.3%")
+    },
+    specialText: {
+        color: '#0470B8',
+        fontWeight: '800',
+        textAlign: 'center'
     },
     instructionsContainer: {
         flex: 1,
@@ -557,41 +576,39 @@ const styles = StyleSheet.create({
         paddingHorizontal: wp('1%')
     },
     quizStartButton: {
-        backgroundColor: "#0470B8",
-        // marginHorizontal: wp("10%"),
-        borderRadius: 10,
-        // marginVertical: hp("4%"),
-        paddingVertical: hp("1.5%"),
-        paddingHorizontal: wp("8%"),
+        flex: 1,
+        paddingVertical: 15,
+        borderRadius: 25,
+        alignItems: "center",
+        justifyContent: "center",
+        marginHorizontal: 10,
+        elevation: 5, // For Android shadow
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.2,
+        shadowRadius: 4,
     },
     quizStartButtonText: {
-        textAlign: "center",
-        color: "white",
-        fontWeight: "700",
-        fontSize: hp("2%"),
+        fontSize: 18,
+        fontWeight: "bold",
+        color: "#fff",
+    },
+    goBackButton: {
+        backgroundColor: "#d9534f",
+    },
+    startQuizButton: {
+        backgroundColor: "#5cb85c",
     },
     scrollViewContent: {
         flexGrow: 1,
         paddingBottom: 80,
     },
     stickyButtonsContainer: {
-        position: 'absolute',
-        bottom: 0,
-        left: 0,
-        right: 0,
-        backgroundColor: 'white',
-        paddingVertical: 15,
+        flexDirection: "row",
+        justifyContent: "space-between",
+        alignItems: "center",
         paddingHorizontal: 20,
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        borderTopWidth: 1,
-        borderColor: '#ccc',
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: -2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 4,
-        elevation: 5,
+        marginTop: 20,
     },
 
     buttonsContainer: {
@@ -620,6 +637,10 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         alignItems: 'center',
         paddingHorizontal: wp("3%")
+    },
+    inputStyles: {
+        // backgroundColor: 'red',
+        width: '90%'
     },
     searchButton: {
         backgroundColor: '#0470B8',

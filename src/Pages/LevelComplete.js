@@ -21,13 +21,11 @@ const LevelComplete = ({ route }) => {
     useFocusEffect(
         React.useCallback(() => {
             const onBackPress = () => {
-                // Prevent back navigation
                 return true;
             };
 
             BackHandler.addEventListener('hardwareBackPress', onBackPress);
 
-            // Clean up the event listener when the screen loses focus
             return () => {
                 BackHandler.removeEventListener('hardwareBackPress', onBackPress);
             };
@@ -64,9 +62,9 @@ const LevelComplete = ({ route }) => {
                     </View>
 
                     <View style={styles.scoreContainer}>
-                        <Text style={styles.scoreLabel}>Your Points</Text>
+                        <Text style={styles.scoreLabel}>Your Score</Text>
                         <View style={styles.scoreBox}>
-                            <Text style={styles.scoreText}>{score}</Text>
+                            <Text style={styles.scoreText}>{score}%</Text>
                         </View>
                     </View>
 
@@ -118,14 +116,14 @@ const styles = StyleSheet.create({
     },
     image: {
         resizeMode: 'contain',
-        height: hp('40%'),
-        width: hp('40%'),
+        height: hp('30%'),
+        width: hp('30%'),
     },
     messageContainer: {
         marginVertical: hp('2%'),
     },
     messageText: {
-        color: '#0470B8',
+        color: '#fff',
         fontSize: hp('3.5%'),
         fontWeight: 'bold',
         textAlign: 'center',

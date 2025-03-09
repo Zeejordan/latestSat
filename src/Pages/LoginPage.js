@@ -62,7 +62,7 @@ const LoginPage = () => {
                     >
                         <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
                             <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
-                                <AntDesign name={"arrowleft"} size={27} color={"white"} />
+                                <AntDesign name={"arrowleft"} size={27} color={"#0470B8"} />
                             </TouchableOpacity>
                             <View style={styles.container}>
                                 <View style={styles.loginGifContainer}>
