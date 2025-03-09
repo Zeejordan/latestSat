@@ -66,6 +66,10 @@ const Statistics = () => {
         }
     }
 
+    const handleSubscription = () => {
+        navigation.navigate("Subscription")
+    }
+
     const handleUpdateProfile = () => {
         navigation.navigate('Update-Profile')
     }
@@ -147,6 +151,11 @@ const Statistics = () => {
                             <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
                                 <Text style={styles.logoutText}>Log Out</Text>
                                 <MaterialCommunityIcons name={"logout"} size={22} color={'white'} />
+                            </TouchableOpacity>
+
+                            <TouchableOpacity style={styles.subscriptionButton} onPress={handleSubscription}>
+                                <Text style={styles.subscriptionText}>Get Subscription</Text>
+                                {/* <MaterialCommunityIcons name={"logout"} size={22} color={'white'} /> */}
                             </TouchableOpacity>
 
                         </ScrollView>
@@ -284,6 +293,24 @@ const styles = StyleSheet.create({
         color: 'white',
         fontSize: hp('2.3%')
     },
+    subscriptionButton: {
+        backgroundColor: '#D98324',
+        // marginVertical: hp("6%"),
+        marginHorizontal: wp('20%'),
+        paddingVertical: hp('0.8%'),
+        borderWidth: 1,
+        borderColor: '#D98324',
+        justifyContent: 'center',
+        alignItems: 'center',
+        gap: 5,
+        borderRadius: 10
+    },
+    subscriptionText: {
+        textAlign: 'center',
+        color: 'white',
+        fontSize: hp('2.3%')
+    },
+
     editIconContainer: {
         flexDirection: 'row',
         justifyContent: 'flex-end',

@@ -35,3 +35,6 @@ export const GET_UPPER_DETAILS = BASE_URL + "user/all-test/"                 // 
 
 // logout api
 export const LOGOUT = BASE_URL + "user/logout"
+
+// subscription api
+export const SUBSCRIPTION = BASE_URL + "user/Package-list/"

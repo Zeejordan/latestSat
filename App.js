@@ -30,6 +30,7 @@ import WelcomeScreen4 from './src/welcomeScreens/WelcomeScreen4';
 import { I18nextProvider } from 'react-i18next';
 import i18n from './i18n'; // Import your i18n config
 import SelectLanguage from './src/Pages/SelectLanguage';
+import PricingCarousel from './src/Pages/PricingCarousel';
 
 const Stack = createNativeStackNavigator();
 
@@ -75,6 +76,7 @@ const App = () => {
               <Stack.Screen name="StatusPage" component={StatusPage} />
               <Stack.Screen name="Update-Profile" component={UpdateProfile} />
               <Stack.Screen name="Quiz-Analysis" component={QuizAnalysisPage} />
+              <Stack.Screen name="Subscription" component={PricingCarousel} />
             </Stack.Navigator>
           </NavigationContainer>
         </GlobalProvider>

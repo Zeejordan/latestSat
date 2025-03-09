@@ -11,7 +11,10 @@ export const COLORS = {
     profileGradientColor2: '#4FAFD7',
     profileGradientColor1: '#0470B8',
     blackColor: 'black',
-    whiteColor: 'white'
+    whiteColor: 'white',
+    semiGradient1: "#FFFFFF",
+    semiGradient2: "#CDCDFF"
+
 }
 
 export const FONTS = {
